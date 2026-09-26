@@ -5,7 +5,7 @@
 | 工程 | c1 実装計画 |
 | plan ファイル | `plans/c1_implementation-plan.md` |
 | 入力 | `docs/b1_design/component-design.md`、`docs/b1_design/decisions/` |
-| 最終更新 | 2026-09-26 22:56 |
+| 最終更新 | 2026-09-26 23:15 |
 
 ## 1. 概要
 
@@ -36,12 +36,13 @@
 | 静的解析ツール | ESLint（推奨ルール ＋ GAS の組み込みオブジェクト（`SpreadsheetApp`、`HtmlService`、`PropertiesService` 等）を既知として登録） | c1/Question-003 |
 | 脆弱性チェックツール | `npm audit` | c1/Question-004 |
 | 脆弱性の許容する基準 | Moderate 以上を不合格とする（`npm audit --audit-level=moderate` で 0 件） | c1/Question-005 |
-| テストの実行環境とツール | Node.js（Dev Container 内）＋ Jest。GAS の組み込みオブジェクト（`SpreadsheetApp` 等）は Jest の代用品（`jest.fn()` 等）に置き換える。画面の DOM・canvas に依存する部分は、表示内容を作る純粋な関数を分けて Small テストの対象とし、DOM・canvas・デプロイ先での動作は c3 で定める Medium・Large テストで確認する | c1/Question-006、c1/Question-010、component-design.md 7.（テストのしやすさ） |
+| テストの実行環境とツール | Node.js v24.21.0（Dev Container 内。版を固定）＋ Jest。GAS の組み込みオブジェクト（`SpreadsheetApp` 等）は Jest の代用品（`jest.fn()` 等）に置き換える。画面の DOM・canvas に依存する部分は、表示内容を作る純粋な関数を分けて Small テストの対象とし、DOM・canvas・デプロイ先での動作は c3 で定める Medium・Large テストで確認する | c1/Question-006、c1/Question-010、c1/Question-023、component-design.md 7.（テストのしやすさ） |
+| Node.js のバージョン | v24.21.0 に固定する（2026-09-26 時点の最新の LTS）。Dev Container の Node.js の Feature、`package.json` の `engines`、`.nvmrc` を同じ版にする。セキュリティ修正を取り込むときは開発者が版を更新する | c1/Question-023、c2/Question-001 |
 | デプロイの方法 | `clasp` を用いたスクリプト（`npm run deploy:aggregate`、`npm run deploy:viewer`）。ビルドしてから `clasp push` する。Web アプリは同じデプロイを更新して URL を変えない。GAS に送るのは `dist/aggregate/`・`dist/viewer/` の中のファイルのみ（`.clasp.json` の `rootDir` で限定）。GAS のプロジェクト・スプレッドシートは、開発者が作成した 1 つの Google ドライブのフォルダにのみ作成・保存する | c1/Question-007、c1/Question-007-1 |
 | 設定値（スプレッドシートの ID） | 閲覧用スプレッドシートの ID を、集計用・閲覧用のプロジェクトのスクリプトプロパティ `VIEWER_SPREADSHEET_ID` に開発者が手作業で設定する（Git に含めない） | c1/Question-008 |
 | ブランチ運用 | 作業ブランチで作業し、プルリクエストで `main` に取り込む。git コマンドは開発者のみが実行する。コミットメッセージは `[Task-001] 日本語の概要` の形式 | c1/Question-011、CLAUDE.md 10. |
 | 依存ライブラリの管理方法 | npm で開発用の依存ライブラリ（devDependencies：Prettier、ESLint、Jest、`@google/clasp`）のみを管理し、`package-lock.json` を Git で管理する。GAS 上で動くコードは外部ライブラリを使わない | c1/Question-012、Decision-0003 |
-| Dev Container | 使う。`.devcontainer/devcontainer.json` に依存ライブラリの導入（`npm ci`）を追加する。`clasp` のログインはコンテナ内で行い、認証情報をホストからマウントしない | c1/Question-010 |
+| Dev Container | 使う。`.devcontainer/devcontainer.json` に依存ライブラリの導入（`npm ci`）を追加し、Node.js の Feature の版を 24.21.0 に固定する。`clasp` のログインはコンテナ内で行い、認証情報をホストからマウントしない | c1/Question-010、c1/Question-023 |
 
 ### `clasp` のセキュリティに関する注意事項
 
@@ -62,6 +63,7 @@ poker-ranking/
 ├── .devcontainer/devcontainer.json   # Task-002 で依存ライブラリの導入を追加
 ├── .gitignore                        # Task-001 で dist/、node_modules/、.clasp.json、.clasprc.json を追加
 ├── package.json / package-lock.json  # Task-001
+├── .nvmrc                            # Task-001：Node.js の版（24.21.0）
 ├── eslint.config.js / jest.config.js # Task-001
 ├── scripts/
 │   ├── build.js                      # Task-003：dist/ の生成
@@ -154,11 +156,12 @@ poker-ranking/
 - Component：開発環境（責務：開発ツールの設定）
 - 対応する要件：Quality-009
 - 依存するタスク：なし
-- 作業内容：`package.json`（devDependencies：Prettier、ESLint、Jest、`@google/clasp`）と npm スクリプト（`build`、`test`、`lint`、`format`、`audit`、`deploy:aggregate`、`deploy:viewer`）、ESLint・Jest の設定、`.gitignore` への追記（`dist/`、`node_modules/`、`.clasp.json`、`.clasprc.json`）
-- 作成・更新する予定のファイル：`package.json`、`package-lock.json`、`eslint.config.js`、`jest.config.js`、`.prettierignore`、`.gitignore`
+- 作業内容：`package.json`（devDependencies：Prettier、ESLint、Jest、`@google/clasp`。`engines` に Node.js 24.21.0）と `.nvmrc`（24.21.0）、npm スクリプト（`build`、`test`、`lint`、`format`、`audit`、`deploy:aggregate`、`deploy:viewer`）、ESLint・Jest の設定、`.gitignore` への追記（`dist/`、`node_modules/`、`.clasp.json`、`.clasprc.json`）
+- 作成・更新する予定のファイル：`package.json`、`package-lock.json`、`.nvmrc`、`eslint.config.js`、`jest.config.js`、`.prettierignore`、`.gitignore`
 - 完了条件：
   - 全タスク共通の完了条件
   - `.gitignore` に `.clasp.json`、`.clasprc.json`、`dist/`、`node_modules/` が含まれる（由来：c1 スキル「秘密情報を Git の管理対象外とする」、c1/Question-007、008）
+  - `package.json` の `engines` と `.nvmrc` が Node.js 24.21.0 を指す（由来：c1/Question-023）
 - テスト期待値の概要：Small テストの対象なし（設定ファイルのみ）。全タスク共通の完了条件のコマンドが実行できることで確認する。
 
 ### Task-002：Dev Container への追加
@@ -166,11 +169,12 @@ poker-ranking/
 - Component：開発環境（責務：Dev Container）
 - 対応する要件：Quality-009
 - 依存するタスク：Task-001
-- 作業内容：`.devcontainer/devcontainer.json` の `postCreateCommand` に依存ライブラリの導入（`npm ci`）を追加する。認証情報をホストからマウントしない
+- 作業内容：`.devcontainer/devcontainer.json` の Node.js の Feature の版を 24.21.0 に固定し、`postCreateCommand` に依存ライブラリの導入（`npm ci`）を追加する。認証情報をホストからマウントしない
 - 作成・更新する予定のファイル：`.devcontainer/devcontainer.json`
 - 完了条件：
   - 全タスク共通の完了条件
   - `mounts` にホストの認証情報（`~/.clasprc.json` 等）が含まれない（由来：c1/Question-010）
+  - Node.js の Feature の版が 24.21.0 である（由来：c1/Question-023）
 - テスト期待値の概要：Small テストの対象なし（設定ファイルのみ）。コンテナの作成と `npm test` の実行は開発者が確認する（由来：c1/Question-010、CLAUDE.md 4.）。
 
 ### Task-003：ビルド用のスクリプト
@@ -689,3 +693,4 @@ flowchart LR
 | 日時 | スキル | 変更内容 | 根拠 |
 |---|---|---|---|
 | 2026-09-26 22:56 | /c1-implementation-plan | 初版を作成（開発の前提、Task-001〜026、テスト期待値の概要、実装の順序、トレーサビリティ） | `plans/c1_implementation-plan.md`（ステータス：確定、Question-001〜022 と枝番の開発者回答） |
+| 2026-09-26 23:15 | /c1-implementation-plan | 「2. 開発の前提」に Node.js のバージョン（v24.21.0 に固定）を追加し、テストの実行環境とツール・Dev Container・ディレクトリ構成（`.nvmrc`）を更新。Task-001（`engines`・`.nvmrc`）と Task-002（Feature の版）の作業内容・完了条件を更新。テスト期待値の変更はない | c1/Question-023（c2/Question-001 からの差し戻し） |

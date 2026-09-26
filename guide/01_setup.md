@@ -5,7 +5,7 @@
 | 必要なもの | 確認方法 | 用途 |
 |---|---|---|
 | Claude Code | `claude --version` | AI との対話、スキルの実行 |
-| Git | `git --version` | バージョン管理。c4 の再テスト対象の選定にも使う |
+| Git | `git --version` | バージョン管理（開発者が使う。AI は git コマンドを実行しない） |
 | jq または python3 | `jq --version` / `python3 --version` | フックが開発者の入力を読み取るために使う |
 | bash | `bash --version` | フックの実行 |
 
