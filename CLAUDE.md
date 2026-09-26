@@ -128,6 +128,7 @@ Question 項目・dev 項目は plan ファイルの「8. 質問・指示」に�
   - 選択肢：
   - 推奨：（根拠付きで記載。根拠がない場合は「推奨なし（根拠資料なし）」）
   - 開発者回答：
+
   - AI確認結果：
 ```
 
@@ -136,6 +137,7 @@ Question 項目・dev 項目は plan ファイルの「8. 質問・指示」に�
 ```markdown
 - [ ] **dev-001**：開発者からの質問・指示の内容
   - AI対応内容：
+
   - AI確認結果：
 ```
 
@@ -144,8 +146,11 @@ Question 項目・dev 項目は plan ファイルの「8. 質問・指示」に�
 ```markdown
 - [ ] **review-001**：指摘内容
   - AI対応内容：
+
   - AI確認結果：
 ```
+
+- 読みやすさのため、「AI確認結果：」の前には空行を 1 行入れる。
 
 ### 採番と ☑ のルール
 
@@ -192,7 +197,7 @@ Question 項目・dev 項目は plan ファイルの「8. 質問・指示」に�
 
 | 対象 | ID | 記載場所 |
 |---|---|---|
-| 依頼書の項目 | `Request-01` | `request.md` |
+| 依頼書の項目 | `Request-1-1`（`Request-<節番号>-<節内の番号>`） | `request.md` |
 | 機能要件 | `Feature-001` | `requirements.md` |
 | 非機能要件 | `Quality-001` | `requirements.md` |
 | 制約 | `Constraint-001` | `requirements.md` |
