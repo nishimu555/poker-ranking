@@ -5,14 +5,14 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 19:55
+最終更新：2026-09-26 20:01
 
 ## 1. 工程一覧
 
 | 記号 | 工程 | ステータス | 未完了の質問・指示 | 未対応のレビュー指摘 | plan ファイル | 最終更新 |
 |---|---|---|---|---|---|---|
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 19:45 |
-| b1 | コンポーネント設計 | 確定 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 19:55 |
+| b1 | コンポーネント設計 | 確定 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 20:01 |
 | c1 | 実装計画 | 未着手 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | |
 | c2 | 実装 | 未着手 | 0 | 0 | [c2_implement.md](c2_implement.md) | |
 | c3 | テスト計画 | 未着手 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | |
@@ -24,8 +24,7 @@
 
 ## 2. 次に行うこと
 
-1. `plans/b1_mockups/index.html` をブラウザで開き、修正後の画面モックを確認する（指摘があれば `plans/b1_design.md`「9. レビュー指摘」に追記して `/z9-answer-review b1` を実行する）。
-2. 指摘がなければ `/b1-design` を実行し、成果物（`docs/b1_design/`）を作成する。
+1. `/b1-design` を実行し、成果物（`docs/b1_design/`）を作成する。
 
 ## 3. 差し戻し中の工程
 
