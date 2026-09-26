@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 00:51 |
+| 最終更新 | 2026-09-27 00:54 |
 
 ## 1. ディレクトリ構成
 
@@ -22,10 +22,12 @@ poker-ranking/
 │   └── build.js                      # Task-003：dist/ の生成
 ├── src/
 │   └── aggregate/                    # 集計用プロジェクト
-│       └── validate.js               # Task-004：行の確認
+│       ├── validate.js               # Task-004：行の確認
+│       └── calc.js                   # Task-005：収支・ウェイト・端数の計算
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
+        ├── aggregate/calc.test.js    # Task-005
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -89,6 +91,7 @@ poker-ranking/
 | `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行 | 開発環境 | Task-002 |
 | `scripts/build.js` | ビルド（`dist/` の生成、画面の CSS・JavaScript の埋め込み） | 開発環境 | Task-003（Task-001 で仮のスクリプトを作成） |
 | `src/aggregate/validate.js` | 行の確認（`validateRow`） | Component-003 | Task-004 |
+| `src/aggregate/calc.js` | 収支・ウェイト・端数の計算（`calcBalance`、`calcWeight`、`roundToInteger`） | Component-003 | Task-005 |
 
 ### GAS のコードの共通の書き方
 
@@ -100,6 +103,9 @@ poker-ranking/
 | 関数 | ファイル | 入力 | 出力 | Task |
 |---|---|---|---|---|
 | `validateRow(row)` | `src/aggregate/validate.js` | `row`：`{ playerName, playDate, playTime, finalChips, debtCount }`（スプレッドシートから読み込んだ値） | `{ valid, nickname }`。有効なら `valid: true` と前後の空白を取り除いたニックネーム、無効なら `valid: false`・`nickname: null` | Task-004 |
+| `calcBalance(finalChips, distributedChips, debtCount)` | `src/aggregate/calc.js` | 最終チップ数、配布チップ数、借金回数 | 収支 ＝ 最終チップ数 − 配布チップ数 × 借金回数（丸めない） | Task-005 |
+| `calcWeight(playTime)` | `src/aggregate/calc.js` | プレイ時間 | ウェイト ＝ min(√（プレイ時間 ÷ 2）, 1)（丸めない） | Task-005 |
+| `roundToInteger(value)` | `src/aggregate/calc.js` | 数値 | 絶対値で四捨五入した整数（-2.5 → -3、-2.4 → -2）。結果が -0 の場合は 0 | Task-005 |
 
 `validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
 
@@ -118,6 +124,7 @@ poker-ranking/
 | （なし） | Task-001・Task-002 は Small テストの対象なし（implementation-plan.md 4.） | — |
 | `tests/small/scripts/build.test.js` | `scripts/build.js` の `build` | Task-003 期待値1〜3 |
 | `tests/small/aggregate/validate.test.js` | `src/aggregate/validate.js` の `validateRow` | Task-004 期待値1〜8 |
+| `tests/small/aggregate/calc.test.js` | `src/aggregate/calc.js` の `calcBalance`、`calcWeight`、`roundToInteger` | Task-005 期待値1〜6 |
 
 ## 4. 主要な処理の流れ
 
@@ -139,3 +146,4 @@ poker-ranking/
 | 2026-09-27 00:25 | /c2-implement | 初版を作成（5-1：Task-001 開発ツールの設定、Task-002 Dev Container への追加） | implementation-plan.md 2.、Task-001、Task-002 |
 | 2026-09-27 00:40 | /c2-implement | Task-003（ビルド用のスクリプト）を追加。ディレクトリ構成、ビルドの処理、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-003 |
 | 2026-09-27 00:51 | /c2-implement | Task-004（行の確認）を追加。ディレクトリ構成、ファイル一覧、GAS のコードの共通の書き方、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-004 |
+| 2026-09-27 00:54 | /c2-implement | Task-005（収支・ウェイト・端数の計算）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-005 |
