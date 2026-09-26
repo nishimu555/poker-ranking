@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 00:40 |
+| 最終更新 | 2026-09-27 00:51 |
 
 ## 1. ディレクトリ構成
 
@@ -20,9 +20,13 @@ poker-ranking/
 ├── jest.config.js                    # Task-001
 ├── scripts/
 │   └── build.js                      # Task-003：dist/ の生成
-├── src/                              # GAS のコード（Task-004 以降）
+├── src/
+│   └── aggregate/                    # 集計用プロジェクト
+│       └── validate.js               # Task-004：行の確認
 └── tests/
-    └── small/scripts/build.test.js   # Task-003
+    └── small/
+        ├── aggregate/validate.test.js # Task-004
+        └── scripts/build.test.js     # Task-003
 ```
 
 | フォルダ | 役割 | 由来 |
@@ -84,6 +88,28 @@ poker-ranking/
 | `.gitignore` | Git の管理対象外（秘密情報・ビルドの出力・依存ライブラリ） | 開発環境 | Task-001 |
 | `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行 | 開発環境 | Task-002 |
 | `scripts/build.js` | ビルド（`dist/` の生成、画面の CSS・JavaScript の埋め込み） | 開発環境 | Task-003（Task-001 で仮のスクリプトを作成） |
+| `src/aggregate/validate.js` | 行の確認（`validateRow`） | Component-003 | Task-004 |
+
+### GAS のコードの共通の書き方
+
+- GAS では全ファイルが同じ場所（グローバル）で動くため、関数はファイルの最上位に宣言する。
+- ファイルの末尾で、`module` がある場合のみ関数を公開する（`if (typeof module !== "undefined") { module.exports = { … }; }`）。GAS 上では `module` がないため何もしない（implementation-plan.md 2.）。
+
+### 主要な関数
+
+| 関数 | ファイル | 入力 | 出力 | Task |
+|---|---|---|---|---|
+| `validateRow(row)` | `src/aggregate/validate.js` | `row`：`{ playerName, playDate, playTime, finalChips, debtCount }`（スプレッドシートから読み込んだ値） | `{ valid, nickname }`。有効なら `valid: true` と前後の空白を取り除いたニックネーム、無効なら `valid: false`・`nickname: null` | Task-004 |
+
+`validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
+
+| 判定 | 無効とする条件 | 由来 |
+|---|---|---|
+| 空欄 | 5 項目のいずれかが `null`・`undefined`・空文字、または前後の空白のみの文字列（全角の空白を含む） | b1/Question-007 (c)、b1/Question-008 |
+| 日付 | プレイ日付が `Date` でない、または無効な `Date` | b1/Question-007 (a) |
+| 数値 | プレイ時間・最終チップ数・借金回数が `number` でない（数字の文字列も数値として扱わない）、有限でない、またはマイナス | b1/Question-007 (a)、b1/Question-020、c1/Question-017-1 |
+
+- ニックネームは `String(playerName).trim()` とする（プレイヤー名のセルが数値の場合も文字列にする）。
 
 ## 3. テストファイル一覧
 
@@ -91,6 +117,7 @@ poker-ranking/
 |---|---|---|
 | （なし） | Task-001・Task-002 は Small テストの対象なし（implementation-plan.md 4.） | — |
 | `tests/small/scripts/build.test.js` | `scripts/build.js` の `build` | Task-003 期待値1〜3 |
+| `tests/small/aggregate/validate.test.js` | `src/aggregate/validate.js` の `validateRow` | Task-004 期待値1〜8 |
 
 ## 4. 主要な処理の流れ
 
@@ -111,3 +138,4 @@ poker-ranking/
 |---|---|---|---|
 | 2026-09-27 00:25 | /c2-implement | 初版を作成（5-1：Task-001 開発ツールの設定、Task-002 Dev Container への追加） | implementation-plan.md 2.、Task-001、Task-002 |
 | 2026-09-27 00:40 | /c2-implement | Task-003（ビルド用のスクリプト）を追加。ディレクトリ構成、ビルドの処理、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-003 |
+| 2026-09-27 00:51 | /c2-implement | Task-004（行の確認）を追加。ディレクトリ構成、ファイル一覧、GAS のコードの共通の書き方、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-004 |

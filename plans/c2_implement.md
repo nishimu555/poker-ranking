@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 00:40 |
+| 最終更新 | 2026-09-27 00:51 |
 
 ## 1. 進捗
 
@@ -100,12 +100,19 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：`src/<プロジェクト>/` がない場合は出力せずに成功するようにした（Task-004・Task-017 で作成するまで、全タスク共通の完了条件「ビルドが成功する」を満たすため）。埋め込めない内容（`</style`・`</script` を含む）と `client/` の外の参照はエラーにした。implementation-design.md「5. 計画との違い」に記載
-    - コミット：
-- [ ] 5-3. Task-004：行の確認
+    - コミット：a1c9d34 task-003
+- [x] 5-3. Task-004：行の確認
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-004）
   - 作成・更新先：`src/aggregate/validate.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/aggregate/validate.test.js`（期待値1〜8、16 件）が全件失敗。理由：`src/aggregate/validate.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 19 件／19 件成功（Task-003 の 3 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/validate.js` を出力。`src/viewer/` がないため閲覧用は出力なし）
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。関数の入出力（行を `{ playerName, playDate, playTime, finalChips, debtCount }` で受け取る）は計画に定めがないため、implementation-design.md「主要な関数」に記載した
+    - コミット：
 - [ ] 5-4. Task-005：収支・ウェイト・端数の計算
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-005）
@@ -313,3 +320,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-26 23:18 | /z9-answer-review c2 | c1 の完了（c1/Question-023 の反映）を確認し、Question-001 に ☑ を付与。「6. 成果物の構成予定」（開発環境の設定、作業する環境）と「7. 他工程との関係」（差し戻しの解消）に反映。「8. 質問・指示」「9. レビュー指摘」がすべて ☑ となったため、ステータスを「確定」とし、「1. 進捗」の 2・3 に ☑ を付与 | c2/Question-001 の開発者回答、`plans/c1_implementation-plan.md`（ステータス：完了） |
 | 2026-09-27 00:25 | /c2-implement | ステータスの確定を確認し「1. 進捗」の 4 に ☑。5-1（Task-001・Task-002）を実施し、実行結果を記載 | implementation-plan.md 2.、Task-001、Task-002 |
 | 2026-09-27 00:40 | /c2-implement | 5-2（Task-003）を実施し、実行結果を記載 | implementation-plan.md Task-003、5-1 のコミット欄についての開発者の回答（このままでよい） |
+| 2026-09-27 00:51 | /c2-implement | 5-3（Task-004）を実施し、実行結果を記載 | implementation-plan.md Task-004 |
