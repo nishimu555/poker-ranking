@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-26 23:18 |
+| 最終更新 | 2026-09-27 00:40 |
 
 ## 1. 進捗
 
@@ -27,7 +27,7 @@ AI が段階を終えるたびに ☑ と日時を記載する。
 - [x] 1. plan 作成（AI：`/c2-implement`）2026-09-26 23:06
 - [x] 2. 質問への回答・指示の記入（開発者）2026-09-26 23:18
 - [x] 3. 回答の確認（AI：`/z9-answer-review c2`）2026-09-26 23:18
-- [ ] 4. plan 確定（AI：`/c2-implement`）
+- [x] 4. plan 確定（AI：`/c2-implement`）2026-09-27 00:25
 - [ ] 5. 成果物作成（AI：`/c2-implement`）
 - [ ] 6. 成果物レビュー（開発者）
 
@@ -72,16 +72,35 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
 コミットの記録（Question-002）：開発者がコミットした後、該当手順の「実行結果」に「コミット：<ID> <メッセージ>」を記入する。AI は git を実行しない。次のタスクに進む前に、前のタスクの「コミット」が空欄なら、AI は開発者に確認して止まる。
 -->
 
-- [ ] 5-1. 開発環境の準備（Task-001：開発ツールの設定、Task-002：Dev Container への追加）
+- [x] 5-1. 開発環境の準備（Task-001：開発ツールの設定、Task-002：Dev Container への追加）
   - 作業内容：実装計画「2. 開発の前提」に従い、package.json、Prettier・ESLint・Jest の設定、npm スクリプト、.gitignore、Dev Container を設定する
   - 参照元：implementation-plan.md 2.、Task-001、Task-002
   - 作成・更新先：設定ファイル、`implementation-design.md`
   - 実行結果：
-- [ ] 5-2. Task-003：ビルド用のスクリプト
+    - 実行環境：Dev Container 内。`node -v` v24.21.0、`npm -v` 11.19.0（2026-09-27 00:13 確認）
+    - 導入した開発用の依存ライブラリ（版を固定）：prettier 3.9.9、eslint 10.11.0、jest 30.5.2、@google/clasp 3.4.1（648 パッケージ）。npm の警告として、推移的な依存の非推奨（node-domexception 1.0.0、glob 10.5.0）と、インストールスクリプトの未承認（@parcel/watcher 2.6.0、unrs-resolver 1.12.2）が出た
+    - 失敗の確認：Small テストの対象なし（implementation-plan.md Task-001・Task-002 のテスト期待値の概要）
+    - ビルド：`npm run build` 成功（仮のスクリプト。Task-003 で置き換える）
+    - テスト：`npm test` 成功（0 件／0 件。テストファイルなし）
+    - 静的解析：`npm run lint` 指摘 0 件。推奨ルールと GAS の組み込みオブジェクトの登録が効くことを、一時ファイル（確認後に削除）で確認した（未定義の変数・未使用の関数を検出し、`SpreadsheetApp` は検出しない）。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件：`.gitignore` に `.clasp.json`・`.clasprc.json`・`dist/`・`node_modules/` を含む。`package.json` の `engines` と `.nvmrc` が 24.21.0。Dev Container の Node.js の Feature の版が 24.21.0。`mounts` はホストの認証情報を含まない（Claude Code の設定用のボリュームのみ）
+    - 計画との差異：(1) ESLint 10 は推奨ルールの設定を本体に含まない（別パッケージ `@eslint/js`）ため、依存ライブラリを追加せず、ESLint 本体の組み込みルールの recommended の印から同じ設定を作った（`@eslint/js` 10.0.1 の recommended と 64 ルールが一致することを確認）。根拠：implementation-plan.md 2.（依存ライブラリは 4 つのみ）。(2) `npm run build` を実行できるよう仮の `scripts/build.js` を作成した。(3) テスト 0 件の段階で `npm test` が成功するよう `jest --passWithNoTests` とした。いずれも implementation-design.md「5. 計画との違い」に記載
+    - Dev Container の再作成（`npm ci` の実行を含む）と、その後の `npm test` の実行は開発者が確認する（implementation-plan.md Task-002 テスト期待値の概要）
+    - コミット：1aab1b1 SKILL見直し
+- [x] 5-2. Task-003：ビルド用のスクリプト
   - 作業内容：「5. 実装」の「1 タスクの流れ」に従う
   - 参照元：implementation-plan.md 4.（Task-003）
   - 作成・更新先：`scripts/build.js`、`tests/small/scripts/`、`implementation-design.md`
   - 実行結果：
+    - 開始前の確認：5-1 の「コミット」欄の記入内容（1aab1b1）について AI が確認を求め、開発者が「このままでよい」と回答したため続行した（2026-09-27 00:30 頃、チャット）
+    - 失敗の確認：`tests/small/scripts/build.test.js` 3 件中 3 件が失敗。理由：仮の `scripts/build.js` が `build` を公開していない（`TypeError: build is not a function`）
+    - テスト：`npm test` 3 件／3 件成功
+    - ビルド：`npm run build` 成功（`src/aggregate/`・`src/viewer/` がまだないため、出力なし）
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：`src/<プロジェクト>/` がない場合は出力せずに成功するようにした（Task-004・Task-017 で作成するまで、全タスク共通の完了条件「ビルドが成功する」を満たすため）。埋め込めない内容（`</style`・`</script` を含む）と `client/` の外の参照はエラーにした。implementation-design.md「5. 計画との違い」に記載
+    - コミット：
 - [ ] 5-3. Task-004：行の確認
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-004）
@@ -292,3 +311,5 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-26 23:06 | /c2-implement | plan を作成し、作業手順（5-1〜5-26）と Question-001〜002 を記載 | `docs/c1_implementation-plan/implementation-plan.md`（c1 完了）、開発環境の確認結果（ホストに Node.js・npm なし） |
 | 2026-09-26 23:11 | /z9-answer-review c2 | Question-002 に ☑ を付与し、「5. 作業手順と実行結果」の注記にコミットの記録方法を反映。Question-001 は Node のバージョンの固定が c1 の成果物の変更を伴うため ☐ のまま、c1 に c1/Question-023 を追記して差し戻した。「7. 他工程との関係」に記録 | c2/Question-001・002 の開発者回答 |
 | 2026-09-26 23:18 | /z9-answer-review c2 | c1 の完了（c1/Question-023 の反映）を確認し、Question-001 に ☑ を付与。「6. 成果物の構成予定」（開発環境の設定、作業する環境）と「7. 他工程との関係」（差し戻しの解消）に反映。「8. 質問・指示」「9. レビュー指摘」がすべて ☑ となったため、ステータスを「確定」とし、「1. 進捗」の 2・3 に ☑ を付与 | c2/Question-001 の開発者回答、`plans/c1_implementation-plan.md`（ステータス：完了） |
+| 2026-09-27 00:25 | /c2-implement | ステータスの確定を確認し「1. 進捗」の 4 に ☑。5-1（Task-001・Task-002）を実施し、実行結果を記載 | implementation-plan.md 2.、Task-001、Task-002 |
+| 2026-09-27 00:40 | /c2-implement | 5-2（Task-003）を実施し、実行結果を記載 | implementation-plan.md Task-003、5-1 のコミット欄についての開発者の回答（このままでよい） |

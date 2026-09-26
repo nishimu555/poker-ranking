@@ -5,7 +5,7 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 23:18
+最終更新：2026-09-27 00:40
 
 ## 1. 工程一覧
 
@@ -14,8 +14,8 @@
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 19:45 |
 | b1 | コンポーネント設計 | 完了 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 22:43 |
 | c1 | 実装計画 | 完了 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | 2026-09-26 23:17 |
-| c2 | 実装 | 確定 | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-26 23:18 |
-| c3 | テスト計画 | 未着手 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | |
+| c2 | 実装 | 確定 | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-27 00:40 |
+| c3 | テスト計画 | 回答待ち | 6 | 0 | [c3_test-plan.md](c3_test-plan.md) | 2026-09-26 23:38 |
 | c4 | テスト | 未着手 | 0 | 0 | [c4_test.md](c4_test.md) | |
 | d1 | セットアップ手順 | 未着手 | 0 | 0 | [d1_setup.md](d1_setup.md) | |
 
@@ -24,8 +24,8 @@
 
 ## 2. 次に行うこと
 
-1. Dev Container 内で起動した Claude Code から `/c2-implement` を実行する（5-1 開発環境の準備から開始）。
-2. `/c3-test-plan` を実行する（c2 と並行して実施できる）。
+1. c2 の 5-2（Task-003）の変更をコミットし、`plans/c2_implement.md` 5-2 の実行結果に「コミット：<ID> <メッセージ>」を記入してから、`/c2-implement` で Task-004（行の確認）に進む。
+2. `plans/c3_test-plan.md` の Question-001〜006（Medium の実行方法、テスト環境、テスト用アカウント、実機、データ量、合格の基準）に回答し、`/z9-answer-review c3` を実行する。
 
 ## 3. 差し戻し中の工程
 

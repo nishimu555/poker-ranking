@@ -3,3 +3,11 @@
 
 # 個人用の Claude Code 設定
 .claude/settings.local.json
+
+# Task-001: ビルドの出力と依存ライブラリ
+dist/
+node_modules/
+
+# Task-001: clasp のプロジェクトの設定ファイルと認証情報（秘密情報のため Git の管理対象外）
+.clasp.json
+.clasprc.json

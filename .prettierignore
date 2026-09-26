@@ -1,0 +1,12 @@
+# Task-001: Prettier の対象外
+# ビルドの出力・依存ライブラリ
+dist/
+node_modules/
+package-lock.json
+# ドキュメント（コードのみを整形の対象とする）
+*.md
+docs/
+plans/
+templates/
+guide/
+.claude/

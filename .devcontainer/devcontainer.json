@@ -7,7 +7,8 @@
   "name": "ai-dev-base",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
+    // Task-002: Node.js の版を固定する（implementation-plan.md 2.、c1/Question-023）
+    "ghcr.io/devcontainers/features/node:1": { "version": "24.21.0" },
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
     // 例：言語を追加する場合
     // "ghcr.io/devcontainers/features/python:1": {}
@@ -22,6 +23,8 @@
     "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
   // フック（.claude/hooks/）が使う jq を導入し、フックに実行権限を付ける
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y jq && chmod +x .claude/hooks/*.sh"
-  // 注意：~/.ssh、クラウドの認証情報ファイル等、ホストの秘密情報をマウントしない
+  // Task-002: 開発用の依存ライブラリを package-lock.json のとおりに導入する（npm ci）
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y jq && chmod +x .claude/hooks/*.sh && npm ci"
+  // 注意：~/.ssh、clasp の認証情報（~/.clasprc.json）、クラウドの認証情報ファイル等、ホストの秘密情報をマウントしない。
+  // clasp login はコンテナ内で行う（c1/Question-010）
 }
