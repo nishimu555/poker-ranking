@@ -2,16 +2,55 @@
   "disableAllHooks": true,
   "sandbox": {
     "excludedCommands": ["docker *"],
+    "filesystem": {
+      "denyRead": [
+        "~/Documents",
+        "~/Desktop",
+        "~/Downloads",
+        "~/Movies",
+        "~/Music",
+        "~/Pictures",
+        "~/Public",
+        "~/Google Drive",
+        "~/マイドライブ",
+        "~/Library/CloudStorage",
+        "~/Library/Application Support/Google/Chrome",
+        "~/Library/Application Support/Firefox",
+        "~/Library/Safari",
+        "~/Library/Cookies",
+        "~/Library/Mail",
+        "~/Library/Messages",
+        "~/.claude/projects"
+      ]
+    },
     "credentials": {
       "files": [
         { "path": "~/.ssh", "mode": "deny" },
         { "path": "~/.aws", "mode": "deny" },
-        { "path": "~/.clasprc.json", "mode": "deny" }
+        { "path": "~/.clasprc.json", "mode": "deny" },
+        { "path": "~/.gnupg", "mode": "deny" },
+        { "path": "~/.config/gh", "mode": "deny" },
+        { "path": "~/.config/gcloud", "mode": "deny" },
+        { "path": "~/.kube", "mode": "deny" },
+        { "path": "~/.docker/config.json", "mode": "deny" },
+        { "path": "~/.netrc", "mode": "deny" },
+        { "path": "~/.git-credentials", "mode": "deny" },
+        { "path": "~/.npmrc", "mode": "deny" },
+        { "path": "~/Library/Keychains", "mode": "deny" },
+        { "path": "~/.claude/.credentials.json", "mode": "deny" }
       ],
       "envVars": [
         { "name": "GITHUB_TOKEN", "mode": "deny" },
         { "name": "GH_TOKEN", "mode": "deny" },
-        { "name": "NPM_TOKEN", "mode": "deny" }
+        { "name": "NPM_TOKEN", "mode": "deny" },
+        { "name": "AWS_ACCESS_KEY_ID", "mode": "deny" },
+        { "name": "AWS_SECRET_ACCESS_KEY", "mode": "deny" },
+        { "name": "AWS_SESSION_TOKEN", "mode": "deny" },
+        { "name": "GOOGLE_APPLICATION_CREDENTIALS", "mode": "deny" },
+        { "name": "OPENAI_API_KEY", "mode": "deny" },
+        { "name": "ANTHROPIC_API_KEY", "mode": "deny" },
+        { "name": "ANTHROPIC_AUTH_TOKEN", "mode": "deny" },
+        { "name": "CLAUDE_CODE_OAUTH_TOKEN", "mode": "deny" }
       ]
     }
   },

@@ -5,7 +5,7 @@
 | 必要なもの | 確認方法 | 用途 |
 |---|---|---|
 | Claude Code | `claude --version` | AI との対話、スキルの実行 |
-| Git | `git --version` | バージョン管理。c4 の再テスト対象の選定にも使う |
+| Git | `git --version` | バージョン管理（開発者が使う。AI は git コマンドを実行しない） |
 | jq または python3 | `jq --version` / `python3 --version` | フックが開発者の入力を読み取るために使う |
 | bash | `bash --version` | フックの実行 |
 
@@ -43,7 +43,7 @@ chmod +x .claude/hooks/*.sh
    ```
 
 2. `docs/a0_request/request.md` を記入します。
-   - 各項目に `Request-01`、`Request-02` … の番号を付けます（ファイル全体で通し番号）。
+   - 各項目に `Request-<節番号>-<節内の番号>`（例：`Request-1-1`、`Request-2-1`）の番号を付けます。番号は半角数字で書きます。
    - わからない事項は空欄のままで構いません。AI が要件定義で質問します。
 3. 記入が終わったら、冒頭のステータスを「記入中」から「確定」に変えます。「確定」になるまで `/a1-requirements` は動きません。
 

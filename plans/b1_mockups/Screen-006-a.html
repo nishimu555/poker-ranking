@@ -1,0 +1,75 @@
+<!--
+Screen ID：Screen-006（画像生成画面）
+案：a（3 つのランキングの上位 5 名を 1 枚の 9:16 画像にまとめる）
+対応する Feature：Feature-012（各ランキングの上位 5 名、9:16、画面上に表示し利用者が保存・共有）、Feature-013（免責表示）
+見た目の基準の由来：b1/Question-010（ポーカー・カジノを題材にしたテーマ）、b1/Question-010-1（WCAG 2.1 AA：通常の文字で 4.5:1 以上）、Quality-005（スマートフォン前提）
+データ：すべて架空の仮データ（ニックネーム・数値は実在しない）
+備考：実装では canvas で画像を作る（b1/Question-004）。モックでは画像の見た目を HTML・CSS で再現している。
+採用：モックのとおり（b1/Question-014）
+修正：ランキングの呼び名（アベレージランキング、累計ランキング）を b1/Question-012-1、アプリの名称（POKER RANKING）を b1/Question-015-1 に基づき修正（2026-09-26 19:21）
+修正：累計ランキングを収支の合計が大きい順の上位 5 名（チップ数）に修正（b1/review-006、a1/Question-024、2026-09-26 19:47）
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen-006 画像生成（案 a）</title>
+<style>
+  :root { --felt:#0b3d2e; --felt2:#12573f; --gold:#f2c14e; --text:#ffffff; --sub:#d6e9df; --minus:#ff9e97; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#062a1f; color:var(--text); font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; }
+  .wrap { max-width:480px; margin:0 auto; padding:16px; }
+  .top a { color:var(--gold); text-decoration:none; font-size:14px; }
+  p.guide { font-size:13px; color:var(--sub); margin:10px 0; }
+  .image { width:100%; max-width:360px; aspect-ratio:9/16; margin:0 auto; border-radius:14px; overflow:hidden;
+           background:radial-gradient(circle at top, #1a6b4e, #0b3d2e 70%); border:3px solid var(--gold); padding:18px 16px; display:flex; flex-direction:column; }
+  .image .title { text-align:center; color:var(--gold); font-weight:bold; font-size:18px; }
+  .image .sub { text-align:center; color:var(--sub); font-size:11px; margin-bottom:10px; }
+  .block { margin:6px 0; }
+  .block h3 { margin:0 0 4px; font-size:13px; color:var(--gold); border-bottom:1px solid rgba(242,193,78,.5); padding-bottom:2px; }
+  .block ol { margin:0; padding:0; list-style:none; font-size:12px; }
+  .block li { display:flex; padding:2px 0; }
+  .block li span:first-child { width:28px; color:var(--gold); }
+  .block li span:nth-child(2) { flex:1; }
+  .minus { color:var(--minus); }
+  .image .foot { margin-top:auto; text-align:center; font-size:9px; color:var(--sub); }
+  .actions { display:flex; gap:8px; margin:14px auto; max-width:360px; }
+  .actions a { flex:1; text-align:center; padding:10px; border-radius:8px; text-decoration:none; font-size:14px; }
+  .actions .primary { background:var(--gold); color:#1a1a1a; font-weight:bold; }
+  .actions .ghost { border:1px solid var(--gold); color:var(--gold); }
+  footer { margin-top:10px; font-size:12px; color:var(--sub); text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="Screen-001-a.html">‹ トップへ</a></div>
+  <p class="guide">画像を長押しすると、端末に保存・共有できます。</p>
+
+  <div class="image" role="img" aria-label="ランキングの画像（9:16）">
+    <div class="title">♠ POKER RANKING ♥</div>
+    <div class="sub">2026 年（2026/01/01〜2026/09/26 時点）</div>
+    <div class="block">
+      <h3>🏆 アベレージランキング</h3>
+      <ol><li><span>1位</span><span>ナッツ</span><span>+12,400</span></li><li><span>2位</span><span>リバー</span><span>+8,150</span></li><li><span>3位</span><span>スペード</span><span>+5,020</span></li><li><span>3位</span><span>ブラフ王</span><span>+5,020</span></li><li><span>5位</span><span>ハート</span><span>+2,300</span></li></ol>
+    </div>
+    <div class="block">
+      <h3>🎖 累計ランキング</h3>
+      <ol><li><span>1位</span><span>ナッツ</span><span>+186,000</span></li><li><span>2位</span><span>リバー</span><span>+44,200</span></li><li><span>3位</span><span>ハート</span><span>+25,300</span></li><li><span>4位</span><span>スペード</span><span>+18,600</span></li><li><span>5位</span><span>ブラフ王</span><span>+9,500</span></li></ol>
+    </div>
+    <div class="block">
+      <h3>⛏ 強制労働への道のり</h3>
+      <ol><li><span>1位</span><span>ジョーカー（強制労働）</span><span class="minus">−210,000</span></li><li><span>2位</span><span>フロップ</span><span class="minus">−95,500</span></li><li><span>3位</span><span>ターン</span><span class="minus">−61,000</span></li><li><span>4位</span><span>ダイヤ</span><span class="minus">−22,300</span></li><li><span>5位</span><span>クラブ</span><span class="minus">−8,800</span></li></ol>
+    </div>
+    <div class="foot">有志が作成したものであり、開催店舗とは関係ありません。</div>
+  </div>
+
+  <div class="actions">
+    <a class="ghost" href="Screen-001-a.html">戻る</a>
+    <a class="primary" href="#">画像を作り直す</a>
+  </div>
+
+  <footer>本ページは有志が作成したものであり、開催店舗とは関係ありません。</footer>
+</div>
+</body>
+</html>

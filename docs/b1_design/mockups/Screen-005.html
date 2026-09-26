@@ -1,0 +1,96 @@
+<!--
+Screen ID：Screen-005（個人の戦績画面）
+案：a
+対応する Feature：Feature-010（参加日数、合計プレイ時間、収支の累計、ランキング 1 の値、借金回数の累計と強制労働までの残りチップ数、各ランキングでの順位、実施日ごとの履歴）、Feature-007（集計期間）、Feature-013（免責表示）
+見た目の基準の由来：b1/Question-010（ポーカー・カジノを題材にしたテーマ）、b1/Question-010-1（WCAG 2.1 AA：通常の文字で 4.5:1 以上）、Quality-005（スマートフォン前提）
+データ：すべて架空の仮データ（ニックネーム・数値は実在しない）。配布チップ数は仮に 20,000、N は 10 としている
+採用：モックのとおり（b1/Question-014）
+修正：ランキングの呼び名（アベレージランキング、累計ランキング）を b1/Question-012-1 に基づき修正（2026-09-26 19:21）
+修正：強制労働ランキングの対象外（基準値がマイナスでない）の場合、順位を「−」と表示するよう修正（b1/review-002、2026-09-26 19:34）
+修正：アベレージランキングの値の見出しを「平均値チップ数」に、累計ランキングの順位を収支の合計が大きい順の仮データ（2位）に修正（b1/review-005・006、b1/Question-016、2026-09-26 19:47）
+配置：plans/b1_mockups/Screen-005-a.html を確定版として配置し、リンク先を確定版のファイル名に変更した（/b1-design、2026-09-26 20:05）
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen-005 個人の戦績（案 a）</title>
+<style>
+  :root { --felt:#0b3d2e; --felt2:#12573f; --gold:#f2c14e; --text:#ffffff; --sub:#d6e9df; --minus:#ff9e97; --card:#0f4a37; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--felt); color:var(--text); font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; }
+  .wrap { max-width:480px; margin:0 auto; padding:16px; }
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .top a { color:var(--gold); text-decoration:none; font-size:14px; }
+  select { background:var(--felt2); color:var(--text); border:1px solid var(--gold); border-radius:6px; padding:6px 8px; font-size:14px; }
+  .profile { text-align:center; margin:16px 0 8px; }
+  .profile .avatar { width:64px; height:64px; margin:0 auto 6px; border-radius:50%; background:var(--gold); color:#1a1a1a; display:flex; align-items:center; justify-content:center; font-size:28px; border:4px dashed #fff5d6; }
+  .profile h1 { margin:0; font-size:22px; color:var(--gold); }
+  .period { font-size:13px; color:var(--sub); text-align:center; margin-bottom:12px; }
+  .stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .stat { background:var(--card); border:1px solid #2e7a5c; border-radius:10px; padding:10px; }
+  .stat .lb { font-size:12px; color:var(--sub); }
+  .stat .vl { font-size:18px; font-weight:bold; font-variant-numeric:tabular-nums; }
+  .minus { color:var(--minus); }
+  h2 { font-size:16px; color:var(--gold); margin:18px 0 8px; }
+  .ranks { display:flex; gap:8px; }
+  .ranks div { flex:1; background:var(--card); border:1px solid #2e7a5c; border-radius:10px; padding:8px; text-align:center; font-size:12px; color:var(--sub); }
+  .ranks b { display:block; font-size:18px; color:var(--text); }
+  .gauge { background:var(--card); border:1px solid #2e7a5c; border-radius:10px; padding:12px; }
+  .gauge .meter { height:10px; border-radius:5px; background:#2e7a5c; overflow:hidden; margin:8px 0 6px; }
+  .gauge .meter span { display:block; height:100%; width:22%; background:var(--minus); }
+  .gauge p { margin:0; font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; font-size:12px; color:var(--sub); font-weight:normal; border-bottom:1px solid var(--gold); padding:6px 4px; }
+  td { padding:8px 4px; border-bottom:1px dashed #2e7a5c; font-variant-numeric:tabular-nums; }
+  td.num, th.num { text-align:right; }
+  footer { margin-top:18px; padding-top:10px; border-top:1px solid #2e7a5c; font-size:12px; color:var(--sub); text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="Screen-002.html">‹ ランキングへ</a>
+    <select aria-label="年を選ぶ"><option>2026年</option><option>2025年</option></select>
+  </div>
+
+  <div class="profile">
+    <div class="avatar">♥</div>
+    <h1>リバー</h1>
+  </div>
+  <div class="period">集計期間：2026/01/01〜2026/12/31</div>
+
+  <div class="stats">
+    <div class="stat"><div class="lb">参加日数</div><div class="vl">12 日</div></div>
+    <div class="stat"><div class="lb">合計プレイ時間</div><div class="vl">21.5 時間</div></div>
+    <div class="stat"><div class="lb">収支の累計</div><div class="vl">+44,200</div></div>
+    <div class="stat"><div class="lb">平均値チップ数</div><div class="vl">+8,150</div></div>
+  </div>
+
+  <h2>各ランキングでの順位</h2>
+  <div class="ranks">
+    <div>🏆 アベレージ<b>2位</b></div>
+    <div>🎖 累計<b>2位</b></div>
+    <div>⛏ 強制労働<b>−</b></div>
+  </div>
+
+  <h2>⛏ 強制労働までの道のり</h2>
+  <div class="gauge">
+    <p>借金回数の累計：<b>3 回</b></p>
+    <div class="meter" aria-hidden="true"><span></span></div>
+    <p>強制労働まで あと <b>244,200</b> チップ（基準値 +44,200）</p>
+  </div>
+
+  <h2>実施日ごとの履歴</h2>
+  <table>
+    <tr><th>日付</th><th class="num">時間</th><th class="num">最終チップ</th><th class="num">借金</th><th class="num">収支</th></tr>
+    <tr><td>2026/09/13</td><td class="num">2.0</td><td class="num">48,000</td><td class="num">0</td><td class="num">+48,000</td></tr>
+    <tr><td>2026/08/30</td><td class="num">1.5</td><td class="num">12,000</td><td class="num">1</td><td class="num minus">−8,000</td></tr>
+    <tr><td>2026/08/16</td><td class="num">3.0</td><td class="num">31,500</td><td class="num">0</td><td class="num">+31,500</td></tr>
+  </table>
+
+  <footer>本ページは有志が作成したものであり、開催店舗とは関係ありません。</footer>
+</div>
+</body>
+</html>

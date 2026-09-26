@@ -44,8 +44,12 @@
 | 設定 | 内容 |
 |---|---|
 | `excludedCommands: ["docker *"]` | `docker` はサンドボックスと互換性がないため、対象外にする |
-| `credentials.files` | `~/.ssh`、`~/.aws`、`~/.clasprc.json`（GAS の `clasp` の認証情報）を、サンドボックス内のコマンドから読めなくする |
-| `credentials.envVars` | `GITHUB_TOKEN`、`GH_TOKEN`、`NPM_TOKEN` を、サンドボックス内のコマンドの環境変数から取り除く |
+| `filesystem.denyRead` | 個人のフォルダ（`~/Documents`、`~/Desktop`、`~/Downloads`、`~/Movies`、`~/Music`、`~/Pictures`、`~/Public`）、クラウドストレージ（`~/Google Drive`、`~/マイドライブ`、`~/Library/CloudStorage`）、ブラウザ・メール・メッセージのデータ（Chrome、Firefox、Safari、Cookies、Mail、Messages）、Claude Code の会話履歴（`~/.claude/projects`）を読めなくする |
+| `credentials.files` | 認証情報のファイル（`~/.ssh`、`~/.aws`、`~/.clasprc.json`、`~/.gnupg`、`~/.config/gh`、`~/.config/gcloud`、`~/.kube`、`~/.docker/config.json`、`~/.netrc`、`~/.git-credentials`、`~/.npmrc`、`~/Library/Keychains`、`~/.claude/.credentials.json`）を読めなくする |
+| `credentials.envVars` | 認証情報の環境変数（`GITHUB_TOKEN`、`GH_TOKEN`、`NPM_TOKEN`、`AWS_ACCESS_KEY_ID`、`AWS_SECRET_ACCESS_KEY`、`AWS_SESSION_TOKEN`、`GOOGLE_APPLICATION_CREDENTIALS`、`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`ANTHROPIC_AUTH_TOKEN`、`CLAUDE_CODE_OAUTH_TOKEN`）を取り除く。Claude Code 本体の認証には影響しない |
+
+- リポジトリや参考資料を上記のフォルダ（例：`~/Documents`）に置くと、サンドボックス内から読めなくなります。リポジトリは上記以外の場所（例：`~/Github/`）に置いてください。
+- 環境に合わせて追加・削除できます。個人の環境だけに関わるパスは、個人用の `.claude/settings.local.json` に記載する方法もあります。
 
 プロジェクトで使う認証情報が増えた場合は、ここに追記します。
 
