@@ -5,14 +5,14 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 18:29
+最終更新：2026-09-26 18:49
 
 ## 1. 工程一覧
 
 | 記号 | 工程 | ステータス | 未完了の質問・指示 | 未対応のレビュー指摘 | plan ファイル | 最終更新 |
 |---|---|---|---|---|---|---|
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 18:28 |
-| b1 | コンポーネント設計 | 回答待ち | 11 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 18:29 |
+| b1 | コンポーネント設計 | 確定 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 18:49 |
 | c1 | 実装計画 | 未着手 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | |
 | c2 | 実装 | 未着手 | 0 | 0 | [c2_implement.md](c2_implement.md) | |
 | c3 | テスト計画 | 未着手 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | |
@@ -24,7 +24,7 @@
 
 ## 2. 次に行うこと
 
-- `plans/b1_design.md` の Question-001〜011 に回答し、`/z9-answer-review b1` を実行する。Question-010（見た目の基準）と Question-011（案の数）が ☑ になると、`/b1-design` で画面モックを作成できる。
+- `/b1-design` を実行し、画面モック（`plans/b1_mockups/`）を作成する。
 ## 3. 差し戻し中の工程
 
 | 日時 | 差し戻された工程 | 影響元 | 追記した項目 |
