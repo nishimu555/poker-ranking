@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 00:57 |
+| 最終更新 | 2026-09-27 01:00 |
 
 ## 1. 進捗
 
@@ -136,12 +136,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし
-    - コミット：
-- [ ] 5-6. Task-007：年ごとの集計と 3 つのランキング
+    - コミット：e1d7ccb task-006
+- [x] 5-6. Task-007：年ごとの集計と 3 つのランキング
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-007）
   - 作成・更新先：`src/aggregate/aggregate.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/aggregate/aggregate.test.js`（期待値1〜13、13 件）が全件失敗。理由：`src/aggregate/aggregate.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - 失敗の確認の後のテストの変更：期待値は変えず、テストの準備のみ追加した（`calc.js`・`rank.js` の公開部分をグローバルに置いてから `aggregate.js` を読み込む。GAS で全ファイルが同じ場所で動く状態の再現）
+    - テスト：`npm test` 51 件／51 件成功（Task-003〜006 の 38 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/` に `aggregate.js`・`calc.js`・`rank.js`・`validate.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み（GAS と同じく同じ場所で動かす）、最上位の名前の重複によるエラーがなく `aggregateAllYears` が動くことを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし
+    - コミット：
 - [ ] 5-7. Task-008：個人の戦績の集計
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-008）
@@ -337,3 +346,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 00:51 | /c2-implement | 5-3（Task-004）を実施し、実行結果を記載 | implementation-plan.md Task-004 |
 | 2026-09-27 00:54 | /c2-implement | 5-4（Task-005）を実施し、実行結果を記載 | implementation-plan.md Task-005 |
 | 2026-09-27 00:57 | /c2-implement | 5-5（Task-006）を実施し、実行結果を記載 | implementation-plan.md Task-006 |
+| 2026-09-27 01:00 | /c2-implement | 5-6（Task-007）を実施し、実行結果を記載 | implementation-plan.md Task-007 |

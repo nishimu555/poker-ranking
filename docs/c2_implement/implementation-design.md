@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 00:57 |
+| 最終更新 | 2026-09-27 01:00 |
 
 ## 1. ディレクトリ構成
 
@@ -24,12 +24,14 @@ poker-ranking/
 │   └── aggregate/                    # 集計用プロジェクト
 │       ├── validate.js               # Task-004：行の確認
 │       ├── calc.js                   # Task-005：収支・ウェイト・端数の計算
-│       └── rank.js                   # Task-006：順位付け
+│       ├── rank.js                   # Task-006：順位付け
+│       └── aggregate.js              # Task-007：年ごとの集計と 3 つのランキング
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
         ├── aggregate/calc.test.js    # Task-005
         ├── aggregate/rank.test.js    # Task-006
+        ├── aggregate/aggregate.test.js # Task-007
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -95,6 +97,7 @@ poker-ranking/
 | `src/aggregate/validate.js` | 行の確認（`validateRow`） | Component-003 | Task-004 |
 | `src/aggregate/calc.js` | 収支・ウェイト・端数の計算（`calcBalance`、`calcWeight`、`roundToInteger`） | Component-003 | Task-005 |
 | `src/aggregate/rank.js` | 順位付け（`rankEntries`、`pickTopRanked`） | Component-003 | Task-006 |
+| `src/aggregate/aggregate.js` | 年ごとの集計と 3 つのランキング（`aggregateAllYears`） | Component-003 | Task-007 |
 
 ### GAS のコードの共通の書き方
 
@@ -107,6 +110,10 @@ poker-ranking/
 | `isBlank`、`isValidDate`、`isNonNegativeNumber`、`validateRow` | `src/aggregate/validate.js` |
 | `calcBalance`、`calcWeight`、`roundToInteger` | `src/aggregate/calc.js` |
 | `TOP_RANK_LIMIT`、`compareNickname`、`rankEntries`、`pickTopRanked` | `src/aggregate/rank.js` |
+| `toDateKey`、`summarizePlayers`、`aggregateYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
+
+- 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
+- Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
 
 ### 主要な関数
 
@@ -121,6 +128,25 @@ poker-ranking/
 
 - 文字コード順は、JavaScript の文字列の比較（`<`・`>`、UTF-16 の符号単位の順）で比べる。ロケールに依存しないため、GAS とローカルで同じ結果になる（c1/Question-014-1）。
 - 同じ値かどうかは値の完全一致（`===`）で判定する。値の丸めは呼び出し側（Task-007）で行う。
+
+| 関数 | ファイル | 入力 | 出力 | Task |
+|---|---|---|---|---|
+| `aggregateAllYears(rows, settings)` | `src/aggregate/aggregate.js` | `rows`：有効な行 `[{ nickname, playDate, playTime, finalChips, debtCount }]`（`nickname` は前後の空白を取り除いたもの）、`settings`：`{ distributedChips（配布チップ数）, forcedLaborCount（N） }` | `{ years, rankingsByYear }`。`years` は集計済みの年（昇順）、`rankingsByYear[年]` は `{ average, total, forcedLabor }`（各要素 `{ nickname, value, rank }`。`forcedLabor` は `isForcedLabor` も持つ） | Task-007 |
+| `summarizePlayers(rows, settings)` | `src/aggregate/aggregate.js` | 1 年分の行、設定値 | プレイヤーごとの `{ nickname, days, weightedSum, balanceSum }`（丸める前の値。Task-008 でも使う） | Task-007 |
+| `toDateKey(date)` | `src/aggregate/aggregate.js` | 日付 | `"年-月-日"` の文字列（同じ日付の判定に使う） | Task-007 |
+
+`aggregateAllYears` の計算（1 年分・プレイヤーごと）：
+
+| 値 | 計算 | 由来 |
+|---|---|---|
+| 年 | プレイ日付の `getFullYear()`（GAS ではスクリプトのタイムゾーン） | Feature-007 条件1 |
+| 参加日数 | 異なるプレイ日付の数（同じ日付の複数行は 1 日） | c1/Question-016 |
+| アベレージランキングの値 | Σ（収支 × ウェイト）÷ 参加日数 を丸めた値。大きい順、全員が対象 | Feature-004、c1/Question-013、c1/Question-016 |
+| 累計ランキングの値（基準値） | Σ 収支 を丸めた値。大きい順、全員が対象 | Feature-005、c1/Question-019 |
+| 強制労働への道のり | 丸めた基準値がマイナスのプレイヤーのみ、小さい順。基準値 ≦ −（配布チップ数 × N）なら `isForcedLabor: true` | Feature-006 条件1・条件2 |
+
+- 丸めは合計・平均を計算した後に 1 回だけ行い（`roundToInteger`）、順位・強制労働の判定は丸めた値で行う（c1/Question-019）。
+- 設定値は引数で受け取るため、配布チップ数を変えて集計し直すと、すべての年が新しい値で計算される（Decision-0006）。
 
 `validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
 
@@ -141,6 +167,7 @@ poker-ranking/
 | `tests/small/aggregate/validate.test.js` | `src/aggregate/validate.js` の `validateRow` | Task-004 期待値1〜8 |
 | `tests/small/aggregate/calc.test.js` | `src/aggregate/calc.js` の `calcBalance`、`calcWeight`、`roundToInteger` | Task-005 期待値1〜6 |
 | `tests/small/aggregate/rank.test.js` | `src/aggregate/rank.js` の `rankEntries`、`pickTopRanked` | Task-006 期待値1〜5 |
+| `tests/small/aggregate/aggregate.test.js` | `src/aggregate/aggregate.js` の `aggregateAllYears` | Task-007 期待値1〜13 |
 
 ## 4. 主要な処理の流れ
 
@@ -164,3 +191,4 @@ poker-ranking/
 | 2026-09-27 00:51 | /c2-implement | Task-004（行の確認）を追加。ディレクトリ構成、ファイル一覧、GAS のコードの共通の書き方、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-004 |
 | 2026-09-27 00:54 | /c2-implement | Task-005（収支・ウェイト・端数の計算）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-005 |
 | 2026-09-27 00:57 | /c2-implement | Task-006（順位付け）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に最上位の名前の一覧を追加 | implementation-plan.md Task-006、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
+| 2026-09-27 01:00 | /c2-implement | Task-007（年ごとの集計と 3 つのランキング）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に、他のファイルの関数の使い方と Small テストでの再現方法を追加 | implementation-plan.md Task-007、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
