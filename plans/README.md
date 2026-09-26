@@ -5,15 +5,15 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 21:58
+最終更新：2026-09-26 23:04
 
 ## 1. 工程一覧
 
 | 記号 | 工程 | ステータス | 未完了の質問・指示 | 未対応のレビュー指摘 | plan ファイル | 最終更新 |
 |---|---|---|---|---|---|---|
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 19:45 |
-| b1 | コンポーネント設計 | 完了 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 21:58 |
-| c1 | 実装計画 | 未着手 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | |
+| b1 | コンポーネント設計 | 完了 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 22:43 |
+| c1 | 実装計画 | 完了 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | 2026-09-26 23:04 |
 | c2 | 実装 | 未着手 | 0 | 0 | [c2_implement.md](c2_implement.md) | |
 | c3 | テスト計画 | 未着手 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | |
 | c4 | テスト | 未着手 | 0 | 0 | [c4_test.md](c4_test.md) | |
@@ -24,10 +24,11 @@
 
 ## 2. 次に行うこと
 
-1. `/c1-implementation-plan` を実行し、実装計画の plan を作成する。
+1. `/c2-implement` と `/c3-test-plan` を実行する（並行して実施できる）。
 
 ## 3. 差し戻し中の工程
 
 | 日時 | 差し戻された工程 | 影響元 | 追記した項目 |
 |---|---|---|---|
 | 2026-09-26 19:34 | a1 | b1/review-001・002・004・006 | a1/Question-024、a1/Question-025（2026-09-26 19:45 解消：a1 完了） |
+| 2026-09-26 22:39 | b1 | c1/Question-017、c1/Question-017-1 | b1/Question-020（2026-09-26 22:46 解消：b1 完了） |
