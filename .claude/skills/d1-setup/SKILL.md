@@ -19,7 +19,7 @@ Microsoft Engineering Playbook に準拠し、手順を実際に試して確か�
 
 | 項目 | パス |
 |---|---|
-| 入力 | `docs/c2_implement/implementation-design.md`、`docs/c1_implementation-plan/implementation-plan.md`（2. 開発の前提）、`docs/c3_test-plan/test-plan.md`（6. 開発者が実行するテストの手順）、`docs/c4_test/test-report.md`、`src/`、`tests/`、設定ファイル |
+| 入力 | `docs/c2_implement/implementation-design.md`、`docs/c1_implementation-plan/implementation-plan.md`（2. 開発の前提）、`docs/c3_test-plan/test-plan.md`（6. 開発者が実行するテストの手順）、`docs/c4_test/test-report.md`、`src/`、`tests/`、設定ファイル、`README.md`（存在する場合） |
 | plan ファイル | `plans/d1_setup.md`（テンプレート：`templates/plan.md`） |
 | 成果物 | `docs/d1_setup/setup-guide.md`（テンプレート：`templates/d1_setup-guide.md`） |
 | 成果物 | `README.md`（リポジトリ直下） |
@@ -89,6 +89,7 @@ plan の「5. 作業手順と実行結果」には、次の手順を記載する
    - すべての記載に由来（`implementation-plan.md` 2. 開発の前提、`Decision-XXXX`、`d1/Question-XXX` 等）を記載する。由来のない記載はしない。
    - 各手順に実行者（AI／開発者）を定め、「8. 検証の記録」に一覧化する。
 3. 手順 5-3：リポジトリ直下に `README.md` を作成・更新する。記載するのは、プロジェクトの概要（`requirements.md` 1. 概要の要約）と、手順書・主要な成果物へのリンクのみとする。
+   - `README.md` がすでに存在する場合は、既存の内容を読み、その内容を踏まえて改修する。開発者が記載した節（著作権・利用条件等）は削除・変更せずに残し、概要と手順書へのリンクを追記・更新する。既存の記載と plan の内容が矛盾する場合は、変更せずに Question 項目で確認する。
 4. 手順 5-4：実行者が AI の手順を検証し、結果を「8. 検証の記録」に記載する。
 5. 実行者が開発者の手順で結果が空欄のものがあれば「6. 開発者の検証結果待ち」、なければ「7. 検証結果の確認」に進む。
 
