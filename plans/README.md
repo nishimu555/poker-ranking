@@ -5,13 +5,13 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 18:22
+最終更新：2026-09-26 18:28
 
 ## 1. 工程一覧
 
 | 記号 | 工程 | ステータス | 未完了の質問・指示 | 未対応のレビュー指摘 | plan ファイル | 最終更新 |
 |---|---|---|---|---|---|---|
-| a1 | 要件定義 | レビュー待ち | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 18:22 |
+| a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 18:28 |
 | b1 | コンポーネント設計 | 未着手 | 0 | 0 | [b1_design.md](b1_design.md) | |
 | c1 | 実装計画 | 未着手 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | |
 | c2 | 実装 | 未着手 | 0 | 0 | [c2_implement.md](c2_implement.md) | |
@@ -24,7 +24,7 @@
 
 ## 2. 次に行うこと
 
-- `docs/a1_requirements/requirements.md` を再レビューする。指摘があれば `plans/a1_requirements.md` の「9. レビュー指摘」に追記し、なければ「1. 進捗」の「6. 成果物レビュー」に ☑ を付けて、`/a1-requirements` を実行する。
+- `/b1-design` を実行し、コンポーネント設計の plan を作成する。
 ## 3. 差し戻し中の工程
 
 | 日時 | 差し戻された工程 | 影響元 | 追記した項目 |
