@@ -1,0 +1,5 @@
+# フックが 1 回のやり取りの開始時に置く目印ファイル
+.claude/hooks/.turn-start
+
+# 個人用の Claude Code 設定
+.claude/settings.local.json
