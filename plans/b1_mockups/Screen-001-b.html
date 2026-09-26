@@ -1,0 +1,107 @@
+<!--
+Screen ID：Screen-001（トップ画面）
+案：b（ランキングをタブで切り替え、1〜3 位を表彰台で表示）
+対応する Feature：Feature-007（集計期間の表示・年の切り替え）、Feature-008（各ランキングの上位 5 名、各ランキングへのリンク）、Feature-012（画像生成への入口）、Feature-013（免責表示）
+見た目の基準の由来：b1/Question-010（ポーカー・カジノを題材にしたテーマ）、b1/Question-010-1（WCAG 2.1 AA：通常の文字で 4.5:1 以上）、Quality-005（スマートフォン前提）
+データ：すべて架空の仮データ（ニックネーム・数値は実在しない）
+備考：モックでは HTML・CSS のみでタブの切り替えを再現している（:target）。実装では JavaScript で切り替える想定。
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen-001 トップ（案 b）</title>
+<style>
+  :root { --felt:#0b3d2e; --felt2:#12573f; --gold:#f2c14e; --text:#ffffff; --sub:#d6e9df; --minus:#ff9e97; --card:#0f4a37; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:radial-gradient(circle at top, #12573f, #0b3d2e 60%); color:var(--text); font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; min-height:100vh; }
+  .wrap { max-width:480px; margin:0 auto; padding:16px; }
+  header { display:flex; align-items:center; justify-content:space-between; }
+  header h1 { margin:0; font-size:20px; color:var(--gold); }
+  select { background:var(--felt2); color:var(--text); border:1px solid var(--gold); border-radius:6px; padding:6px 8px; font-size:14px; }
+  .period { font-size:13px; color:var(--sub); margin:6px 0 14px; }
+  .tabs { display:flex; gap:6px; }
+  .tabs a { flex:1; text-align:center; padding:10px 4px; border-radius:10px 10px 0 0; background:var(--felt2); color:var(--sub); text-decoration:none; font-size:13px; font-weight:bold; }
+  .panel { display:none; background:var(--card); border:1px solid var(--gold); border-radius:0 0 12px 12px; padding:16px; }
+  .panel:target, .panel.default { display:block; }
+  .panel:target ~ .panel.default { display:none; }
+  .panel p.desc { margin:0 0 12px; font-size:12px; color:var(--sub); }
+  .podium { display:flex; align-items:flex-end; justify-content:center; gap:8px; margin:6px 0 14px; }
+  .step { width:30%; text-align:center; }
+  .step .nm { font-size:14px; margin-bottom:4px; }
+  .step .vl { font-size:12px; color:var(--sub); margin-bottom:4px; }
+  .step .bar { border-radius:8px 8px 0 0; background:var(--gold); color:#1a1a1a; font-weight:bold; padding-top:6px; }
+  .p1 .bar { height:90px; } .p2 .bar { height:64px; background:#d9d9d9; } .p3 .bar { height:48px; background:#e0a16a; }
+  .minus { color:var(--minus); }
+  ul { list-style:none; margin:0; padding:0; }
+  li { display:flex; padding:8px 0; border-top:1px dashed #2e7a5c; font-size:15px; }
+  li .rk { width:34px; color:var(--gold); font-weight:bold; }
+  li .nm { flex:1; }
+  .tag { margin-left:6px; font-size:11px; background:#5a1f1a; color:#ffd7d3; border-radius:4px; padding:2px 5px; }
+  a.more { display:block; text-align:center; margin-top:10px; padding:10px; border:1px solid var(--gold); border-radius:8px; color:var(--gold); text-decoration:none; font-size:14px; }
+  a.btn { display:block; text-align:center; margin:18px 0 8px; padding:12px; border-radius:10px; background:var(--gold); color:#1a1a1a; font-weight:bold; text-decoration:none; }
+  footer { margin-top:18px; font-size:12px; color:var(--sub); text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>♠ ポーカー ランキング</h1>
+    <select aria-label="年を選ぶ"><option>2026年</option><option>2025年</option></select>
+  </header>
+  <div class="period">集計期間：2026/01/01〜2026/12/31</div>
+
+  <nav class="tabs">
+    <a href="#t1">🏆 活躍</a>
+    <a href="#t2">🎖 皆勤</a>
+    <a href="#t3">⛏ 強制労働</a>
+  </nav>
+
+  <section class="panel" id="t2">
+    <p class="desc">回数の多い人向け（参加日数）</p>
+    <div class="podium">
+      <div class="step p2"><div class="nm">ダイヤ</div><div class="vl">16 日</div><div class="bar">2</div></div>
+      <div class="step p1"><div class="nm">クラブ</div><div class="vl">18 日</div><div class="bar">1</div></div>
+      <div class="step p3"><div class="nm">ナッツ</div><div class="vl">15 日</div><div class="bar">3</div></div>
+    </div>
+    <ul>
+      <li><span class="rk">4位</span><span class="nm">リバー</span><span>12 日</span></li>
+      <li><span class="rk">5位</span><span class="nm">ハート</span><span>11 日</span></li>
+    </ul>
+    <a class="more" href="Screen-002-b.html#r2">皆勤ランキングをすべて見る</a>
+  </section>
+
+  <section class="panel" id="t3">
+    <p class="desc">基準値（1 年の収支の合計）が小さい順。次の一勝で逆転！</p>
+    <div class="podium">
+      <div class="step p2"><div class="nm">フロップ</div><div class="vl minus">−95,500</div><div class="bar">2</div></div>
+      <div class="step p1"><div class="nm">ジョーカー <span class="tag">強制労働</span></div><div class="vl minus">−210,000</div><div class="bar">1</div></div>
+      <div class="step p3"><div class="nm">ターン</div><div class="vl minus">−61,000</div><div class="bar">3</div></div>
+    </div>
+    <ul>
+      <li><span class="rk">4位</span><span class="nm">ダイヤ</span><span class="minus">−22,300</span></li>
+      <li><span class="rk">5位</span><span class="nm">クラブ</span><span class="minus">−8,800</span></li>
+    </ul>
+    <a class="more" href="Screen-002-b.html#r3">強制労働への道のりをすべて見る</a>
+  </section>
+
+  <section class="panel default" id="t1">
+    <p class="desc">回数が少なくても活躍できる（プレイ時間で補正した 1 日あたりの収支）</p>
+    <div class="podium">
+      <div class="step p2"><div class="nm">リバー</div><div class="vl">+8,150</div><div class="bar">2</div></div>
+      <div class="step p1"><div class="nm">ナッツ</div><div class="vl">+12,400</div><div class="bar">1</div></div>
+      <div class="step p3"><div class="nm">スペード<br>ブラフ王</div><div class="vl">+5,020</div><div class="bar">3</div></div>
+    </div>
+    <ul>
+      <li><span class="rk">5位</span><span class="nm">ハート</span><span>+2,300</span></li>
+    </ul>
+    <a class="more" href="Screen-002-b.html#r1">活躍ランキングをすべて見る</a>
+  </section>
+
+  <a class="btn" href="Screen-006-a.html">📷 ランキングを画像にする</a>
+
+  <footer>本ページは有志が作成したものであり、開催店舗とは関係ありません。</footer>
+</div>
+</body>
+</html>

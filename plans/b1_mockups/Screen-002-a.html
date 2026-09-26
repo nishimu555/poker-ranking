@@ -1,0 +1,109 @@
+<!--
+Screen ID：Screen-002〜004（ランキング画面。3 画面で共通の配置）
+案：a（一覧表形式。1 行に 順位・ニックネーム・値・参加日数）
+対応する Feature：Feature-004（ランキング 1）、Feature-005（ランキング 2）、Feature-006（強制労働への道のり）、Feature-007（集計期間・年の切り替え・同順）、Feature-009（全員の一覧、個人の戦績へのリンク）、Feature-013（免責表示）
+見た目の基準の由来：b1/Question-010（ポーカー・カジノを題材にしたテーマ）、b1/Question-010-1（WCAG 2.1 AA：通常の文字で 4.5:1 以上）、Quality-005（スマートフォン前提）
+データ：すべて架空の仮データ（ニックネーム・数値は実在しない）
+備考：モックでは 1 ファイルで 3 画面（#r1＝Screen-002、#r2＝Screen-003、#r3＝Screen-004）を切り替えて表示している（:target）。
+採用：本案を採用（b1/Question-013）
+修正：ランキングの呼び名（アベレージランキング、累計ランキング、強制労働への道のり）を b1/Question-012-1 に基づき修正（2026-09-26 19:21）
+修正：累計ランキングを収支の合計が大きい順（見出し「累計チップ数」）に、強制労働への道のりを収支の合計がマイナスの人のみ（対象者なしは「ランキングなし」）に変更し、説明文を修正。アベレージランキングの見出しを「平均値チップ数」に修正（b1/review-001・004・005・006、a1/Question-024・025、b1/Question-016、2026-09-26 19:47）
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen-002〜004 ランキング画面（案 a）</title>
+<style>
+  :root { --felt:#0b3d2e; --felt2:#12573f; --gold:#f2c14e; --text:#ffffff; --sub:#d6e9df; --minus:#ff9e97; --card:#0f4a37; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--felt); color:var(--text); font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; }
+  .wrap { max-width:480px; margin:0 auto; padding:16px; }
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .top a { color:var(--gold); text-decoration:none; font-size:14px; }
+  select { background:var(--felt2); color:var(--text); border:1px solid var(--gold); border-radius:6px; padding:6px 8px; font-size:14px; }
+  .switch { display:flex; gap:6px; margin:14px 0 6px; }
+  .switch a { flex:1; text-align:center; padding:8px 2px; border-radius:8px; border:1px solid #2e7a5c; color:var(--sub); text-decoration:none; font-size:12px; }
+  .screen { display:none; }
+  .screen:target, .screen.default { display:block; }
+  .screen:target ~ .screen.default { display:none; }
+  h1 { font-size:20px; color:var(--gold); margin:10px 0 2px; }
+  p.desc { font-size:12px; color:var(--sub); margin:0 0 4px; }
+  p.period { font-size:13px; color:var(--sub); margin:0 0 10px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; font-size:12px; color:var(--sub); font-weight:normal; border-bottom:1px solid var(--gold); padding:6px 4px; }
+  td { padding:9px 4px; border-bottom:1px dashed #2e7a5c; }
+  td.rk { color:var(--gold); font-weight:bold; width:44px; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  td a { color:var(--text); text-decoration:underline; text-decoration-color:#2e7a5c; }
+  .minus { color:var(--minus); }
+  .tag { margin-left:4px; font-size:11px; background:#5a1f1a; color:#ffd7d3; border-radius:4px; padding:2px 5px; }
+  .note { font-size:12px; color:var(--sub); margin:10px 0; }
+  footer { margin-top:18px; padding-top:10px; border-top:1px solid #2e7a5c; font-size:12px; color:var(--sub); text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="Screen-001-a.html">‹ トップへ</a>
+    <select aria-label="年を選ぶ"><option>2026年</option><option>2025年</option></select>
+  </div>
+  <nav class="switch">
+    <a href="#r1">🏆 アベレージ</a><a href="#r2">🎖 累計</a><a href="#r3">⛏ 強制労働</a>
+  </nav>
+
+  <section class="screen" id="r2">
+    <h1>🎖 累計ランキング</h1>
+    <p class="desc">参加したすべてのゲームの累計（集計期間内の収支の合計が大きい順）</p>
+    <p class="period">集計期間：2026/01/01〜2026/12/31</p>
+    <table>
+      <tr><th>順位</th><th>ニックネーム</th><th class="num">累計チップ数</th><th class="num">参加日数</th></tr>
+      <tr><td class="rk">1位</td><td><a href="Screen-005-a.html">ナッツ</a></td><td class="num">+186,000</td><td class="num">15 日</td></tr>
+      <tr><td class="rk">2位</td><td><a href="Screen-005-a.html">リバー</a></td><td class="num">+44,200</td><td class="num">12 日</td></tr>
+      <tr><td class="rk">3位</td><td><a href="Screen-005-a.html">ハート</a></td><td class="num">+25,300</td><td class="num">11 日</td></tr>
+      <tr><td class="rk">4位</td><td><a href="Screen-005-a.html">スペード</a></td><td class="num">+18,600</td><td class="num">9 日</td></tr>
+      <tr><td class="rk">5位</td><td><a href="Screen-005-a.html">ブラフ王</a></td><td class="num">+9,500</td><td class="num">2 日</td></tr>
+      <tr><td class="rk">6位</td><td><a href="Screen-005-a.html">クラブ</a></td><td class="num minus">−8,800</td><td class="num">18 日</td></tr>
+      <tr><td class="rk">7位</td><td><a href="Screen-005-a.html">ダイヤ</a></td><td class="num minus">−22,300</td><td class="num">16 日</td></tr>
+      <tr><td class="rk">8位</td><td><a href="Screen-005-a.html">ターン</a></td><td class="num minus">−61,000</td><td class="num">4 日</td></tr>
+      <tr><td class="rk">9位</td><td><a href="Screen-005-a.html">フロップ</a></td><td class="num minus">−95,500</td><td class="num">6 日</td></tr>
+      <tr><td class="rk">10位</td><td><a href="Screen-005-a.html">ジョーカー</a></td><td class="num minus">−210,000</td><td class="num">8 日</td></tr>
+    </table>
+  </section>
+
+  <section class="screen" id="r3">
+    <h1>⛏ 強制労働への道のり</h1>
+    <p class="desc">強制労働に誰が近いか！のランキング（集計期間内の収支の合計がマイナスの人のみ。小さい順）。−（配布チップ数 × 10）以下で「強制労働」</p>
+    <p class="period">集計期間：2026/01/01〜2026/12/31</p>
+    <table>
+      <tr><th>順位</th><th>ニックネーム</th><th class="num">基準値</th><th class="num">参加日数</th></tr>
+      <tr><td class="rk">1位</td><td><a href="Screen-005-a.html">ジョーカー</a><span class="tag">強制労働</span></td><td class="num minus">−210,000</td><td class="num">8 日</td></tr>
+      <tr><td class="rk">2位</td><td><a href="Screen-005-a.html">フロップ</a></td><td class="num minus">−95,500</td><td class="num">6 日</td></tr>
+      <tr><td class="rk">3位</td><td><a href="Screen-005-a.html">ターン</a></td><td class="num minus">−61,000</td><td class="num">4 日</td></tr>
+      <tr><td class="rk">4位</td><td><a href="Screen-005-a.html">ダイヤ</a></td><td class="num minus">−22,300</td><td class="num">16 日</td></tr>
+      <tr><td class="rk">5位</td><td><a href="Screen-005-a.html">クラブ</a></td><td class="num minus">−8,800</td><td class="num">18 日</td></tr>
+    </table>
+    <p class="note">※ 対象者がいない場合は「ランキングなし」と表示します。</p>
+    <p class="note">※「強制労働」はあくまで遊びの表現です。次の一勝で逆転を！</p>
+  </section>
+
+  <section class="screen default" id="r1">
+    <h1>🏆 アベレージランキング</h1>
+    <p class="desc">回数が少なくても活躍できる（プレイ時間で補正した 1 日あたりの収支の平均）</p>
+    <p class="period">集計期間：2026/01/01〜2026/12/31</p>
+    <table>
+      <tr><th>順位</th><th>ニックネーム</th><th class="num">平均値チップ数</th><th class="num">参加日数</th></tr>
+      <tr><td class="rk">1位</td><td><a href="Screen-005-a.html">ナッツ</a></td><td class="num">+12,400</td><td class="num">15 日</td></tr>
+      <tr><td class="rk">2位</td><td><a href="Screen-005-a.html">リバー</a></td><td class="num">+8,150</td><td class="num">12 日</td></tr>
+      <tr><td class="rk">3位</td><td><a href="Screen-005-a.html">スペード</a></td><td class="num">+5,020</td><td class="num">9 日</td></tr>
+      <tr><td class="rk">3位</td><td><a href="Screen-005-a.html">ブラフ王</a></td><td class="num">+5,020</td><td class="num">2 日</td></tr>
+      <tr><td class="rk">5位</td><td><a href="Screen-005-a.html">ハート</a></td><td class="num">+2,300</td><td class="num">11 日</td></tr>
+      <tr><td class="rk">6位</td><td><a href="Screen-005-a.html">クラブ</a></td><td class="num minus">−490</td><td class="num">18 日</td></tr>
+    </table>
+  </section>
+
+  <footer>本ページは有志が作成したものであり、開催店舗とは関係ありません。</footer>
+</div>
+</body>
+</html>

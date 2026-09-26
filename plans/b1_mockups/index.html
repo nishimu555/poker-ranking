@@ -1,0 +1,72 @@
+<!--
+画面モックの一覧（b1 コンポーネント設計の確認用）
+由来：b1/Question-010（見た目の基準）、b1/Question-010-1（WCAG 2.1 AA）、b1/Question-011（案の数）
+データ：すべて架空の仮データ
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>画面モック一覧（b1）</title>
+<style>
+  body { margin:0; background:#f5f5f0; color:#1a1a1a; font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:20px; }
+  h1 { font-size:22px; }
+  table { width:100%; border-collapse:collapse; background:#fff; font-size:14px; }
+  th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top; }
+  th { background:#0b3d2e; color:#fff; }
+  a { color:#0b5a3f; }
+  .note { font-size:13px; color:#444; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>画面モック一覧（b1 コンポーネント設計）</h1>
+  <p class="note">スマートフォンでの表示を想定しています（PC で見る場合はブラウザの幅を狭くしてください）。表示しているニックネーム・数値はすべて架空の仮データです。採用する案と修正点は <code>plans/b1_design.md</code> の Question-012〜015 に回答してください。修正の指示は dev 項目に記載してください。</p>
+
+  <table>
+    <tr><th>Screen</th><th>名称</th><th>案</th><th>案の違い</th></tr>
+    <tr>
+      <td rowspan="2">Screen-001</td><td rowspan="2">トップ画面</td>
+      <td><a href="Screen-001-a.html">案 a</a></td>
+      <td>3 つのランキングをカードで縦に並べ、それぞれ上位 5 名を一覧で表示する。スクロールすると全ランキングが見られる。</td>
+    </tr>
+    <tr>
+      <td><a href="Screen-001-b.html">案 b</a></td>
+      <td>ランキングをタブで切り替える。1〜3 位を表彰台（高さの違う台）で表示し、4・5 位を一覧で表示する。</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Screen-002〜004</td><td rowspan="2">ランキング画面（アベレージ／累計／強制労働への道のり。共通の配置）</td>
+      <td><a href="Screen-002-a.html">案 a</a></td>
+      <td>一覧表形式。1 行に 順位・ニックネーム・値・参加日数を並べる。情報が多く、全員を短い縦幅で見られる。</td>
+    </tr>
+    <tr>
+      <td><a href="Screen-002-b.html">案 b</a></td>
+      <td>プレイヤーごとのカード形式。順位をチップの意匠で表示し、値の大きさを横棒で表示する。強制労働は「強制労働まであと○○」を併記する。</td>
+    </tr>
+    <tr>
+      <td>Screen-005</td><td>個人の戦績画面</td>
+      <td><a href="Screen-005-a.html">案 a</a></td>
+      <td>1 案のみ。数値のタイル、各ランキングの順位、強制労働までの残りチップ数のゲージ、実施日ごとの履歴。</td>
+    </tr>
+    <tr>
+      <td>Screen-006</td><td>画像生成画面</td>
+      <td><a href="Screen-006-a.html">案 a</a></td>
+      <td>1 案のみ。3 つのランキングの上位 5 名を 1 枚の 9:16 画像にまとめる。</td>
+    </tr>
+  </table>
+
+  <h2>共通事項</h2>
+  <ul class="note">
+    <li>雰囲気：ポーカー・カジノを題材にしたテーマ（テーブルの緑、金色、チップ・トランプの意匠）（b1/Question-010）</li>
+    <li>文字と背景の明暗の差：WCAG 2.1 AA（通常の文字で 4.5:1 以上）を目安に配色（b1/Question-010-1）</li>
+    <li>採用した案：Screen-001 は案 a、Screen-002〜004 は案 a、Screen-005・006 はモックのとおり（b1/Question-012〜014）。案 b は比較のための記録として残している（呼び名・名称は修正前のまま）</li>
+    <li>ランキングの呼び名：アベレージランキング（ランキング 1）、累計ランキング（ランキング 2）、強制労働への道のり（b1/Question-012-1）</li>
+    <li>アプリの名称：POKER RANKING（b1/Question-015-1）</li>
+    <li>免責表示の文言：「本ページは有志が作成したものであり、開催店舗とは関係ありません。」（b1/Question-015）</li>
+    <li>タブやランキングの切り替えは、モックでは HTML・CSS のみで再現している。実装では JavaScript で切り替える想定</li>
+  </ul>
+</div>
+</body>
+</html>
