@@ -1,5 +1,20 @@
 {
   "disableAllHooks": true,
+  "sandbox": {
+    "excludedCommands": ["docker *"],
+    "credentials": {
+      "files": [
+        { "path": "~/.ssh", "mode": "deny" },
+        { "path": "~/.aws", "mode": "deny" },
+        { "path": "~/.clasprc.json", "mode": "deny" }
+      ],
+      "envVars": [
+        { "name": "GITHUB_TOKEN", "mode": "deny" },
+        { "name": "GH_TOKEN", "mode": "deny" },
+        { "name": "NPM_TOKEN", "mode": "deny" }
+      ]
+    }
+  },
   "hooks": {
     "UserPromptSubmit": [
       {

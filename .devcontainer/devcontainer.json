@@ -1,0 +1,27 @@
+// AI 駆動開発の基盤用 Dev Container（共通部分のひな形）
+// - Claude Code は公式の Dev Container Feature で導入する。
+// - プログラミング言語・ツールは、c1 実装計画「2. 開発の前提」で決まった内容を features に追加する。
+// - 通信先の制限（ファイアウォール）が必要な場合は、guide/04_sandbox.md を参照する。
+// 参考：https://code.claude.com/docs/en/devcontainer
+{
+  "name": "ai-dev-base",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    // 例：言語を追加する場合
+    // "ghcr.io/devcontainers/features/python:1": {}
+  },
+  // root 以外のユーザーで実行する
+  "remoteUser": "vscode",
+  // Claude Code の認証・設定をコンテナの再作成後も保持する（プロジェクトごとに分離）
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+  },
+  // フック（.claude/hooks/）が使う jq を導入し、フックに実行権限を付ける
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y jq && chmod +x .claude/hooks/*.sh"
+  // 注意：~/.ssh、クラウドの認証情報ファイル等、ホストの秘密情報をマウントしない
+}

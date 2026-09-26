@@ -17,6 +17,7 @@
 |---|---|
 | `CLAUDE.md` | 全工程共通のルール |
 | `.claude/` | スキル、フック、設定 |
+| `.devcontainer/` | Dev Container のひな形（使う場合） |
 | `templates/` | ひな形 |
 | `guide/` | 本ガイド |
 | `.gitignore` | フックの目印ファイル等を Git の管理対象外にする設定 |
@@ -25,7 +26,7 @@
 
 ```bash
 cd <新規>
-cp -R <基盤>/CLAUDE.md <基盤>/.claude <基盤>/templates <基盤>/guide <基盤>/.gitignore .
+cp -R <基盤>/CLAUDE.md <基盤>/.claude <基盤>/.devcontainer <基盤>/templates <基盤>/guide <基盤>/.gitignore .
 mkdir -p docs/{_reference,a0_request,a1_requirements,b1_design/{decisions,mockups},c1_implementation-plan,c2_implement,c3_test-plan,c4_test,d1_setup} plans/_log src tests
 chmod +x .claude/hooks/*.sh
 ```
@@ -68,7 +69,16 @@ chmod +x .claude/hooks/*.sh
 - 記録は `docs/a0_request/request.md` が存在する場合のみ行われます。
 - 基盤そのものを編集している間は、`"disableAllHooks": true` を戻して記録を止めてください。
 
-## 6. 動作確認
+## 6. 実行環境を隔離する（推奨）
+
+AI がコマンドを実行する範囲を制限するため、次のいずれかを設定します。詳細は [04_sandbox.md](04_sandbox.md) を参照してください。
+
+| 方法 | 手順の概要 |
+|---|---|
+| Claude Code のサンドボックス（標準） | Claude Code で `/sandbox` を実行し、モードを選ぶ |
+| Dev Container | Docker と VS Code の Dev Containers 拡張を導入し、**Dev Containers: Reopen in Container** を実行する |
+
+## 7. 動作確認
 
 1. Claude Code の入力欄で `/` を入力し、次の 8 つのコマンドが候補に表示されることを確認します。
 
@@ -85,6 +95,6 @@ chmod +x .claude/hooks/*.sh
 
 2. 同じ名前の別のコマンドが表示される場合（名前の衝突）は、基盤の管理者に連絡してください。
 
-## 7. 開始する
+## 8. 開始する
 
 `/a1-requirements` を実行します。以降の進め方は [02_workflow.md](02_workflow.md) を参照してください。

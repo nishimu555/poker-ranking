@@ -10,6 +10,7 @@ AI は本フォルダを工程の根拠資料として使いません。
 | [01_setup.md](01_setup.md) | 利用開始の手順（基盤の取り込み、依頼書の作成、フックの有効化、動作確認） |
 | [02_workflow.md](02_workflow.md) | 使い方（工程ごとのコマンドの流れ、回答・指示・レビュー指摘の書き方） |
 | [03_notes.md](03_notes.md) | 注意点（書き換えてはいけない欄、コミット、秘密情報、引き継ぎ、困ったとき） |
+| [04_sandbox.md](04_sandbox.md) | 安全な実行環境（Claude Code のサンドボックス、Dev Container） |
 
 ## 全体像
 
@@ -55,7 +56,8 @@ flowchart TD
 |---|---|---|
 | `CLAUDE.md` | 全工程共通のルール | 基盤の管理者 |
 | `.claude/skills/` | 工程ごとのコマンド（スキル） | 基盤の管理者 |
-| `.claude/hooks/`、`.claude/settings.json` | やり取りの自動記録 | 基盤の管理者 |
+| `.claude/hooks/`、`.claude/settings.json` | やり取りの自動記録、サンドボックスの設定 | 基盤の管理者 |
+| `.devcontainer/` | Dev Container のひな形 | 基盤の管理者（言語・ツールは c1 の決定に合わせて追加） |
 | `templates/` | plan・成果物のひな形 | 基盤の管理者 |
 | `guide/` | 本ガイド | 基盤の管理者 |
 | `docs/a0_request/request.md` | 開発依頼書 | 開発者 |
