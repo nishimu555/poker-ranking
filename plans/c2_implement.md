@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 00:54 |
+| 最終更新 | 2026-09-27 00:57 |
 
 ## 1. 進捗
 
@@ -124,12 +124,19 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。四捨五入の結果が -0 になる場合（-0.4 等）は 0 を返すようにした（implementation-design.md「主要な関数」に記載）
-    - コミット：
-- [ ] 5-5. Task-006：順位付け
+    - コミット：ce40f2b task-005
+- [x] 5-5. Task-006：順位付け
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-006）
   - 作成・更新先：`src/aggregate/rank.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/aggregate/rank.test.js`（期待値1〜5、5 件）が全件失敗。理由：`src/aggregate/rank.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 38 件／38 件成功（Task-003〜005 の 33 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/` に `calc.js`・`rank.js`・`validate.js` を出力）
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし
+    - コミット：
 - [ ] 5-6. Task-007：年ごとの集計と 3 つのランキング
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-007）
@@ -329,3 +336,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 00:40 | /c2-implement | 5-2（Task-003）を実施し、実行結果を記載 | implementation-plan.md Task-003、5-1 のコミット欄についての開発者の回答（このままでよい） |
 | 2026-09-27 00:51 | /c2-implement | 5-3（Task-004）を実施し、実行結果を記載 | implementation-plan.md Task-004 |
 | 2026-09-27 00:54 | /c2-implement | 5-4（Task-005）を実施し、実行結果を記載 | implementation-plan.md Task-005 |
+| 2026-09-27 00:57 | /c2-implement | 5-5（Task-006）を実施し、実行結果を記載 | implementation-plan.md Task-006 |

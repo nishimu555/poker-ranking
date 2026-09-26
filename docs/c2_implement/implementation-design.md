@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 00:54 |
+| 最終更新 | 2026-09-27 00:57 |
 
 ## 1. ディレクトリ構成
 
@@ -23,11 +23,13 @@ poker-ranking/
 ├── src/
 │   └── aggregate/                    # 集計用プロジェクト
 │       ├── validate.js               # Task-004：行の確認
-│       └── calc.js                   # Task-005：収支・ウェイト・端数の計算
+│       ├── calc.js                   # Task-005：収支・ウェイト・端数の計算
+│       └── rank.js                   # Task-006：順位付け
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
         ├── aggregate/calc.test.js    # Task-005
+        ├── aggregate/rank.test.js    # Task-006
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -92,11 +94,19 @@ poker-ranking/
 | `scripts/build.js` | ビルド（`dist/` の生成、画面の CSS・JavaScript の埋め込み） | 開発環境 | Task-003（Task-001 で仮のスクリプトを作成） |
 | `src/aggregate/validate.js` | 行の確認（`validateRow`） | Component-003 | Task-004 |
 | `src/aggregate/calc.js` | 収支・ウェイト・端数の計算（`calcBalance`、`calcWeight`、`roundToInteger`） | Component-003 | Task-005 |
+| `src/aggregate/rank.js` | 順位付け（`rankEntries`、`pickTopRanked`） | Component-003 | Task-006 |
 
 ### GAS のコードの共通の書き方
 
 - GAS では全ファイルが同じ場所（グローバル）で動くため、関数はファイルの最上位に宣言する。
 - ファイルの末尾で、`module` がある場合のみ関数を公開する（`if (typeof module !== "undefined") { module.exports = { … }; }`）。GAS 上では `module` がないため何もしない（implementation-plan.md 2.）。
+- 同じプロジェクト（`src/aggregate/`、`src/viewer/`）の中では、ファイルの最上位の名前（関数・定数）を重複させない。GAS では全ファイルが同じ場所で動くため、重複すると上書きやエラーになる。
+
+| 最上位の名前 | ファイル |
+|---|---|
+| `isBlank`、`isValidDate`、`isNonNegativeNumber`、`validateRow` | `src/aggregate/validate.js` |
+| `calcBalance`、`calcWeight`、`roundToInteger` | `src/aggregate/calc.js` |
+| `TOP_RANK_LIMIT`、`compareNickname`、`rankEntries`、`pickTopRanked` | `src/aggregate/rank.js` |
 
 ### 主要な関数
 
@@ -106,6 +116,11 @@ poker-ranking/
 | `calcBalance(finalChips, distributedChips, debtCount)` | `src/aggregate/calc.js` | 最終チップ数、配布チップ数、借金回数 | 収支 ＝ 最終チップ数 − 配布チップ数 × 借金回数（丸めない） | Task-005 |
 | `calcWeight(playTime)` | `src/aggregate/calc.js` | プレイ時間 | ウェイト ＝ min(√（プレイ時間 ÷ 2）, 1)（丸めない） | Task-005 |
 | `roundToInteger(value)` | `src/aggregate/calc.js` | 数値 | 絶対値で四捨五入した整数（-2.5 → -3、-2.4 → -2）。結果が -0 の場合は 0 | Task-005 |
+| `rankEntries(entries, order)` | `src/aggregate/rank.js` | `entries`：`[{ nickname, value }]`、`order`：`"desc"`（大きい順）／`"asc"`（小さい順） | `[{ nickname, value, rank }]`（新しい配列。入力は変更しない）。値の順、同じ値はニックネームの文字コード順に並ぶ。同じ値は同じ順位、次の順位は同順の人数分を飛ばす | Task-006 |
+| `pickTopRanked(rankedEntries)` | `src/aggregate/rank.js` | `rankEntries` の戻り値 | 順位が 5 位以内（`TOP_RANK_LIMIT`）の要素（6 人以上になることがある） | Task-006 |
+
+- 文字コード順は、JavaScript の文字列の比較（`<`・`>`、UTF-16 の符号単位の順）で比べる。ロケールに依存しないため、GAS とローカルで同じ結果になる（c1/Question-014-1）。
+- 同じ値かどうかは値の完全一致（`===`）で判定する。値の丸めは呼び出し側（Task-007）で行う。
 
 `validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
 
@@ -125,6 +140,7 @@ poker-ranking/
 | `tests/small/scripts/build.test.js` | `scripts/build.js` の `build` | Task-003 期待値1〜3 |
 | `tests/small/aggregate/validate.test.js` | `src/aggregate/validate.js` の `validateRow` | Task-004 期待値1〜8 |
 | `tests/small/aggregate/calc.test.js` | `src/aggregate/calc.js` の `calcBalance`、`calcWeight`、`roundToInteger` | Task-005 期待値1〜6 |
+| `tests/small/aggregate/rank.test.js` | `src/aggregate/rank.js` の `rankEntries`、`pickTopRanked` | Task-006 期待値1〜5 |
 
 ## 4. 主要な処理の流れ
 
@@ -147,3 +163,4 @@ poker-ranking/
 | 2026-09-27 00:40 | /c2-implement | Task-003（ビルド用のスクリプト）を追加。ディレクトリ構成、ビルドの処理、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-003 |
 | 2026-09-27 00:51 | /c2-implement | Task-004（行の確認）を追加。ディレクトリ構成、ファイル一覧、GAS のコードの共通の書き方、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-004 |
 | 2026-09-27 00:54 | /c2-implement | Task-005（収支・ウェイト・端数の計算）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-005 |
+| 2026-09-27 00:57 | /c2-implement | Task-006（順位付け）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に最上位の名前の一覧を追加 | implementation-plan.md Task-006、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
