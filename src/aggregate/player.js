@@ -1,7 +1,7 @@
 // Task-008: 個人の戦績の集計（Component-003 集計ロジック）
 // 入力は有効な行（行の確認：Task-004 を通ったもの）と設定値、出力は年ごと・プレイヤーごとの戦績のデータ。
 // 他のファイルの関数（GAS では同じ場所で動く）
-/* global calcBalance, toDateKey, groupRowsByYear, aggregateAllYears */
+/* global calcBalance, roundToInteger, toDateKey, groupRowsByYear, aggregateAllYears */
 
 // Task-008: ランキングからプレイヤーの順位を探す。含まれない場合は null（Feature-010 条件2-2：画面で「−」）
 function findRank(rankedEntries, nickname) {
@@ -25,10 +25,9 @@ function buildPlayerStats(nickname, playerRows, settings, rankings) {
       playTime: row.playTime,
       finalChips: row.finalChips,
       debtCount: row.debtCount,
-      balance: calcBalance(
-        row.finalChips,
-        settings.distributedChips,
-        row.debtCount,
+      // 実施日ごとの収支は整数に四捨五入する（c1/Question-019）
+      balance: roundToInteger(
+        calcBalance(row.finalChips, settings.distributedChips, row.debtCount),
       ),
     });
   }

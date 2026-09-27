@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 09:56 |
+| 最終更新 | 2026-09-27 10:02 |
 
 ## 1. ディレクトリ構成
 
@@ -26,7 +26,8 @@ poker-ranking/
 │       ├── calc.js                   # Task-005：収支・ウェイト・端数の計算
 │       ├── rank.js                   # Task-006：順位付け
 │       ├── aggregate.js              # Task-007：年ごとの集計と 3 つのランキング
-│       └── player.js                 # Task-008：個人の戦績の集計
+│       ├── player.js                 # Task-008：個人の戦績の集計
+│       └── input-access.js           # Task-009：入力用スプレッドシートの読み込み
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -34,6 +35,7 @@ poker-ranking/
         ├── aggregate/rank.test.js    # Task-006
         ├── aggregate/aggregate.test.js # Task-007
         ├── aggregate/player.test.js  # Task-008
+        ├── aggregate/input-access.test.js # Task-009
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -101,6 +103,7 @@ poker-ranking/
 | `src/aggregate/rank.js` | 順位付け（`rankEntries`、`pickTopRanked`） | Component-003 | Task-006 |
 | `src/aggregate/aggregate.js` | 年ごとの集計と 3 つのランキング（`aggregateAllYears`） | Component-003 | Task-007 |
 | `src/aggregate/player.js` | 個人の戦績の集計（`aggregatePlayerStats`） | Component-003 | Task-008 |
+| `src/aggregate/input-access.js` | 入力用スプレッドシートの読み込み（`readPlayRows`、`readSettings`） | Component-004 | Task-009 |
 
 ### GAS のコードの共通の書き方
 
@@ -115,6 +118,7 @@ poker-ranking/
 | `TOP_RANK_LIMIT`、`compareNickname`、`rankEntries`、`pickTopRanked` | `src/aggregate/rank.js` |
 | `toDateKey`、`summarizePlayers`、`aggregateYear`、`groupRowsByYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
 | `findRank`、`buildPlayerStats`、`aggregatePlayerStats` | `src/aggregate/player.js` |
+| `PLAY_SHEET_NAME`、`SETTINGS_SHEET_NAME`、`PLAY_COLUMN_COUNT`、`SETTING_LABEL_DISTRIBUTED_CHIPS`、`SETTING_LABEL_FORCED_LABOR_COUNT`、`getRequiredSheet`、`readPlayRows`、`readSettings` | `src/aggregate/input-access.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -169,10 +173,28 @@ poker-ranking/
 | `totalDebtCount` | 借金回数の累計（借金回数の合計。丸めない） | Feature-010 条件1 |
 | `remainingChips` | 強制労働までの残りチップ数 ＝ `totalBalance` ＋ 配布チップ数 × N（0 以下もそのまま返す） | Feature-010 条件1 |
 | `ranks` | `{ average, total, forcedLabor }`。各ランキングでの順位。強制労働への道のりの対象外（基準値が 0 以上）は `null` | Feature-010 条件1・条件2-2 |
-| `history` | 実施日ごとの履歴 `[{ playDate, playTime, finalChips, debtCount, balance }]`。新しい日付から並ぶ。同じ日付の行はすべて含め、入力の順のまま。`balance` は `calcBalance` の値（丸めない） | Feature-010 条件1、component-design.md 8.（Screen-005）、c1/Question-016 |
+| `history` | 実施日ごとの履歴 `[{ playDate, playTime, finalChips, debtCount, balance }]`。新しい日付から並ぶ。同じ日付の行はすべて含め、入力の順のまま。`balance` は `calcBalance` の値を `roundToInteger` で整数に四捨五入した値 | Feature-010 条件1、component-design.md 8.（Screen-005）、c1/Question-016、c1/Question-019 |
 
 - 順位・基準値・平均値チップ数は `aggregateAllYears` の結果から取り出し、ランキングと個人の戦績で値が食い違わないようにする。
-- 丸めない値（合計プレイ時間、借金回数の累計、履歴の値）の表示の整形は、閲覧用の表示用の整形（Task-019）で行う。
+- 丸めない値（合計プレイ時間、借金回数の累計、履歴のプレイ時間・最終チップ数・借金回数）は入力の値のままとし、表示の整形は閲覧用の表示用の整形（Task-019）で行う。
+
+`src/aggregate/input-access.js`（Task-009）：
+
+| 関数 | 入力 | 出力 | Task |
+|---|---|---|---|
+| `readPlayRows(spreadsheet)` | 入力用スプレッドシート（`SpreadsheetApp.getActiveSpreadsheet()` の戻り値を呼び出し元が渡す） | シート「プレイ結果」の 2 行目から最終行（`getLastRow()`）までの 5 列を `[{ rowNumber, playerName, playDate, playTime, finalChips, debtCount }]` で返す。値はセルの値のまま（確認は `validateRow`）。データ行がない場合は空の配列 | Task-009 |
+| `readSettings(spreadsheet)` | 同上 | シート「設定」から `{ distributedChips, forcedLaborCount }` を返す。空欄はセルの値（空文字）のまま、項目名が見つからない場合は `null`（どちらも Task-014 で集計を中止する：b1/Question-019） | Task-009 |
+
+シート「設定」の配置（Task-012 で作り、Task-009 で読む）：
+
+| A 列（項目名） | B 列（値） | 由来 |
+|---|---|---|
+| 配布チップ数（`SETTING_LABEL_DISTRIBUTED_CHIPS`） | 配布チップ数（初期値は空欄） | Feature-002 条件1、b1/Question-019 |
+| 強制労働の基準の回数 N（`SETTING_LABEL_FORCED_LABOR_COUNT`） | N（初期値 10） | Feature-002 条件2、b1/Question-019 |
+
+- 値は行の位置ではなく、A 列の項目名が一致する行の B 列から読む（行の並びが変わっても読めるようにするため）。
+- シート「プレイ結果」「設定」がない場合は、メニューの「初期設定」を案内するエラー（`Error`）を投げる。呼び出し元（Task-014）で管理者へのメッセージにする（component-design.md 7.（エラー処理））。
+- スプレッドシートを引数で受け取るため、Small テストでは代用品（`getSheetByName`・`getLastRow`・`getRange`・`getDataRange` を `jest.fn()` で作ったもの）を渡す。
 
 `validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
 
@@ -195,6 +217,7 @@ poker-ranking/
 | `tests/small/aggregate/rank.test.js` | `src/aggregate/rank.js` の `rankEntries`、`pickTopRanked` | Task-006 期待値1〜5 |
 | `tests/small/aggregate/aggregate.test.js` | `src/aggregate/aggregate.js` の `aggregateAllYears` | Task-007 期待値1〜13 |
 | `tests/small/aggregate/player.test.js` | `src/aggregate/player.js` の `aggregatePlayerStats` | Task-008 期待値1〜7 |
+| `tests/small/aggregate/input-access.test.js` | `src/aggregate/input-access.js` の `readPlayRows`、`readSettings` | Task-009 期待値1〜3 |
 
 ## 4. 主要な処理の流れ
 
@@ -223,3 +246,4 @@ poker-ranking/
 | 2026-09-27 01:00 | /c2-implement | Task-007（年ごとの集計と 3 つのランキング）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に、他のファイルの関数の使い方と Small テストでの再現方法を追加 | implementation-plan.md Task-007、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
 | 2026-09-27 09:53 | /c2-implement | Task-008（個人の戦績の集計）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（`groupRowsByYear` の切り出しを含む）、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-008 |
 | 2026-09-27 09:56 | /c2-implement | Task-008 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）の設定を追加し、ディレクトリ構成・ファイル一覧・計画との違いを更新 | 開発者の指示（チャット） |
+| 2026-09-27 10:02 | /c2-implement | Task-009（入力用スプレッドシートの読み込み）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（シート「設定」の配置を含む）、テストファイル一覧を更新。Task-008 の履歴の収支を整数に四捨五入するよう修正し、主要な関数の記載を更新 | implementation-plan.md Task-009、c1/Question-019（収支も整数に四捨五入する） |

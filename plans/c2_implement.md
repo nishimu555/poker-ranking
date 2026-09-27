@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 09:56 |
+| 最終更新 | 2026-09-27 10:02 |
 
 ## 1. 進捗
 
@@ -165,12 +165,22 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストは全件成功）。implementation-design.md「5. 計画との違い」に記載
     - 開発者の指示による追加の変更（2026-09-27 09:56）：`.devcontainer/devcontainer.json` の `containerEnv` に `TZ`（`Asia/Tokyo`）を追加した（コンテナの既定は UTC）。`TZ=Asia/Tokyo`・UTC のどちらでも `npm test` 58 件／58 件成功。`npm run lint` 指摘 0 件、`prettier --check .` 違反 0 件。コンテナの作り直しと、その後に時刻が JST になることの確認は開発者が行う
-    - コミット：
-- [ ] 5-8. Task-009：入力用スプレッドシートの読み込み
+    - コミット：57f3f97 [Task-008] 個人の戦績の集計を実装し、コンテナの時刻を JST に設定
+- [x] 5-8. Task-009：入力用スプレッドシートの読み込み
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-009）
   - 作成・更新先：`src/aggregate/input-access.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 開始前の確認：5-7 の「コミット」欄が記入済み（57f3f97）であることを確認した。コンテナは作り直す前で時刻が UTC のため、記録の日時は `TZ=Asia/Tokyo` で取得した
+    - 失敗の確認：`tests/small/aggregate/input-access.test.js`（期待値1〜3、3 件）が全件失敗。理由：`src/aggregate/input-access.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 61 件／61 件成功（Task-003〜008 の 58 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/` に `aggregate.js`・`calc.js`・`input-access.js`・`player.js`・`rank.js`・`validate.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み、最上位の名前の重複によるエラーがなく `readPlayRows`・`readSettings` が定義されることを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。計画に定めのないシート「設定」の配置（A 列に項目名、B 列に値）と、シートがない場合の扱い（初期設定を案内するエラー）は implementation-design.md「主要な関数」に記載した
+    - Task-008 の修正：implementation-plan.md「テスト期待値の前提」の c1/Question-019（収支も整数に四捨五入する）に合わせ、`src/aggregate/player.js` の履歴の収支（`balance`）を `roundToInteger` で丸めるよう修正した。c1 の Task-008 の期待値には該当する項目がないため Small テストは追加せず、`dist/aggregate/` を読み込んだ実行環境で最終チップ数 100.5 の行の収支が 101 になることを確認した
+    - コミット：
 - [ ] 5-9. Task-010：除外した行の印付け
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-010）
@@ -359,3 +369,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 01:00 | /c2-implement | 5-6（Task-007）を実施し、実行結果を記載 | implementation-plan.md Task-007 |
 | 2026-09-27 09:53 | /c2-implement | 5-7（Task-008）を実施し、実行結果を記載 | implementation-plan.md Task-008、sandbox を無効にしてコマンドを実行するという開発者の指示（チャット） |
 | 2026-09-27 09:56 | /c2-implement | 5-7 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）を設定し、5-7 の実行結果に記載 | 開発者の指示（チャット：日時を JST にする、コンテナを作り直しても JST にする） |
+| 2026-09-27 10:02 | /c2-implement | 5-8（Task-009）を実施し、実行結果を記載。Task-008 の履歴の収支の丸めを修正し、5-8 の実行結果に記載 | implementation-plan.md Task-009、c1/Question-019 |
