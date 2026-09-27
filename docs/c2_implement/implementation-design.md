@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:00 |
+| 最終更新 | 2026-09-27 12:01 |
 
 ## 1. ディレクトリ構成
 
@@ -40,7 +40,8 @@ poker-ranking/
 │   └── viewer/                       # 閲覧用プロジェクト
 │       ├── server.js                 # Task-017：データの取得、Task-018：画面の返却
 │       └── client/
-│           └── index.html            # Task-018：画面の HTML（ビルド時に CSS・JavaScript を埋め込む）
+│           ├── index.html            # Task-018：画面の HTML（ビルド時に CSS・JavaScript を埋め込む）
+│           └── format.js             # Task-019：表示用の整形
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -54,6 +55,7 @@ poker-ranking/
         ├── aggregate/run.test.js     # Task-014
         ├── aggregate/menu.test.js    # Task-015
         ├── viewer/server.test.js     # Task-017・018
+        ├── viewer/format.test.js     # Task-019
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -155,6 +157,7 @@ poker-ranking/
 | `src/aggregate/menu.js` | メニュー（`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet`） | Component-002 | Task-015 |
 | `src/viewer/server.js` | Web アプリのサーバー側：データの取得（`getViewerData`）、画面の返却（`doGet`） | Component-006 | Task-017、Task-018 |
 | `src/viewer/client/index.html` | 画面の HTML（ビルド時に CSS・JavaScript を埋め込む） | Component-007 | Task-018 |
+| `src/viewer/client/format.js` | 表示用の整形（無害化、数値・順位・残りチップ数の表示、ゲージの割合） | Component-007 | Task-019 |
 
 ### GAS のコードの共通の書き方
 
@@ -180,6 +183,12 @@ poker-ranking/
 | 最上位の名前 | ファイル |
 |---|---|
 | `VIEWER_SPREADSHEET_ID_PROPERTY`、`NOT_VIEWABLE_MESSAGE`、`RANKING_KINDS`、`pad2`、`formatDate`、`formatDateTime`、`toRankOrNull`、`readDataRows`、`readSummary`、`readRankings`、`readPlayers`、`readHistory`、`getViewerData`、`APP_TITLE`、`doGet` | `src/viewer/server.js` |
+
+画面（`src/viewer/client/`。ビルドで 1 つの HTML に埋め込まれ、ブラウザの同じ場所で動く）：
+
+| 最上位の名前 | ファイル |
+|---|---|
+| `MINUS_SIGN`、`escapeHtml`、`groupDigits`、`formatNumber`、`formatSignedNumber`、`formatRank`、`formatRemainingChips`、`calcGaugePercent` | `src/viewer/client/format.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -332,6 +341,7 @@ poker-ranking/
 | `tests/small/aggregate/run.test.js` | `src/aggregate/run.js` の `runAggregation`（Component-003 は実物、Component-004 の関数と `updateNicknameOptions` は代用品） | Task-014 期待値1〜6 |
 | `tests/small/aggregate/menu.test.js` | `src/aggregate/menu.js` の `onOpen`（`SpreadsheetApp.getUi()` は代用品） | Task-015 期待値1 |
 | `tests/small/viewer/server.test.js` | `src/viewer/server.js` の `getViewerData`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-017 期待値1〜4、Task-018 期待値1 |
+| `tests/small/viewer/format.test.js` | `src/viewer/client/format.js` の各関数 | Task-019 期待値1〜9 |
 
 ## 4. 主要な処理の流れ
 
@@ -392,6 +402,21 @@ poker-ranking/
 - GAS の Web アプリでは、HTML 内の `<title>`・viewport の `<meta>` が効かないため、`setTitle("POKER RANKING")`（`APP_TITLE`：b1/Question-015-1）と `addMetaTag("viewport", "width=device-width, initial-scale=1")`（Quality-005）で指定する。
 - `index.html` の `<base target="_top">` は、画面内のリンクを GAS の枠の外で開くための指定である。
 
+### 表示用の整形（`src/viewer/client/format.js`、Task-019）
+
+| 関数 | 入力 | 出力（例） | 由来 |
+|---|---|---|---|
+| `escapeHtml(value)` | 文字列 | `&`・`<`・`>`・`"`・`'` を文字参照にした文字列（`<b>ナッツ&</b>` → `&lt;b&gt;ナッツ&amp;&lt;/b&gt;`） | b1/Question-018 |
+| `formatNumber(value)` | 数値 | 3 桁区切り。マイナスは「−」（U+2212）を付ける（244200 → `244,200`、-10000 → `−10,000`） | Feature-010 条件1 |
+| `formatSignedNumber(value)` | 数値 | プラスは「+」、マイナスは「−」を付けた 3 桁区切り。0 は `0`（44200 → `+44,200`、-8800 → `−8,800`） | 採用したモック（Screen-002、Screen-005） |
+| `formatRank(rank)` | 順位または `null` | `2位`。`null` は `−` | 採用したモック、Feature-010 条件2-2、b1/review-002 |
+| `formatRemainingChips(remainingChips)` | 残りチップ数 | 0 より大きい場合は `formatNumber`、0 以下は `強制労働` | c1/Question-022-1 |
+| `calcGaugePercent(totalBalance, distributedChips, forcedLaborCount)` | 基準値、配布チップ数、N | 基準値がマイナスの分 ÷（配布チップ数 × N）× 100。基準値が 0 以上は 0、上限 100 | c1/Question-022 |
+
+- 3 桁区切りは、ロケールに依存しないよう正規表現で行う（`toLocaleString` を使わない）。小数はそのまま残す（例：21.5）。
+- 配布チップ数 × N が 0 以下の場合（設定値の誤り）、`calcGaugePercent` は基準値がマイナスなら 100、それ以外は 0 を返す（0 での割り算を避ける）。
+- 閲覧用スプレッドシートには配布チップ数・N を置かないため、画面では「残りチップ数 − 基準値」（＝ 配布チップ数 × N）を求めて `calcGaugePercent(基準値, 残りチップ数 − 基準値, 1)` として呼ぶ（Task-023）。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -427,3 +452,4 @@ poker-ranking/
 | 2026-09-27 11:57 | /c2-implement | Task-016（集計用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、集計用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-016、clasp 3.4.1 の設定ファイルの扱い |
 | 2026-09-27 11:59 | /c2-implement | Task-017（データの取得）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（閲覧用プロジェクト）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-017 |
 | 2026-09-27 12:00 | /c2-implement | Task-018（画面の返却）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-018 |
+| 2026-09-27 12:01 | /c2-implement | Task-019（表示用の整形）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（画面）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-019 |
