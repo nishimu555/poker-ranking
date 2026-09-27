@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 11:40 |
+| 最終更新 | 2026-09-27 11:47 |
 
 ## 1. 進捗
 
@@ -208,12 +208,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：初回の `npm run lint` で 2 件（テストコードが代用品の `SpreadsheetApp` をグローバルの名前で参照していた：`no-undef`）。期待値は変えずに `global.SpreadsheetApp` と書き直し、指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。計画に定めのない各シートの列の並び・見出し、集計済みの年の書き方（「,」区切りの文字列）、「各ランキングでの順位」を 3 列に分けたこと、シートがない場合に作ること、例外時に実行ログへ残して失敗を返すことは、implementation-design.md「主要な関数」に記載した
-    - コミット：
-- [ ] 5-11. Task-012：入力用スプレッドシートの初期設定
+    - コミット：4a34e5c [Task-011] 閲覧用スプレッドシートへの書き出しを実装
+- [x] 5-11. Task-012：入力用スプレッドシートの初期設定
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-012）
   - 作成・更新先：`src/aggregate/setup.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 開始前の確認：`git status` で未コミットの変更は `plans/README.md`・`plans/c2_implement.md`（5-10 の「コミット」欄の記入等）のみであることを確認した。5-10 の「コミット」欄は記入済み（4a34e5c）
+    - 失敗の確認：`tests/small/aggregate/setup.test.js`（期待値1〜3、3 件）が全件失敗。理由：`src/aggregate/setup.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 70 件／70 件成功（Task-003〜011 の 67 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/setup.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み、最上位の名前の重複によるエラーがなく `setupInputSpreadsheet` が定義されることを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。数値の入力規則は GAS に「数値のみ」の指定がないため「0 以上の数値」とし（行の確認のマイナスを無効とする判定と一致）、規則に合わない入力を拒否する設定とした。implementation-design.md「主要な関数」に記載した
+    - コミット：
 - [ ] 5-12. Task-013：ニックネームの候補の更新
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-013）
@@ -391,3 +400,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 11:30 | /c2-implement | 5-9（Task-010）を実施し、実行結果を記載 | implementation-plan.md Task-010 |
 | 2026-09-27 11:36 | /c2-implement | 5-10（Task-011）を実施し、実行結果を記載 | implementation-plan.md Task-011 |
 | 2026-09-27 11:40 | /c2-implement | コミットの記録方法の注記（5. 作業手順と実行結果）を変更：5-10 以降は AI が git add・git commit を行い「コミット」欄に記入する。push は開発者が行う | 開発者の指示（2026-09-27 チャット）、c2 スキルの変更（「5. 実装」の「git の扱い」） |
+| 2026-09-27 11:47 | /c2-implement | 5-11（Task-012）を実施し、実行結果を記載 | implementation-plan.md Task-012 |
