@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:10 |
+| 最終更新 | 2026-09-27 12:11 |
 
 ## 1. ディレクトリ構成
 
@@ -44,6 +44,7 @@ poker-ranking/
 │           ├── format.js             # Task-019：表示用の整形、Task-021：ランキングの表示の定義
 │           ├── screen-top.js         # Task-021：Screen-001 トップ画面
 │           ├── screen-ranking.js     # Task-022：Screen-002〜004 ランキング画面
+│           ├── screen-player.js      # Task-023：Screen-005 個人の戦績画面
 │           ├── app.js                # Task-020：画面の共通部分（最後に読み込む）
 │           └── style.css             # Task-020：画面の見た目
 └── tests/
@@ -63,6 +64,7 @@ poker-ranking/
         ├── viewer/app.test.js        # Task-020
         ├── viewer/screen-top.test.js # Task-021
         ├── viewer/screen-ranking.test.js # Task-022
+        ├── viewer/screen-player.test.js # Task-023
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -167,6 +169,7 @@ poker-ranking/
 | `src/viewer/client/format.js` | 表示用の整形（無害化、数値・順位・残りチップ数の表示、ゲージの割合）、ランキングの表示の定義と上位の取り出し | Component-007 | Task-019、Task-021 |
 | `src/viewer/client/screen-top.js` | Screen-001 トップ画面（`buildTopContent`、`renderTopScreen`） | Component-007 | Task-021 |
 | `src/viewer/client/screen-ranking.js` | Screen-002〜004 ランキング画面（`buildRankingContent`、`renderRankingScreen`） | Component-007 | Task-022 |
+| `src/viewer/client/screen-player.js` | Screen-005 個人の戦績画面（`buildPlayerContent`、`renderPlayerScreen`） | Component-007 | Task-023 |
 | `src/viewer/client/app.js` | 画面の共通部分（年の選択、画面の切り替え、データの取得、閲覧できない旨、免責表示） | Component-007 | Task-020 |
 | `src/viewer/client/style.css` | 画面の見た目（採用したモックの色・配置） | Component-007 | Task-020（各画面の分は Task-021〜025 で追加） |
 
@@ -202,6 +205,7 @@ poker-ranking/
 | `MINUS_SIGN`、`escapeHtml`、`groupDigits`、`formatNumber`、`formatSignedNumber`、`formatRank`、`formatRemainingChips`、`calcGaugePercent`、`TOP_RANK_LIMIT`、`RANKING_DEFINITIONS`、`pickTopRanked`、`forcedLaborTag` | `src/viewer/client/format.js` |
 | `buildTopContent`、`renderTopScreen` | `src/viewer/client/screen-top.js` |
 | `buildRankingContent`、`renderRankingScreen` | `src/viewer/client/screen-ranking.js` |
+| `formatHours`、`buildPlayerContent`、`renderPlayerScreen` | `src/viewer/client/screen-player.js` |
 | `DISCLAIMER`、`NOT_VIEWABLE_FALLBACK_MESSAGE`、`buildYearOptions`、`buildNotViewableContent`、`buildPeriodText`、`appState`、`yearDataCache`、`el`、`navigate`、`buildYearSelect`、`screenHelpers`、`findRenderer`、`render`、`loadYear` | `src/viewer/client/app.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
@@ -359,6 +363,7 @@ poker-ranking/
 | `tests/small/viewer/app.test.js` | `src/viewer/client/app.js` の `buildYearOptions`、`buildNotViewableContent`、`DISCLAIMER` | Task-020 期待値1〜3 |
 | `tests/small/viewer/screen-top.test.js` | `src/viewer/client/screen-top.js` の `buildTopContent` | Task-021 期待値1〜4 |
 | `tests/small/viewer/screen-ranking.test.js` | `src/viewer/client/screen-ranking.js` の `buildRankingContent` | Task-022 期待値1〜4 |
+| `tests/small/viewer/screen-player.test.js` | `src/viewer/client/screen-player.js` の `buildPlayerContent` | Task-023 期待値1〜3 |
 
 ## 4. 主要な処理の流れ
 
@@ -480,6 +485,24 @@ poker-ranking/
 - `buildRankingContent(rankings, kind)`：`{ kind, icon, title, description, valueHeader, switchItems, rows, emptyText, notes }` を作る。`rows` は対象者全員の `{ rankText, nickname, tag, valueText, isMinus, daysText（「15 日」）, link（{ screen: "player", nickname }） }`（順位の順：Feature-009 条件1・条件2）。対象者がいない場合は「ランキングなし」（Feature-006 条件1-2）。強制労働への道のりでは、モックの注記「※「強制労働」はあくまで遊びの表現です。次の一勝で逆転を！」を `notes` に持つ（モックの「※ 対象者がいない場合は…」はモック上の説明のため表示しない）。
 - `renderRankingScreen`：採用したモック（Screen-002）の構成（「‹ トップへ」と年の選択、切り替え、見出し、説明文、集計期間、一覧の表、注記）で描く。ニックネームを選ぶと Screen-005 に移動する。
 
+### Screen-005 個人の戦績画面（`src/viewer/client/screen-player.js`、Task-023）
+
+- `buildPlayerContent(data, nickname)`：表示中の年の `players` からプレイヤーを探して内容を作る。閲覧者が誰かによらず同じ内容になる（Feature-010 条件2）。
+
+| 項目 | 内容 | 由来 |
+|---|---|---|
+| `tiles` | 参加日数（`12 日`）、合計プレイ時間（`21.5 時間`）、収支の累計（符号付き）、平均値チップ数（符号付き） | Feature-010 条件1、b1/Question-016 |
+| `ranks` | 🏆 アベレージ・🎖 累計・⛏ 強制労働の順位（`formatRank`。対象外は `−`） | Feature-010 条件1・条件2-2 |
+| `debtText` | 借金回数の累計（`3 回`） | Feature-010 条件1 |
+| `remainingText`・`reachedForcedLabor` | 残りチップ数（`formatRemainingChips`。0 以下は「強制労働」とし、ラベルの見た目で表示する） | c1/Question-022-1 |
+| `basisText` | 基準値（符号付き） | 採用したモック |
+| `gaugePercent` | `calcGaugePercent(基準値, 残りチップ数 − 基準値, 1)`（残りチップ数 − 基準値 ＝ 配布チップ数 × N） | c1/Question-022 |
+| `history` | 実施日ごとの履歴（日付、時間、最終チップ、借金、収支）。新しい日付から | Feature-010 条件1、採用したモック |
+
+- 表示中のプレイヤーが参加していない年を選んだ場合は、`{ hasRecord: false, emptyText: "この年の戦績はありません" }` とし、名前と集計期間の下に文言のみを表示する（c1/Question-021）。
+- 時間は `formatHours` で小数第 1 位まで表す（2 → `2.0`。モックの表記）。合計の誤差を避けるため小数第 2 位で丸め、小数第 2 位がある場合はそのまま表す。
+- アバターの記号はモックと同じ「♥」とした。「‹ ランキングへ」は、最後に表示したランキングの種類の画面に戻る。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -519,3 +542,4 @@ poker-ranking/
 | 2026-09-27 12:04 | /c2-implement | Task-020（画面の共通部分）を追加。ディレクトリ構成、ビルドの処理、ファイル一覧、最上位の名前（画面）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-020 |
 | 2026-09-27 12:05 | /c2-implement | Task-021（Screen-001 トップ画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れ（ランキングの表示の定義を含む）を更新 | implementation-plan.md Task-021、採用したモック（Screen-001） |
 | 2026-09-27 12:10 | /c2-implement | Task-022（Screen-002〜004 ランキング画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-022、採用したモック（Screen-002） |
+| 2026-09-27 12:11 | /c2-implement | Task-023（Screen-005 個人の戦績画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-023、採用したモック（Screen-005） |

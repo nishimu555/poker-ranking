@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:10 |
+| 最終更新 | 2026-09-27 12:11 |
 
 ## 1. 進捗
 
@@ -353,12 +353,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-002.html）と同じ構成・文言・CSS で作った（切り替えのボタンの表示中の強調はモックにないため付けていない）。ブラウザでの見た目の確認は、この環境にブラウザがないため行っていない（デプロイ後に開発者のレビュー、または c3 で定める Large テストで確認する）
     - 計画との差異：なし。強制労働への道のりの説明文の「−（配布チップ数 × 10）」は「−（配布チップ数 × N）」とした（N は設定値で変わるため。Task-021 で `RANKING_DEFINITIONS` に記載）
-    - コミット：
-- [ ] 5-22. Task-023：Screen-005 個人の戦績画面
+    - コミット：d6eea36 [Task-022] Screen-002〜004 ランキング画面を実装
+- [x] 5-22. Task-023：Screen-005 個人の戦績画面
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-023）
   - 作成・更新先：`src/viewer/client/screen-player.js`、`tests/small/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/viewer/screen-player.test.js`（期待値1〜3、3 件）が全件失敗。理由：`src/viewer/client/screen-player.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 109 件／109 件成功（Task-003〜022 の 106 件を含む）
+    - ビルド：`npm run build` 成功（`dist/viewer/index.html` に 5 つの JavaScript を埋め込んだ）
+    - 追加の確認：`dist/viewer/index.html` に埋め込んだ JavaScript を 1 つの実行環境に読み込み、構文の誤り・最上位の名前の重複によるエラーがないことを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-005.html）と同じ構成・文言・CSS で作った。ブラウザでの見た目の確認は、この環境にブラウザがないため行っていない（デプロイ後に開発者のレビュー、または c3 で定める Large テストで確認する）
+    - 計画との差異：なし。閲覧用スプレッドシートに配布チップ数・N がないため、ゲージの割合を「残りチップ数 − 基準値」から求めたこと、時間の表記、残りチップ数が 0 以下の場合の表示の形は implementation-design.md「4. 主要な処理の流れ」に記載した
+    - コミット：
 - [ ] 5-23. Task-024：画像に描く内容の計算
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-024）
@@ -492,3 +501,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:04 | /c2-implement | 5-19（Task-020）を実施し、実行結果を記載 | implementation-plan.md Task-020 |
 | 2026-09-27 12:05 | /c2-implement | 5-20（Task-021）を実施し、実行結果を記載 | implementation-plan.md Task-021 |
 | 2026-09-27 12:10 | /c2-implement | 5-21（Task-022）を実施し、実行結果を記載 | implementation-plan.md Task-022 |
+| 2026-09-27 12:11 | /c2-implement | 5-22（Task-023）を実施し、実行結果を記載 | implementation-plan.md Task-023 |

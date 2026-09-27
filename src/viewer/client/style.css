@@ -244,3 +244,119 @@ p.period-text {
   color: var(--sub);
   text-align: center;
 }
+/* Task-023: Screen-005 個人の戦績画面 */
+.profile {
+  text-align: center;
+  margin: 16px 0 8px;
+}
+.profile .avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  border: 4px dashed #fff5d6;
+}
+.profile h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--gold);
+}
+.player-period {
+  font-size: 13px;
+  color: var(--sub);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+}
+.stat .lb {
+  font-size: 12px;
+  color: var(--sub);
+}
+.stat .vl {
+  font-size: 18px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+.section-title {
+  font-size: 16px;
+  color: var(--gold);
+  margin: 18px 0 8px;
+}
+.ranks {
+  display: flex;
+  gap: 8px;
+}
+.ranks div {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--sub);
+}
+.ranks b {
+  display: block;
+  font-size: 18px;
+  color: var(--text);
+}
+.gauge {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+}
+.gauge .meter {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--line);
+  overflow: hidden;
+  margin: 8px 0 6px;
+}
+.gauge .meter span {
+  display: block;
+  height: 100%;
+  background: var(--minus);
+}
+.gauge p {
+  margin: 0;
+  font-size: 13px;
+}
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.history-table th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--sub);
+  font-weight: normal;
+  border-bottom: 1px solid var(--gold);
+  padding: 6px 4px;
+}
+.history-table td {
+  padding: 8px 4px;
+  border-bottom: 1px dashed var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.history-table .num {
+  text-align: right;
+}
