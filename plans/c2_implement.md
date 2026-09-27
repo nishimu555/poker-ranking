@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:11 |
+| 最終更新 | 2026-09-27 12:13 |
 
 ## 1. 進捗
 
@@ -367,12 +367,20 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-005.html）と同じ構成・文言・CSS で作った。ブラウザでの見た目の確認は、この環境にブラウザがないため行っていない（デプロイ後に開発者のレビュー、または c3 で定める Large テストで確認する）
     - 計画との差異：なし。閲覧用スプレッドシートに配布チップ数・N がないため、ゲージの割合を「残りチップ数 − 基準値」から求めたこと、時間の表記、残りチップ数が 0 以下の場合の表示の形は implementation-design.md「4. 主要な処理の流れ」に記載した
-    - コミット：
-- [ ] 5-23. Task-024：画像に描く内容の計算
+    - コミット：a39ec67 [Task-023] Screen-005 個人の戦績画面を実装
+- [x] 5-23. Task-024：画像に描く内容の計算
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-024）
   - 作成・更新先：`src/viewer/client/image-layout.js`、`tests/small/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/viewer/image-layout.test.js`（期待値1〜5、5 件）が全件失敗。理由：`src/viewer/client/image-layout.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 114 件／114 件成功（Task-003〜023 の 109 件を含む）
+    - ビルド：`npm run build` 成功（`dist/viewer/index.html` に 6 つの JavaScript を埋め込んだ）
+    - 追加の確認：`dist/viewer/index.html` に埋め込んだ JavaScript を 1 つの実行環境に読み込み、構文の誤り・最上位の名前の重複によるエラーがないことを確認した。同順位で各ランキング 12 人（計 36 行）の場合も、最後の行が免責表示の上に収まる（最後の行の下端 1800、免責表示 1831）ことを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。描く位置・大きさ・色（モックの 3 倍）、人数が増えた場合の縮め方、過去の年の集計時点の日付（その年の 12/31）は implementation-design.md「4. 主要な処理の流れ」に記載した
+    - コミット：
 - [ ] 5-24. Task-025：画像の描画と Screen-006
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-025）
@@ -502,3 +510,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:05 | /c2-implement | 5-20（Task-021）を実施し、実行結果を記載 | implementation-plan.md Task-021 |
 | 2026-09-27 12:10 | /c2-implement | 5-21（Task-022）を実施し、実行結果を記載 | implementation-plan.md Task-022 |
 | 2026-09-27 12:11 | /c2-implement | 5-22（Task-023）を実施し、実行結果を記載 | implementation-plan.md Task-023 |
+| 2026-09-27 12:13 | /c2-implement | 5-23（Task-024）を実施し、実行結果を記載 | implementation-plan.md Task-024 |

@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:11 |
+| 最終更新 | 2026-09-27 12:13 |
 
 ## 1. ディレクトリ構成
 
@@ -45,6 +45,7 @@ poker-ranking/
 │           ├── screen-top.js         # Task-021：Screen-001 トップ画面
 │           ├── screen-ranking.js     # Task-022：Screen-002〜004 ランキング画面
 │           ├── screen-player.js      # Task-023：Screen-005 個人の戦績画面
+│           ├── image-layout.js       # Task-024：画像に描く内容の計算
 │           ├── app.js                # Task-020：画面の共通部分（最後に読み込む）
 │           └── style.css             # Task-020：画面の見た目
 └── tests/
@@ -65,6 +66,7 @@ poker-ranking/
         ├── viewer/screen-top.test.js # Task-021
         ├── viewer/screen-ranking.test.js # Task-022
         ├── viewer/screen-player.test.js # Task-023
+        ├── viewer/image-layout.test.js # Task-024
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -170,6 +172,7 @@ poker-ranking/
 | `src/viewer/client/screen-top.js` | Screen-001 トップ画面（`buildTopContent`、`renderTopScreen`） | Component-007 | Task-021 |
 | `src/viewer/client/screen-ranking.js` | Screen-002〜004 ランキング画面（`buildRankingContent`、`renderRankingScreen`） | Component-007 | Task-022 |
 | `src/viewer/client/screen-player.js` | Screen-005 個人の戦績画面（`buildPlayerContent`、`renderPlayerScreen`） | Component-007 | Task-023 |
+| `src/viewer/client/image-layout.js` | 画像に描く内容の計算（`buildImageLayout`） | Component-008 | Task-024 |
 | `src/viewer/client/app.js` | 画面の共通部分（年の選択、画面の切り替え、データの取得、閲覧できない旨、免責表示） | Component-007 | Task-020 |
 | `src/viewer/client/style.css` | 画面の見た目（採用したモックの色・配置） | Component-007 | Task-020（各画面の分は Task-021〜025 で追加） |
 
@@ -206,6 +209,7 @@ poker-ranking/
 | `buildTopContent`、`renderTopScreen` | `src/viewer/client/screen-top.js` |
 | `buildRankingContent`、`renderRankingScreen` | `src/viewer/client/screen-ranking.js` |
 | `formatHours`、`buildPlayerContent`、`renderPlayerScreen` | `src/viewer/client/screen-player.js` |
+| `IMAGE_WIDTH`、`IMAGE_HEIGHT`、`IMAGE_COLORS`、`IMAGE_DISCLAIMER`、`IMAGE_METRICS`、`buildPointDate`、`buildImageLayout` | `src/viewer/client/image-layout.js` |
 | `DISCLAIMER`、`NOT_VIEWABLE_FALLBACK_MESSAGE`、`buildYearOptions`、`buildNotViewableContent`、`buildPeriodText`、`appState`、`yearDataCache`、`el`、`navigate`、`buildYearSelect`、`screenHelpers`、`findRenderer`、`render`、`loadYear` | `src/viewer/client/app.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
@@ -364,6 +368,7 @@ poker-ranking/
 | `tests/small/viewer/screen-top.test.js` | `src/viewer/client/screen-top.js` の `buildTopContent` | Task-021 期待値1〜4 |
 | `tests/small/viewer/screen-ranking.test.js` | `src/viewer/client/screen-ranking.js` の `buildRankingContent` | Task-022 期待値1〜4 |
 | `tests/small/viewer/screen-player.test.js` | `src/viewer/client/screen-player.js` の `buildPlayerContent` | Task-023 期待値1〜3 |
+| `tests/small/viewer/image-layout.test.js` | `src/viewer/client/image-layout.js` の `buildImageLayout` | Task-024 期待値1〜5 |
 
 ## 4. 主要な処理の流れ
 
@@ -503,6 +508,23 @@ poker-ranking/
 - 時間は `formatHours` で小数第 1 位まで表す（2 → `2.0`。モックの表記）。合計の誤差を避けるため小数第 2 位で丸め、小数第 2 位がある場合はそのまま表す。
 - アバターの記号はモックと同じ「♥」とした。「‹ ランキングへ」は、最後に表示したランキングの種類の画面に戻る。
 
+### 画像に描く内容の計算（`src/viewer/client/image-layout.js`、Task-024）
+
+`buildImageLayout(data)` は、canvas に依存せずに、描く順の図形・文字（`items`）と、ランキングごとの行（`blocks`：テスト・確認用）を返す。
+
+| 順 | 描く内容 | 由来 |
+|---|---|---|
+| 1 | 背景（中心が明るい緑の放射状のグラデーション）と金色の枠（線幅 9、角の丸み 42） | 採用したモック（Screen-006） |
+| 2 | 「♠ POKER RANKING ♥」（中央、54px、太字、金色） | b1/Question-015-1、採用したモック |
+| 3 | 「<年> 年（<年>/01/01〜<集計日> 時点）」（中央、33px） | 採用したモック |
+| 4 | 3 つのランキング（アベレージ → 累計 → 強制労働への道のり）。見出し（39px、金色）と下線、5 位以内の行（順位・ニックネーム・値）。対象者がいない場合は「ランキングなし」 | Feature-012 条件1、c1/Question-015、Feature-006 条件1-2 |
+| 5 | 免責表示「有志が作成したものであり、開催店舗とは関係ありません。」（中央、下端、27px） | Feature-013、採用したモック（画像内の文言） |
+
+- 大きさは 1080 × 1920（`IMAGE_WIDTH`・`IMAGE_HEIGHT`：9:16）。寸法・色は、モック（360 × 640 相当）の値を 3 倍にした（`IMAGE_METRICS`、`IMAGE_COLORS`）。
+- 「強制労働」に該当するプレイヤーは、ニックネームに「（強制労働）」を付ける（採用したモック）。
+- 同順位で表示の人数が増えた場合（c1/Question-015）は、行の高さ（標準 55px）と文字の大きさ（標準 36px）を、見出し・免責表示を除いた残りの高さに収まるよう縮める（各ランキング 12 人・計 36 行でも免責表示の上に収まることを確認した）。
+- 集計時点の日付は、集計日時の日付とする。表示中の年より後に集計した場合（過去の年を表示する場合）は、その年の 12/31 とする（`buildPointDate`）。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -543,3 +565,4 @@ poker-ranking/
 | 2026-09-27 12:05 | /c2-implement | Task-021（Screen-001 トップ画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れ（ランキングの表示の定義を含む）を更新 | implementation-plan.md Task-021、採用したモック（Screen-001） |
 | 2026-09-27 12:10 | /c2-implement | Task-022（Screen-002〜004 ランキング画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-022、採用したモック（Screen-002） |
 | 2026-09-27 12:11 | /c2-implement | Task-023（Screen-005 個人の戦績画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-023、採用したモック（Screen-005） |
+| 2026-09-27 12:13 | /c2-implement | Task-024（画像に描く内容の計算）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-024、採用したモック（Screen-006） |
