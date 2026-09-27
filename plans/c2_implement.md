@@ -14,7 +14,7 @@
 | ステータス | レビュー待ち |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:55 |
+| 最終更新 | 2026-09-27 13:01 |
 
 ## 1. 進捗
 
@@ -529,29 +529,29 @@ ID を付けずに追記した場合は、AI が ID を付与する。
   - 推奨：`--passWithNoTests` を外し、`jest` のみとする。根拠：implementation-plan.md 2.（全タスク共通の完了条件：Small テストがすべて成功する）を、テストが実行されたうえで確認できるようにするため
   - 開発者判断：推奨で対応
 
-  - AI対応内容：`package.json` の npm スクリプト `test` を `jest --passWithNoTests` から `jest` に変更した。`implementation-design.md` の開発ツールと npm スクリプト、計画との違い（Task-001）を更新した。コミット：（下記）
+  - AI対応内容：`package.json` の npm スクリプト `test` を `jest --passWithNoTests` から `jest` に変更した。`implementation-design.md` の開発ツールと npm スクリプト、計画との違い（Task-001）を更新した。コミット：59554bb [Task-001] ai-review-002：npm test からテストが 0 件でも成功する設定を外す
 
   - AI確認結果：`npm test` 18 ファイル 114 件／114 件成功。テストが見つからない場合（`jest --roots` に存在しないフォルダを指定）に終了コードが 1（失敗）になることを確認した。`npm run build` 成功、`npm run lint` 指摘 0 件、`prettier --check .` 違反 0 件、`npm audit --audit-level=moderate` 0 件（2026-09-27 13:00）
 
-- [ ] **ai-review-003**：`.gitignore` に、環境変数のファイル・鍵・証明書・npm の設定の除外がない
+- [x] **ai-review-003**：`.gitignore` に、環境変数のファイル・鍵・証明書・npm の設定の除外がない
   - 観点・重要度：6. 除外設定と秘密情報の配置／低
   - 事実：`git check-ignore` で、`.env`・`.env.local`・`*.pem`・`*.key`・`.npmrc` が除外されないことを確認した。現在、これらのファイルはリポジトリにない（`git status --ignored` で確認）。今後、開発者やツールがこれらのファイル（認証のトークン等を含みうる）を置いた場合、`git add` で誤って Git に含めるおそれがある
   - 推奨：`.gitignore` に `.env*`（見本を置く場合は `!.env.example`）、`*.pem`、`*.key`、`.npmrc` を、理由のコメントとともに追加する。根拠：c1 スキル・c1/Question-007（秘密情報を Git の管理対象外とする）、Microsoft SDL（秘密情報の管理）
   - 開発者判断：推奨で対応
 
-  - AI対応内容：
+  - AI対応内容：`.gitignore` に、理由のコメントとともに `.env*`（見本の `.env.example` は `!.env.example` で除外しない）、`*.pem`、`*.key`、`.npmrc` を追加した。`implementation-design.md` のディレクトリ構成・ファイル一覧を更新した。コミット：（下記）
 
-  - AI確認結果：
+  - AI確認結果：`git check-ignore -v` で、`.env`・`.env.local`・`.env.production`・`secret.pem`・`id.key`・`.npmrc`・`sub/.npmrc` が除外され、`.env.example`・見本の `.clasp.json.example`・ソース・`package.json` が除外されないことを確認した。`git ls-files -ci --exclude-standard` で、Git の管理対象のファイルに新しい除外に当たるものがないことを確認した（2026-09-27 13:01）
 
-- [ ] **ai-review-004**：c2 の範囲のコミットに、他の工程の plan・成果物の変更が含まれている
+- [x] **ai-review-004**：c2 の範囲のコミットに、他の工程の plan・成果物の変更が含まれている
   - 観点・重要度：5. 工程の範囲／参考
   - 事実：開発者のコミット `1aab1b1`（SKILL見直し）に c1 の成果物・plan（`docs/c1_implementation-plan/implementation-plan.md`、`plans/c1_implementation-plan.md`）と `guide/` の変更が、`a1c9d34`（task-003）に c3 の plan（`plans/c3_test-plan.md`）の新規作成が含まれている。いずれも c1・c3 の工程で作成・更新した内容を、c2 の作業と同じコミットにまとめたもので、c2 の AI が他工程のファイルを書き換えたものではない（各工程の plan の変更履歴と一致する）。なお、基盤（スキル・CLAUDE.md・テンプレート）の変更は、開発者の指示により独立したコミット（`0de1046`、`0180951`、`75ba852`、`fa84f68`）としている
   - 推奨：履歴の書き換えは不要（push 済みの可能性があり、内容にも問題がないため）。今後は工程ごとにコミットを分けると、工程の範囲の点検と差し戻しの影響の特定がしやすくなる。根拠：Microsoft Engineering Playbook（コミット規約：1 つのコミットに 1 つの目的）
   - 開発者判断：対応しない。今後の方針は推奨通りとする。
 
-  - AI対応内容：
+  - AI対応内容：対応しない（開発者判断：履歴の書き換えは行わない。今後は工程ごとにコミットを分ける方針とする）。コードと履歴は変更していない
 
-  - AI確認結果：
+  - AI確認結果：開発者判断のとおり、コミット `1aab1b1`・`a1c9d34` は変更していないことを確認した。今後の方針（工程ごとにコミットを分ける）は、AI がコミットする c2 のスキルの定め（そのタスク・指摘への対応で変更したファイルと、`plans/`・`docs/c2_implement/` の変更のみを `git add` する）と矛盾しない（2026-09-27 13:01）
 
 #### 最終レビューの実施記録
 
@@ -605,3 +605,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:18 | /c2-implement | 5-26（実装設計書の全体確認）を実施し、実行結果を記載。全手順が ☑ となったため「1. 進捗」の 5 に ☑ を付け、ステータスを「レビュー待ち」とした | c2 スキル「5. 実装」の「全タスクの完了」 |
 | 2026-09-27 12:47 | （開発者の指示） | 「9. レビュー指摘」に「AI からのレビュー指摘」と「最終レビューの実施記録」の欄を追加（templates/plan.md の変更に合わせた）。5-26 の実行結果の期待値の項目数を 109 から 96 に訂正 | 実装の最終レビューのスキル（r1-final-review）の追加（開発者の指示、チャット）、期待値の再集計 |
 | 2026-09-27 12:55 | /r1-final-review c2 | 実装の最終レビューを実施（観点 1〜6）。ai-review-001〜004 を追記し、「最終レビューの実施記録」に観点別の結果と未確認の観点を記載 | c2 スキル「5. 実装」の成果物（`1aab1b1` から `HEAD` まで）、r1-final-review スキル |
+| 2026-09-27 13:01 | /c2-implement | c2/ai-review-001〜004 に対応：001〜003 は推奨どおり修正してコミットし ☑、004 は開発者判断（対応しない）により ☑。成果物（`src/aggregate/viewer-writer.js`、`package.json`、`.gitignore`、`implementation-design.md`）を修正したため、再レビューが必要 | c2/ai-review-001〜004 の開発者判断 |

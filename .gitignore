@@ -13,3 +13,12 @@ node_modules/
 .clasprc.json
 # Task-016: プロジェクトごとの clasp の設定ファイル（リポジトリの直下に置く。見本は deploy/<プロジェクト>/.clasp.json.example）
 .clasp-*.json
+
+# Task-001（c2/ai-review-003）: 環境変数のファイル（認証のトークン等を含みうる）。見本（.env.example）は Git で管理する
+.env*
+!.env.example
+# Task-001（c2/ai-review-003）: 鍵・証明書
+*.pem
+*.key
+# Task-001（c2/ai-review-003）: npm の設定（レジストリの認証のトークンを含みうる）
+.npmrc

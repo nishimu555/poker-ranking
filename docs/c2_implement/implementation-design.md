@@ -5,14 +5,14 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 13:00 |
+| 最終更新 | 2026-09-27 13:01 |
 
 ## 1. ディレクトリ構成
 
 ```
 poker-ranking/
 ├── .devcontainer/devcontainer.json   # Task-002：Node.js 24.21.0 の固定、npm ci、タイムゾーン（JST）
-├── .gitignore                        # Task-001：dist/、node_modules/、.clasp.json、.clasprc.json、Task-016：.clasp-*.json
+├── .gitignore                        # Task-001：dist/、node_modules/、.clasp.json、.clasprc.json、.env*、*.pem、*.key、.npmrc、Task-016：.clasp-*.json
 ├── .clasp-aggregate.json             # Task-016：集計用の clasp の設定（開発者が作成。Git の管理対象外）
 ├── .clasp-viewer.json                # Task-026：閲覧用の clasp の設定とデプロイ ID（開発者が作成。Git の管理対象外）
 ├── .nvmrc                            # Task-001：Node.js の版（24.21.0）
@@ -168,7 +168,7 @@ poker-ranking/
 | `eslint.config.js` | ESLint の設定 | 開発環境 | Task-001 |
 | `jest.config.js` | Jest の設定 | 開発環境 | Task-001 |
 | `.prettierignore` | Prettier の対象外 | 開発環境 | Task-001 |
-| `.gitignore` | Git の管理対象外（秘密情報・ビルドの出力・依存ライブラリ） | 開発環境 | Task-001 |
+| `.gitignore` | Git の管理対象外（秘密情報：clasp の設定・認証情報、環境変数のファイル（`.env*`。見本の `.env.example` は除く）、鍵・証明書（`*.pem`、`*.key`）、npm の設定（`.npmrc`）。ビルドの出力・依存ライブラリ・個人用の Claude Code の設定） | 開発環境 | Task-001、Task-016、c2/ai-review-003 |
 | `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行、タイムゾーンの設定（`containerEnv` の `TZ`：`Asia/Tokyo`） | 開発環境 | Task-002 |
 | `.devcontainer/devcontainer-lock.json` | Dev Container の Feature の版の固定（Dev Container のツールが自動で作成・更新する） | 開発環境 | Task-002（Task-003 のコミットに含めた） |
 | `src/.gitkeep`、`tests/.gitkeep` | 空のフォルダを Git で管理するための空ファイル（基盤のひな形。フォルダに他のファイルができたため役割はないが、基盤のファイルのため残す） | 基盤 | — |
@@ -608,3 +608,4 @@ poker-ranking/
 | 2026-09-27 12:18 | /c2-implement | 5-26 の全体確認として、ファイル一覧に `.devcontainer/devcontainer-lock.json`・`src/.gitkeep`・`tests/.gitkeep` を追記し、「5. 計画との違い」をタスクの番号順に並べ直して Task-021・Task-021〜025・Task-022 の違いを追記 | c2 スキル（最後の手順：実装設計書の全体確認） |
 | 2026-09-27 13:00 | /c2-implement | c2/ai-review-001 への対応：閲覧用スプレッドシートへの書き出しで、文字列の列を書式なしテキストにしてから書き込むよう変更（主要な関数、最上位の名前を更新） | c2/ai-review-001 の開発者判断（推奨で対応） |
 | 2026-09-27 13:00 | /c2-implement | c2/ai-review-002 への対応：npm スクリプト `test` から `--passWithNoTests` を外した（開発ツールと npm スクリプト、計画との違いを更新） | c2/ai-review-002 の開発者判断（推奨で対応） |
+| 2026-09-27 13:01 | /c2-implement | c2/ai-review-003 への対応：`.gitignore` に `.env*`（`.env.example` を除く）、`*.pem`、`*.key`、`.npmrc` を追加（ディレクトリ構成、ファイル一覧を更新） | c2/ai-review-003 の開発者判断（推奨で対応） |
