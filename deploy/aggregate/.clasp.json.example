@@ -1,0 +1,4 @@
+{
+  "scriptId": "<入力用スプレッドシートに付属する集計用の GAS プロジェクトのスクリプト ID>",
+  "rootDir": "dist/aggregate"
+}

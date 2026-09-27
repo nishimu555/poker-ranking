@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 11:54 |
+| 最終更新 | 2026-09-27 11:57 |
 
 ## 1. 進捗
 
@@ -262,12 +262,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。メニューの名前（アプリの名称「POKER RANKING」）と、メニューの項目から呼ぶ関数（`menuRunAggregation`・`menuSetupInputSpreadsheet`）は implementation-design.md「4. 主要な処理の流れ」に記載した
-    - コミット：
-- [ ] 5-15. Task-016：集計用のデプロイ用スクリプト
+    - コミット：2515841 [Task-015] メニューを実装
+- [x] 5-15. Task-016：集計用のデプロイ用スクリプト
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-016）
   - 作成・更新先：`scripts/deploy.js`、`src/aggregate/appsscript.json`、`deploy/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：Small テストの対象なし（implementation-plan.md Task-016 のテスト期待値の概要）
+    - テスト：`npm test` 81 件／81 件成功（既存のテストがすべて成功することを確認）
+    - ビルド：`npm run build` 成功（`dist/aggregate/appsscript.json` を出力）
+    - 静的解析：初回の `npm run lint` で 1 件（`scripts/deploy.js` で例外を投げ直す際に元の例外を `cause` に付けていない：`preserve-caught-error`）。`{ cause: error }` を付けて指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件：`git check-ignore` で `.clasp.json`・`.clasprc.json`・`.clasp-aggregate.json` が Git の管理対象外であることを確認した。`deploy/aggregate/.clasp.json.example` の `rootDir` は `dist/aggregate`
+    - 追加の確認：`node scripts/deploy.js` を、設定ファイルがない場合・`rootDir` が `dist/aggregate` 以外の場合・`scriptId` が空の場合・対象外の値の場合に実行し、いずれもエラーで止まる（終了コード 1）ことを確認した。仮の `scriptId` の設定ファイルで `clasp --project .clasp-aggregate.json show-file-status` を実行し、送る対象が `dist/aggregate/` の 11 ファイル（`.js` と `appsscript.json`）のみであることを確認した（確認後に仮の設定ファイルを削除した）。`clasp push` は認証情報がないため実行していない（デプロイは開発者が行う）
+    - 計画との差異：(1) clasp 3.4.1 は設定ファイルのあるフォルダの外を `rootDir` にできない（`initClaspInstance` のパスの検査）ため、計画の `deploy/aggregate/.clasp.json` では `dist/aggregate/` を送れない。設定ファイルをリポジトリの直下の `.clasp-aggregate.json` とし、`.gitignore` に `.clasp-*.json` を追加した。見本は計画どおり `deploy/aggregate/.clasp.json.example`。根拠：implementation-plan.md 2.（ファイル名は c2 で変更してよい）。(2) マニフェストのタイムゾーンは根拠資料に定めがないため `Asia/Tokyo` とした（年・日付の判定がスクリプトのタイムゾーンで行われるため明示が必要）。開発者のレビューで確認する。いずれも implementation-design.md「5. 計画との違い」に記載
+    - コミット：
 - [ ] 5-16. Task-017：データの取得
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-017）
@@ -429,3 +438,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 11:52 | /c2-implement | 5-12（Task-013）を実施し、実行結果を記載 | implementation-plan.md Task-013、開発者の一時的な指示（5-26 まで承認なしで進める） |
 | 2026-09-27 11:53 | /c2-implement | 5-13（Task-014）を実施し、実行結果を記載 | implementation-plan.md Task-014 |
 | 2026-09-27 11:54 | /c2-implement | 5-14（Task-015）を実施し、実行結果を記載 | implementation-plan.md Task-015 |
+| 2026-09-27 11:57 | /c2-implement | 5-15（Task-016）を実施し、実行結果を記載 | implementation-plan.md Task-016 |

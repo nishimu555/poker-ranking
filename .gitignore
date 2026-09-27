@@ -11,3 +11,5 @@ node_modules/
 # Task-001: clasp のプロジェクトの設定ファイルと認証情報（秘密情報のため Git の管理対象外）
 .clasp.json
 .clasprc.json
+# Task-016: プロジェクトごとの clasp の設定ファイル（リポジトリの直下に置く。見本は deploy/<プロジェクト>/.clasp.json.example）
+.clasp-*.json
