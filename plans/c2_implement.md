@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 11:30 |
+| 最終更新 | 2026-09-27 11:40 |
 
 ## 1. 進捗
 
@@ -69,7 +69,7 @@ AI が段階を終えるたびに ☑ と日時を記載する。
 本工程は実行を伴うため、各手順に「実行結果」を記載する。
 記載するのは事実（失敗の確認、テスト結果、ビルド結果、静的解析、脆弱性チェック、コミット）と、計画との差異とその根拠のみとする。
 c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-001（開発ツールの設定）・Task-002（Dev Container への追加）と同じ内容のため、5-1 として実施する。
-コミットの記録（Question-002）：開発者がコミットした後、該当手順の「実行結果」に「コミット：<ID> <メッセージ>」を記入する。AI は git を実行しない。次のタスクに進む前に、前のタスクの「コミット」が空欄なら、AI は開発者に確認して止まる。
+コミットの記録（Question-002、2026-09-27 11:40 に開発者の指示で変更）：5-10（Task-011）以降は、AI がタスクの完了時に `git add`・`git commit` を行い、該当手順の「実行結果」に「コミット：<ID> <メッセージ>」を記入する（c2 スキル「5. 実装」の「git の扱い」）。push は開発者が行う。5-9（Task-010）までは開発者がコミットして記入した。
 -->
 
 - [x] 5-1. 開発環境の準備（Task-001：開発ツールの設定、Task-002：Dev Container への追加）
@@ -194,12 +194,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。印の色は設計書に「背景色」とのみ定められているため薄い赤（`#f4cccc`）とし、implementation-design.md「主要な関数」に記載した
-    - コミット：
+    - コミット：3eb192c [Task-010] 除外した行の印付けを実装
 - [ ] 5-10. Task-011：閲覧用スプレッドシートへの書き出し
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-011）
   - 作成・更新先：`src/aggregate/viewer-writer.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 開始前の確認：5-9 の「コミット」欄が記入済み（3eb192c）であることを確認した
+    - 失敗の確認：`tests/small/aggregate/viewer-writer.test.js`（期待値1〜4、4 件）が全件失敗。理由：`src/aggregate/viewer-writer.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 67 件／67 件成功（Task-003〜010 の 63 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/viewer-writer.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み、最上位の名前の重複によるエラーがなく `writeViewerSpreadsheet` が定義されることを確認した
+    - 静的解析：初回の `npm run lint` で 2 件（テストコードが代用品の `SpreadsheetApp` をグローバルの名前で参照していた：`no-undef`）。期待値は変えずに `global.SpreadsheetApp` と書き直し、指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。計画に定めのない各シートの列の並び・見出し、集計済みの年の書き方（「,」区切りの文字列）、「各ランキングでの順位」を 3 列に分けたこと、シートがない場合に作ること、例外時に実行ログへ残して失敗を返すことは、implementation-design.md「主要な関数」に記載した
+    - コミット：
 - [ ] 5-11. Task-012：入力用スプレッドシートの初期設定
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-012）
@@ -380,3 +389,5 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 09:56 | /c2-implement | 5-7 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）を設定し、5-7 の実行結果に記載 | 開発者の指示（チャット：日時を JST にする、コンテナを作り直しても JST にする） |
 | 2026-09-27 10:02 | /c2-implement | 5-8（Task-009）を実施し、実行結果を記載。Task-008 の履歴の収支の丸めを修正し、5-8 の実行結果に記載 | implementation-plan.md Task-009、c1/Question-019 |
 | 2026-09-27 11:30 | /c2-implement | 5-9（Task-010）を実施し、実行結果を記載 | implementation-plan.md Task-010 |
+| 2026-09-27 11:36 | /c2-implement | 5-10（Task-011）を実施し、実行結果を記載 | implementation-plan.md Task-011 |
+| 2026-09-27 11:40 | /c2-implement | コミットの記録方法の注記（5. 作業手順と実行結果）を変更：5-10 以降は AI が git add・git commit を行い「コミット」欄に記入する。push は開発者が行う | 開発者の指示（2026-09-27 チャット）、c2 スキルの変更（「5. 実装」の「git の扱い」） |

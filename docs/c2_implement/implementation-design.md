@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 11:30 |
+| 最終更新 | 2026-09-27 11:36 |
 
 ## 1. ディレクトリ構成
 
@@ -27,7 +27,8 @@ poker-ranking/
 │       ├── rank.js                   # Task-006：順位付け
 │       ├── aggregate.js              # Task-007：年ごとの集計と 3 つのランキング
 │       ├── player.js                 # Task-008：個人の戦績の集計
-│       └── input-access.js           # Task-009：入力用スプレッドシートの読み込み、Task-010：除外した行の印付け
+│       ├── input-access.js           # Task-009：入力用スプレッドシートの読み込み、Task-010：除外した行の印付け
+│       └── viewer-writer.js          # Task-011：閲覧用スプレッドシートへの書き出し
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -36,6 +37,7 @@ poker-ranking/
         ├── aggregate/aggregate.test.js # Task-007
         ├── aggregate/player.test.js  # Task-008
         ├── aggregate/input-access.test.js # Task-009・010
+        ├── aggregate/viewer-writer.test.js # Task-011
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -104,6 +106,7 @@ poker-ranking/
 | `src/aggregate/aggregate.js` | 年ごとの集計と 3 つのランキング（`aggregateAllYears`） | Component-003 | Task-007 |
 | `src/aggregate/player.js` | 個人の戦績の集計（`aggregatePlayerStats`） | Component-003 | Task-008 |
 | `src/aggregate/input-access.js` | 入力用スプレッドシートの読み込み（`readPlayRows`、`readSettings`）、除外した行の印付け（`markExcludedRows`） | Component-004 | Task-009、Task-010 |
+| `src/aggregate/viewer-writer.js` | 閲覧用スプレッドシートへの書き出し（`writeViewerSpreadsheet`） | Component-004、Component-005 | Task-011 |
 
 ### GAS のコードの共通の書き方
 
@@ -119,6 +122,7 @@ poker-ranking/
 | `toDateKey`、`summarizePlayers`、`aggregateYear`、`groupRowsByYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
 | `findRank`、`buildPlayerStats`、`aggregatePlayerStats` | `src/aggregate/player.js` |
 | `PLAY_SHEET_NAME`、`SETTINGS_SHEET_NAME`、`PLAY_COLUMN_COUNT`、`SETTING_LABEL_DISTRIBUTED_CHIPS`、`SETTING_LABEL_FORCED_LABOR_COUNT`、`getRequiredSheet`、`readPlayRows`、`readSettings`、`EXCLUDED_ROW_COLOR`、`markExcludedRows` | `src/aggregate/input-access.js` |
+| `VIEWER_SPREADSHEET_ID_KEY`、`RANKING_KIND_LABELS`、`VIEWER_SHEET_HEADERS`、`toCellValue`、`buildSummaryRows`、`buildRankingRows`、`buildPlayerRows`、`buildHistoryRows`、`replaceSheetValues`、`writeViewerSpreadsheet` | `src/aggregate/viewer-writer.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -208,6 +212,27 @@ poker-ranking/
 
 - ニックネームは `String(playerName).trim()` とする（プレイヤー名のセルが数値の場合も文字列にする）。
 
+`src/aggregate/viewer-writer.js`（Task-011）：
+
+| 関数 | 入力 | 出力 | Task |
+|---|---|---|---|
+| `writeViewerSpreadsheet(aggregation, aggregatedAt)` | `aggregation`：`{ years, rankingsByYear（aggregateAllYears の戻り値）, playersByYear（aggregatePlayerStats の戻り値） }`、`aggregatedAt`：集計日時（`Date`） | `{ ok: true }`、または `{ ok: false, message }`（管理者に知らせる文言）。4 シートの内容を置き換える | Task-011 |
+
+- 閲覧用スプレッドシートの ID は、スクリプトプロパティ `VIEWER_SPREADSHEET_ID` から読む（c1/Question-008）。未設定の場合は `openById` を呼ばず、`{ ok: false, message }` を返す。
+- `openById` や書き込みで例外が起きた場合は、`console.error` で GAS の標準の実行ログに残し、`{ ok: false, message }` を返す（component-design.md 7.（ログ・監視、エラー処理））。途中のシートまで書き込まれている場合がある（次の集計で置き換わる）。
+- 各シートは `clearContents()` で前回の内容（値）を消してから、1 行目に見出し、2 行目以降にデータを `setValues` で書き込む。シートがない場合は `insertSheet` で作る。
+
+閲覧用スプレッドシートの各シートの列（1 行目が見出し。component-design.md 5.）：
+
+| シート | 列（見出し） | 書き込む値 |
+|---|---|---|
+| 集計情報 | 集計日時、集計済みの年 | データは 1 行。集計済みの年は昇順を「,」でつないだ文字列（例：`2025,2026`） |
+| ランキング | 年、ランキングの種類、順位、ニックネーム、値、参加日数、強制労働の該当 | 年ごとに、種類「アベレージ」「累計」「強制労働への道のり」の順、各ランキングの表示の順。強制労働の該当は「強制労働への道のり」の行のみ `true`／`false`、他の種類は空欄 |
+| 個人の戦績 | 年、ニックネーム、参加日数、合計プレイ時間、収支の累計、平均値チップ数、借金回数の累計、強制労働までの残りチップ数、アベレージランキングの順位、累計ランキングの順位、強制労働への道のりの順位 | `aggregatePlayerStats` の値。順位がない（強制労働への道のりの対象外）欄は空欄 |
+| 履歴 | 年、ニックネーム、実施日、プレイ時間、最終チップ数、借金回数、収支 | プレイヤーごとに、新しい日付から |
+
+- 設計書の「各ランキングでの順位」は、ランキングごとに 1 列ずつ（3 列）とした。
+
 ## 3. テストファイル一覧
 
 | パス | 確かめる対象 | Task と期待値 |
@@ -220,6 +245,7 @@ poker-ranking/
 | `tests/small/aggregate/aggregate.test.js` | `src/aggregate/aggregate.js` の `aggregateAllYears` | Task-007 期待値1〜13 |
 | `tests/small/aggregate/player.test.js` | `src/aggregate/player.js` の `aggregatePlayerStats` | Task-008 期待値1〜7 |
 | `tests/small/aggregate/input-access.test.js` | `src/aggregate/input-access.js` の `readPlayRows`、`readSettings`、`markExcludedRows` | Task-009 期待値1〜3、Task-010 期待値1〜2 |
+| `tests/small/aggregate/viewer-writer.test.js` | `src/aggregate/viewer-writer.js` の `writeViewerSpreadsheet`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-011 期待値1〜4 |
 
 ## 4. 主要な処理の流れ
 
@@ -250,3 +276,4 @@ poker-ranking/
 | 2026-09-27 09:56 | /c2-implement | Task-008 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）の設定を追加し、ディレクトリ構成・ファイル一覧・計画との違いを更新 | 開発者の指示（チャット） |
 | 2026-09-27 10:02 | /c2-implement | Task-009（入力用スプレッドシートの読み込み）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（シート「設定」の配置を含む）、テストファイル一覧を更新。Task-008 の履歴の収支を整数に四捨五入するよう修正し、主要な関数の記載を更新 | implementation-plan.md Task-009、c1/Question-019（収支も整数に四捨五入する） |
 | 2026-09-27 11:30 | /c2-implement | Task-010（除外した行の印付け）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（印の色を含む）、テストファイル一覧を更新 | implementation-plan.md Task-010 |
+| 2026-09-27 11:36 | /c2-implement | Task-011（閲覧用スプレッドシートへの書き出し）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（閲覧用スプレッドシートの各シートの列を含む）、テストファイル一覧を更新 | implementation-plan.md Task-011、component-design.md 5. |
