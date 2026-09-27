@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 11:57 |
+| 最終更新 | 2026-09-27 11:59 |
 
 ## 1. ディレクトリ構成
 
@@ -37,6 +37,8 @@ poker-ranking/
 │       ├── setup.js                  # Task-012：入力用スプレッドシートの初期設定、Task-013：ニックネームの候補の更新
 │       ├── run.js                    # Task-014：集計の実行の処理の流れ
 │       └── menu.js                   # Task-015：メニュー
+│   └── viewer/                       # 閲覧用プロジェクト
+│       └── server.js                 # Task-017：データの取得
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -49,6 +51,7 @@ poker-ranking/
         ├── aggregate/setup.test.js   # Task-012・013
         ├── aggregate/run.test.js     # Task-014
         ├── aggregate/menu.test.js    # Task-015
+        ├── viewer/server.test.js     # Task-017
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -148,6 +151,7 @@ poker-ranking/
 | `src/aggregate/setup.js` | 入力用スプレッドシートの初期設定（`setupInputSpreadsheet`）、ニックネームの候補の更新（`updateNicknameOptions`） | Component-001 | Task-012、Task-013 |
 | `src/aggregate/run.js` | 集計の実行の処理の流れ（`runAggregation`） | Component-002 | Task-014 |
 | `src/aggregate/menu.js` | メニュー（`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet`） | Component-002 | Task-015 |
+| `src/viewer/server.js` | Web アプリのサーバー側：データの取得（`getViewerData`） | Component-006 | Task-017 |
 
 ### GAS のコードの共通の書き方
 
@@ -167,6 +171,12 @@ poker-ranking/
 | `PLAY_SHEET_HEADERS`、`DEFAULT_FORCED_LABOR_COUNT`、`createPlaySheet`、`createSettingsSheet`、`setupInputSpreadsheet`、`updateNicknameOptions` | `src/aggregate/setup.js` |
 | `isValidSettingValue`、`runAggregation` | `src/aggregate/run.js` |
 | `MENU_TITLE`、`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet` | `src/aggregate/menu.js` |
+
+閲覧用プロジェクト（`src/viewer/` 直下。画面の `client/` は GAS のサーバー側とは別の場所で動く）：
+
+| 最上位の名前 | ファイル |
+|---|---|
+| `VIEWER_SPREADSHEET_ID_PROPERTY`、`NOT_VIEWABLE_MESSAGE`、`RANKING_KINDS`、`pad2`、`formatDate`、`formatDateTime`、`toRankOrNull`、`readDataRows`、`readSummary`、`readRankings`、`readPlayers`、`readHistory`、`getViewerData` | `src/viewer/server.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -318,6 +328,7 @@ poker-ranking/
 | `tests/small/aggregate/setup.test.js` | `src/aggregate/setup.js` の `setupInputSpreadsheet`、`updateNicknameOptions`（`SpreadsheetApp` の入力規則とスプレッドシートは代用品） | Task-012 期待値1〜3、Task-013 期待値1〜2 |
 | `tests/small/aggregate/run.test.js` | `src/aggregate/run.js` の `runAggregation`（Component-003 は実物、Component-004 の関数と `updateNicknameOptions` は代用品） | Task-014 期待値1〜6 |
 | `tests/small/aggregate/menu.test.js` | `src/aggregate/menu.js` の `onOpen`（`SpreadsheetApp.getUi()` は代用品） | Task-015 期待値1 |
+| `tests/small/viewer/server.test.js` | `src/viewer/server.js` の `getViewerData`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-017 期待値1〜4 |
 
 ## 4. 主要な処理の流れ
 
@@ -345,6 +356,32 @@ poker-ranking/
 
 - メニューの名前は計画・設計に定めがないため、アプリの名称とした。
 - `menuRunAggregation`・`menuSetupInputSpreadsheet` の動作（ダイアログの表示）は、`SpreadsheetApp.getUi()` に依存するため Small テストの対象外とし、Medium（デプロイ先）で確認する（component-design.md 7.（テストのしやすさ））。
+
+### データの取得（`getViewerData(year)`、`src/viewer/server.js`、Task-017）
+
+画面から `google.script.run` で呼ばれ、閲覧用スプレッドシートの 4 シート（Task-011 の列の構成）から、指定した年の集計結果を返す。
+
+| 順 | 処理 | 失敗の扱い |
+|---|---|---|
+| 1 | スクリプトプロパティ `VIEWER_SPREADSHEET_ID` を読む | 未設定：`console.error` で実行ログに残し、`{ ok: false, message }` を返す（`openById` は呼ばない） |
+| 2 | `SpreadsheetApp.openById` で開く（アクセスしたユーザーの権限） | 例外（共有されていないアカウント等）：`console.warn` で実行ログに残し、`{ ok: false, message }` を返す |
+| 3 | シート「集計情報」から集計日時と集計済みの年（昇順）を読み、表示する年を決める | — |
+| 4 | その年のランキング・個人の戦績・履歴を読み、`{ ok: true, … }` を返す | 読み込み中の例外：`console.error` で実行ログに残し、`{ ok: false, message }` を返す |
+
+戻り値（`ok: true` の場合）：
+
+| 項目 | 内容 |
+|---|---|
+| `year` | 表示する年。引数の年が集計済みの年にない場合・指定しない場合は最新の年（c1/Question-020）。集計済みの年がない場合は `null` |
+| `years` | 集計済みの年（昇順の数値の配列） |
+| `aggregatedAt` | 集計日時の文字列（`yyyy/MM/dd HH:mm`） |
+| `rankings` | `{ average, total, forcedLabor }`。各要素は `{ rank, nickname, value, days }`（`forcedLabor` は `isForcedLabor` も持つ）。閲覧用スプレッドシートの並び（表示の順）のまま |
+| `players` | 個人の戦績 `[{ nickname, days, totalPlayTime, totalBalance, averageChips, totalDebtCount, remainingChips, ranks: { average, total, forcedLabor } }]`。空欄の順位は `null` |
+| `history` | ニックネームごとの履歴 `{ ニックネーム: [{ playDate（yyyy/MM/dd）, playTime, finalChips, debtCount, balance }] }`。新しい日付から |
+
+- `google.script.run` は `Date` を画面に渡せないため、日付・日時は文字列にして返す。日付の文字列は GAS のスクリプトのタイムゾーン（閲覧用のマニフェスト：Task-026）で作られる。
+- 閲覧できない場合の文言は `NOT_VIEWABLE_MESSAGE`（「閲覧できません。このページを閲覧するには、管理者からの招待が必要です。」）とし、原因（未設定・権限なし）を画面に出さない。原因は実行ログで確認する。
+- 強制労働への道のりの「強制労働の該当」は、閲覧用スプレッドシートの値が `true` の場合のみ `true` とする。
 
 ## 5. 計画との違い
 
@@ -379,3 +416,4 @@ poker-ranking/
 | 2026-09-27 11:53 | /c2-implement | Task-014（集計の実行の処理の流れ）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-014 |
 | 2026-09-27 11:54 | /c2-implement | Task-015（メニュー）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-015 |
 | 2026-09-27 11:57 | /c2-implement | Task-016（集計用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、集計用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-016、clasp 3.4.1 の設定ファイルの扱い |
+| 2026-09-27 11:59 | /c2-implement | Task-017（データの取得）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（閲覧用プロジェクト）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-017 |
