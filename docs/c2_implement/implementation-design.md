@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 11:52 |
+| 最終更新 | 2026-09-27 11:53 |
 
 ## 1. ディレクトリ構成
 
@@ -29,7 +29,8 @@ poker-ranking/
 │       ├── player.js                 # Task-008：個人の戦績の集計
 │       ├── input-access.js           # Task-009：入力用スプレッドシートの読み込み、Task-010：除外した行の印付け
 │       ├── viewer-writer.js          # Task-011：閲覧用スプレッドシートへの書き出し
-│       └── setup.js                  # Task-012：入力用スプレッドシートの初期設定、Task-013：ニックネームの候補の更新
+│       ├── setup.js                  # Task-012：入力用スプレッドシートの初期設定、Task-013：ニックネームの候補の更新
+│       └── run.js                    # Task-014：集計の実行の処理の流れ
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -40,6 +41,7 @@ poker-ranking/
         ├── aggregate/input-access.test.js # Task-009・010
         ├── aggregate/viewer-writer.test.js # Task-011
         ├── aggregate/setup.test.js   # Task-012・013
+        ├── aggregate/run.test.js     # Task-014
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -110,6 +112,7 @@ poker-ranking/
 | `src/aggregate/input-access.js` | 入力用スプレッドシートの読み込み（`readPlayRows`、`readSettings`）、除外した行の印付け（`markExcludedRows`） | Component-004 | Task-009、Task-010 |
 | `src/aggregate/viewer-writer.js` | 閲覧用スプレッドシートへの書き出し（`writeViewerSpreadsheet`） | Component-004、Component-005 | Task-011 |
 | `src/aggregate/setup.js` | 入力用スプレッドシートの初期設定（`setupInputSpreadsheet`）、ニックネームの候補の更新（`updateNicknameOptions`） | Component-001 | Task-012、Task-013 |
+| `src/aggregate/run.js` | 集計の実行の処理の流れ（`runAggregation`） | Component-002 | Task-014 |
 
 ### GAS のコードの共通の書き方
 
@@ -127,6 +130,7 @@ poker-ranking/
 | `PLAY_SHEET_NAME`、`SETTINGS_SHEET_NAME`、`PLAY_COLUMN_COUNT`、`SETTING_LABEL_DISTRIBUTED_CHIPS`、`SETTING_LABEL_FORCED_LABOR_COUNT`、`getRequiredSheet`、`readPlayRows`、`readSettings`、`EXCLUDED_ROW_COLOR`、`markExcludedRows` | `src/aggregate/input-access.js` |
 | `VIEWER_SPREADSHEET_ID_KEY`、`RANKING_KIND_LABELS`、`VIEWER_SHEET_HEADERS`、`toCellValue`、`buildSummaryRows`、`buildRankingRows`、`buildPlayerRows`、`buildHistoryRows`、`replaceSheetValues`、`writeViewerSpreadsheet` | `src/aggregate/viewer-writer.js` |
 | `PLAY_SHEET_HEADERS`、`DEFAULT_FORCED_LABOR_COUNT`、`createPlaySheet`、`createSettingsSheet`、`setupInputSpreadsheet`、`updateNicknameOptions` | `src/aggregate/setup.js` |
+| `isValidSettingValue`、`runAggregation` | `src/aggregate/run.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -275,10 +279,23 @@ poker-ranking/
 | `tests/small/aggregate/input-access.test.js` | `src/aggregate/input-access.js` の `readPlayRows`、`readSettings`、`markExcludedRows` | Task-009 期待値1〜3、Task-010 期待値1〜2 |
 | `tests/small/aggregate/viewer-writer.test.js` | `src/aggregate/viewer-writer.js` の `writeViewerSpreadsheet`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-011 期待値1〜4 |
 | `tests/small/aggregate/setup.test.js` | `src/aggregate/setup.js` の `setupInputSpreadsheet`、`updateNicknameOptions`（`SpreadsheetApp` の入力規則とスプレッドシートは代用品） | Task-012 期待値1〜3、Task-013 期待値1〜2 |
+| `tests/small/aggregate/run.test.js` | `src/aggregate/run.js` の `runAggregation`（Component-003 は実物、Component-004 の関数と `updateNicknameOptions` は代用品） | Task-014 期待値1〜6 |
 
 ## 4. 主要な処理の流れ
 
-（Component をまたぐ処理は Task-014 以降で記載する）
+### 集計の実行（`runAggregation(spreadsheet, notify)`、Task-014）
+
+| 順 | 処理 | 呼び出す関数 | 失敗・中止の扱い | 由来 |
+|---|---|---|---|---|
+| 1 | 設定値の確認 | `readSettings` | 配布チップ数・N のどちらかが数値（`number` かつ有限）でなければ、該当する項目名を含むメッセージを表示して中止する。印付け・書き出しは行わない | b1/Question-019 |
+| 2 | 行の確認と印付け | `readPlayRows`、`validateRow`、`markExcludedRows` | 無効な行は集計から除外し、行番号に印を付ける（前回の印は消す） | b1/Question-008、b1/Question-020 |
+| 3 | 集計と書き出し | `aggregateAllYears`、`aggregatePlayerStats`、`writeViewerSpreadsheet`（集計日時は実行した時刻） | 書き出しが失敗した場合（`ok: false`）は、その `message` を表示して終える（候補の更新は行わない） | Decision-0006、component-design.md 7.（エラー処理） |
+| 4 | ニックネームの候補の更新 | `updateNicknameOptions`（有効な行のニックネーム） | — | c1/Question-009 |
+| 5 | 完了のメッセージ | `notify` | 集計した行の数と除外した行の数を表示する。除外した行がある場合は、背景色で示していることを添える | b1/Question-008 |
+
+- 途中で例外が起きた場合（シートがない等）は、`console.error` で実行ログに残し、「集計を実行できませんでした。」に例外のメッセージを続けて表示する。
+- `notify` は、メニューから呼ぶ際に `SpreadsheetApp.getUi().alert` を渡す（Task-015）。Small テストでは `jest.fn()` を渡す。
+- 設定値のマイナス・0 は、計画・設計に定めがないため中止の対象にしていない。
 
 ## 5. 計画との違い
 
@@ -308,3 +325,4 @@ poker-ranking/
 | 2026-09-27 11:36 | /c2-implement | Task-011（閲覧用スプレッドシートへの書き出し）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（閲覧用スプレッドシートの各シートの列を含む）、テストファイル一覧を更新 | implementation-plan.md Task-011、component-design.md 5. |
 | 2026-09-27 11:47 | /c2-implement | Task-012（入力用スプレッドシートの初期設定）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（作るシートの内容・入力規則を含む）、テストファイル一覧を更新 | implementation-plan.md Task-012 |
 | 2026-09-27 11:52 | /c2-implement | Task-013（ニックネームの候補の更新）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-013 |
+| 2026-09-27 11:53 | /c2-implement | Task-014（集計の実行の処理の流れ）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-014 |

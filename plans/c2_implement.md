@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 11:52 |
+| 最終更新 | 2026-09-27 11:53 |
 
 ## 1. 進捗
 
@@ -236,12 +236,20 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。候補の並び順（文字コード順）と、候補が 0 件の場合に入力規則を外すことは implementation-design.md「主要な関数」に記載した
-    - コミット：
-- [ ] 5-13. Task-014：集計の実行の処理の流れ
+    - コミット：3c13518 [Task-013] ニックネームの候補の更新を実装
+- [x] 5-13. Task-014：集計の実行の処理の流れ
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-014）
   - 作成・更新先：`src/aggregate/run.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/aggregate/run.test.js`（期待値1〜6、8 件。期待値1・2 は空欄と数値でない値の 2 件ずつ）が全件失敗。理由：`src/aggregate/run.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 80 件／80 件成功（Task-003〜013 の 72 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/run.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み、最上位の名前の重複によるエラーがなく `runAggregation` が定義されることを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。メッセージの表示は引数 `notify` で受け取る形とした（component-design.md 7.（テストのしやすさ））。書き出しの失敗時は候補の更新を行わないこと、例外時の扱い、設定値のマイナス・0 は中止の対象にしていないことは implementation-design.md「4. 主要な処理の流れ」に記載した
+    - コミット：
 - [ ] 5-14. Task-015：メニュー
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-015）
@@ -411,3 +419,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 11:40 | /c2-implement | コミットの記録方法の注記（5. 作業手順と実行結果）を変更：5-10 以降は AI が git add・git commit を行い「コミット」欄に記入する。push は開発者が行う | 開発者の指示（2026-09-27 チャット）、c2 スキルの変更（「5. 実装」の「git の扱い」） |
 | 2026-09-27 11:47 | /c2-implement | 5-11（Task-012）を実施し、実行結果を記載 | implementation-plan.md Task-012 |
 | 2026-09-27 11:52 | /c2-implement | 5-12（Task-013）を実施し、実行結果を記載 | implementation-plan.md Task-013、開発者の一時的な指示（5-26 まで承認なしで進める） |
+| 2026-09-27 11:53 | /c2-implement | 5-13（Task-014）を実施し、実行結果を記載 | implementation-plan.md Task-014 |
