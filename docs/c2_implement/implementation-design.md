@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:01 |
+| 最終更新 | 2026-09-27 12:04 |
 
 ## 1. ディレクトリ構成
 
@@ -41,7 +41,9 @@ poker-ranking/
 │       ├── server.js                 # Task-017：データの取得、Task-018：画面の返却
 │       └── client/
 │           ├── index.html            # Task-018：画面の HTML（ビルド時に CSS・JavaScript を埋め込む）
-│           └── format.js             # Task-019：表示用の整形
+│           ├── format.js             # Task-019：表示用の整形
+│           ├── app.js                # Task-020：画面の共通部分（最後に読み込む）
+│           └── style.css             # Task-020：画面の見た目
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -56,6 +58,7 @@ poker-ranking/
         ├── aggregate/menu.test.js    # Task-015
         ├── viewer/server.test.js     # Task-017・018
         ├── viewer/format.test.js     # Task-019
+        ├── viewer/app.test.js        # Task-020
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -101,7 +104,7 @@ poker-ranking/
 | 3 | `src/<プロジェクト>/client/index.html` がある場合、`<link rel="stylesheet" href="…">` を `<style>` に、`<script src="…"></script>` を `<script>` に置き換え、参照先の内容を埋め込んだ `index.html` を `dist/<プロジェクト>/` に出力する。JavaScript は `index.html` に書いた順に埋め込まれる | Task-003 期待値2、c1/Question-001 |
 
 - ローカルのテスト用の公開部分（`module` がある場合のみ公開する記述）は、そのまま出力する。GAS・ブラウザには `module` がないため動作に影響しない（Task-003 作業内容）。
-- 画面の JavaScript の読み込み順は、`src/viewer/client/index.html` の `<script src>` の並び順で決まる（Task-020 以降で記載する）。
+- 画面の JavaScript の読み込み順は、`src/viewer/client/index.html` の `<script src>` の並び順で決まる（「4. 主要な処理の流れ」の「画面の共通部分」）。
 - 次の場合はエラーにしてビルドを止める：埋め込む CSS に `</style`、JavaScript に `</script` が含まれる（HTML のタグが途中で閉じるため）。`index.html` が `client/` の外のファイルを参照している。
 - `build(rootDir)` を公開し、Small テストでは一時フォルダを `rootDir` にして確認する。
 
@@ -158,6 +161,8 @@ poker-ranking/
 | `src/viewer/server.js` | Web アプリのサーバー側：データの取得（`getViewerData`）、画面の返却（`doGet`） | Component-006 | Task-017、Task-018 |
 | `src/viewer/client/index.html` | 画面の HTML（ビルド時に CSS・JavaScript を埋め込む） | Component-007 | Task-018 |
 | `src/viewer/client/format.js` | 表示用の整形（無害化、数値・順位・残りチップ数の表示、ゲージの割合） | Component-007 | Task-019 |
+| `src/viewer/client/app.js` | 画面の共通部分（年の選択、画面の切り替え、データの取得、閲覧できない旨、免責表示） | Component-007 | Task-020 |
+| `src/viewer/client/style.css` | 画面の見た目（採用したモックの色・配置） | Component-007 | Task-020（各画面の分は Task-021〜025 で追加） |
 
 ### GAS のコードの共通の書き方
 
@@ -189,6 +194,7 @@ poker-ranking/
 | 最上位の名前 | ファイル |
 |---|---|
 | `MINUS_SIGN`、`escapeHtml`、`groupDigits`、`formatNumber`、`formatSignedNumber`、`formatRank`、`formatRemainingChips`、`calcGaugePercent` | `src/viewer/client/format.js` |
+| `DISCLAIMER`、`NOT_VIEWABLE_FALLBACK_MESSAGE`、`buildYearOptions`、`buildNotViewableContent`、`buildPeriodText`、`appState`、`yearDataCache`、`el`、`navigate`、`buildYearSelect`、`screenHelpers`、`findRenderer`、`render`、`loadYear` | `src/viewer/client/app.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -342,6 +348,7 @@ poker-ranking/
 | `tests/small/aggregate/menu.test.js` | `src/aggregate/menu.js` の `onOpen`（`SpreadsheetApp.getUi()` は代用品） | Task-015 期待値1 |
 | `tests/small/viewer/server.test.js` | `src/viewer/server.js` の `getViewerData`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-017 期待値1〜4、Task-018 期待値1 |
 | `tests/small/viewer/format.test.js` | `src/viewer/client/format.js` の各関数 | Task-019 期待値1〜9 |
+| `tests/small/viewer/app.test.js` | `src/viewer/client/app.js` の `buildYearOptions`、`buildNotViewableContent`、`DISCLAIMER` | Task-020 期待値1〜3 |
 
 ## 4. 主要な処理の流れ
 
@@ -417,6 +424,26 @@ poker-ranking/
 - 配布チップ数 × N が 0 以下の場合（設定値の誤り）、`calcGaugePercent` は基準値がマイナスなら 100、それ以外は 0 を返す（0 での割り算を避ける）。
 - 閲覧用スプレッドシートには配布チップ数・N を置かないため、画面では「残りチップ数 − 基準値」（＝ 配布チップ数 × N）を求めて `calcGaugePercent(基準値, 残りチップ数 − 基準値, 1)` として呼ぶ（Task-023）。
 
+### 画面の共通部分（`src/viewer/client/app.js`、Task-020）
+
+画面は 1 つの HTML（単一ページ）で、表示する画面を JavaScript で切り替える（Decision-0003）。
+
+| 項目 | 内容 | 由来 |
+|---|---|---|
+| 読み込み順 | `index.html` の `<script src>` の順：`format.js` → 各画面のファイル（Task-021〜025 で追加） → `app.js`（最後）。`app.js` は読み込まれると `loadYear()` を呼び、最新の年のデータを取得して描画を始める | Task-003（ビルドで書いた順に埋め込む） |
+| 画面の状態 | `appState`：`data`（`getViewerData` の戻り値）、`loading`、`screen`（`top`・`ranking`・`player`・`image`）、`rankingKind`（`average`・`total`・`forcedLabor`）、`nickname` | Task-020 |
+| 画面の切り替え | `navigate(screen, params)` で状態を変えて `render()` し、先頭に戻す。URL（ハッシュ）は使わない | Decision-0003 |
+| データの取得 | `loadYear(year)`：`google.script.run.getViewerData(year)` を呼ぶ。取得済みの年は `yearDataCache` から表示する。失敗（通信の失敗等）は `console.error` に残し、閲覧できない旨を表示する | Component-006、Feature-007 条件2 |
+| 年の選択 | `buildYearOptions(years)`：選択肢は新しい年から、最初に選ぶ年は最新の年。`buildYearSelect()` で `<select>` を作り、選ぶと `loadYear` を呼ぶ | Feature-007 条件2、c1/Question-020、c1/Question-021 |
+| 閲覧できない旨 | `buildNotViewableContent(result)`：`ok` でない場合は `{ viewable: false, message }`。`render()` はデータの代わりに文言のみを表示する | Quality-001、component-design.md 7.（エラー処理） |
+| 集計期間 | `buildPeriodText(year)`：`集計期間：<年>/01/01〜<年>/12/31` | Feature-007 条件1、採用したモック |
+| 免責表示 | `DISCLAIMER` を、すべての画面の末尾（`<footer>`）に置く | Feature-013、b1/Question-015 |
+| 各画面の描画 | 各画面のファイルの `renderTopScreen`・`renderRankingScreen`・`renderPlayerScreen`・`renderImageScreen`（`(data, appState, screenHelpers)` を受け取り、要素の配列を返す）を `render()` が呼ぶ。未定義の画面は「準備中です。」と表示する | Task-021〜025 |
+| 文字の表示 | `el(tag, props, children)` で要素を作り、文字列はテキストノードとして追加する（`innerHTML` を使わない） | b1/Question-018 |
+
+- 集計済みの年がない場合（`year` が `null`）は「集計結果がまだありません。」と表示する。
+- `style.css` には、採用したモックの共通の見た目（色の変数、ヘッダー、年の選択、免責表示等）を置き、各画面の見た目は Task-021〜025 で追加する。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -453,3 +480,4 @@ poker-ranking/
 | 2026-09-27 11:59 | /c2-implement | Task-017（データの取得）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（閲覧用プロジェクト）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-017 |
 | 2026-09-27 12:00 | /c2-implement | Task-018（画面の返却）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-018 |
 | 2026-09-27 12:01 | /c2-implement | Task-019（表示用の整形）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（画面）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-019 |
+| 2026-09-27 12:04 | /c2-implement | Task-020（画面の共通部分）を追加。ディレクトリ構成、ビルドの処理、ファイル一覧、最上位の名前（画面）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-020 |

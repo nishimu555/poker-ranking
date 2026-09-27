@@ -1,0 +1,112 @@
+/* Task-020: 画面の見た目（採用したモック：docs/b1_design/mockups/Screen-001・002・005・006.html） */
+/* テーマ：ポーカー・カジノ（b1/Question-010）。文字と背景の明暗の差は WCAG 2.1 AA（b1/Question-010-1） */
+:root {
+  --felt: #0b3d2e;
+  --felt2: #12573f;
+  --gold: #f2c14e;
+  --text: #ffffff;
+  --sub: #d6e9df;
+  --minus: #ff9e97;
+  --card: #0f4a37;
+  --line: #2e7a5c;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--felt);
+  color: var(--text);
+  font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+a,
+.link {
+  color: var(--gold);
+  text-decoration: none;
+  cursor: pointer;
+}
+select {
+  background: var(--felt2);
+  color: var(--text);
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+.minus {
+  color: var(--minus);
+}
+.tag {
+  margin-left: 6px;
+  font-size: 11px;
+  background: #5a1f1a;
+  color: #ffd7d3;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+.note,
+.loading {
+  font-size: 12px;
+  color: var(--sub);
+  margin: 10px 0;
+}
+.loading {
+  text-align: center;
+  font-size: 14px;
+  margin: 40px 0;
+}
+.not-viewable {
+  margin: 24px 0;
+  padding: 14px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: var(--card);
+  font-size: 14px;
+  line-height: 1.6;
+}
+footer {
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--sub);
+  text-align: center;
+}
+/* 共通：ヘッダー（Screen-001） */
+.app-header {
+  text-align: center;
+  padding: 20px 8px 12px;
+  border-bottom: 2px solid var(--gold);
+}
+.app-header .suits {
+  color: var(--gold);
+  letter-spacing: 8px;
+  font-size: 20px;
+}
+.app-header h1 {
+  margin: 6px 0 4px;
+  font-size: 24px;
+  color: var(--gold);
+}
+/* 共通：戻るリンクと年の選択の行（Screen-002・005・006） */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-bar .link {
+  font-size: 14px;
+}
+.period {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+  font-size: 14px;
+  color: var(--sub);
+}

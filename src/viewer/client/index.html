@@ -4,8 +4,13 @@
     <!-- Task-018: 閲覧用の画面（Component-007）。タイトルと viewport は server.js の doGet で指定する -->
     <meta charset="UTF-8" />
     <base target="_top" />
+    <!-- Task-020: 画面の見た目（ビルド時に埋め込む） -->
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="wrap" id="app"></div>
+    <!-- Task-020: 画面の JavaScript（ビルド時にこの順で埋め込む。app.js は最後に読み込み、描画を始める） -->
+    <script src="format.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

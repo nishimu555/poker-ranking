@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:01 |
+| 最終更新 | 2026-09-27 12:04 |
 
 ## 1. 進捗
 
@@ -312,12 +312,20 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。3 桁区切りをロケールに依存しない方法で行うこと、配布チップ数 × N が 0 以下の場合の扱い、画面でゲージの割合を求める方法（閲覧用スプレッドシートに設定値がないため、残りチップ数 − 基準値 を使う）は implementation-design.md「4. 主要な処理の流れ」に記載した
-    - コミット：
-- [ ] 5-19. Task-020：画面の共通部分
+    - コミット：ecb13a1 [Task-019] 表示用の整形を実装
+- [x] 5-19. Task-020：画面の共通部分
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-020）
   - 作成・更新先：`src/viewer/client/app.js`・`index.html`・`style.css`、`tests/small/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/viewer/app.test.js`（期待値1〜3、3 件）が全件失敗。理由：`src/viewer/client/app.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 98 件／98 件成功（Task-003〜019 の 95 件を含む）
+    - ビルド：`npm run build` 成功（`dist/viewer/index.html` に `style.css` と、`format.js`・`app.js` の 2 つの JavaScript を埋め込んだ）
+    - 追加の確認：`dist/viewer/index.html` に埋め込んだ JavaScript を 1 つの実行環境に読み込み、構文の誤り・最上位の名前の重複によるエラーがないことを確認した
+    - 静的解析：初回の `npm run lint` で 1 件（`app.js` の `/* global */` で、ESLint の設定で既知の `google` を重ねて宣言していた：`no-redeclare`）。宣言から `google` を外し、指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。画面の切り替え・データの取得・描画の仕組みは implementation-design.md「4. 主要な処理の流れ」に記載した。DOM での表示と画面の切り替えの動作は Small テストの対象外（Large テストで確認する：component-design.md 7.（テストのしやすさ））
+    - コミット：
 - [ ] 5-20. Task-021：Screen-001 トップ画面
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-021）
@@ -463,3 +471,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 11:59 | /c2-implement | 5-16（Task-017）を実施し、実行結果を記載 | implementation-plan.md Task-017 |
 | 2026-09-27 12:00 | /c2-implement | 5-17（Task-018）を実施し、実行結果を記載 | implementation-plan.md Task-018 |
 | 2026-09-27 12:01 | /c2-implement | 5-18（Task-019）を実施し、実行結果を記載 | implementation-plan.md Task-019 |
+| 2026-09-27 12:04 | /c2-implement | 5-19（Task-020）を実施し、実行結果を記載 | implementation-plan.md Task-020 |
