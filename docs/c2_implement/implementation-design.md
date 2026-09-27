@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:17 |
+| 最終更新 | 2026-09-27 12:18 |
 
 ## 1. ディレクトリ構成
 
@@ -170,6 +170,8 @@ poker-ranking/
 | `.prettierignore` | Prettier の対象外 | 開発環境 | Task-001 |
 | `.gitignore` | Git の管理対象外（秘密情報・ビルドの出力・依存ライブラリ） | 開発環境 | Task-001 |
 | `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行、タイムゾーンの設定（`containerEnv` の `TZ`：`Asia/Tokyo`） | 開発環境 | Task-002 |
+| `.devcontainer/devcontainer-lock.json` | Dev Container の Feature の版の固定（Dev Container のツールが自動で作成・更新する） | 開発環境 | Task-002（Task-003 のコミットに含めた） |
+| `src/.gitkeep`、`tests/.gitkeep` | 空のフォルダを Git で管理するための空ファイル（基盤のひな形。フォルダに他のファイルができたため役割はないが、基盤のファイルのため残す） | 基盤 | — |
 | `scripts/build.js` | ビルド（`dist/` の生成、画面の CSS・JavaScript の埋め込み） | 開発環境 | Task-003（Task-001 で仮のスクリプトを作成） |
 | `scripts/deploy.js` | デプロイ（ビルドと clasp push、閲覧用の既存のデプロイの更新） | 開発環境 | Task-016、Task-026 |
 | `deploy/aggregate/.clasp.json.example` | 集計用の clasp の設定ファイルの見本（リポジトリの直下に `.clasp-aggregate.json` として複製して使う） | 開発環境 | Task-016 |
@@ -563,11 +565,14 @@ poker-ranking/
 | Task-001 | 作成予定のファイルに `scripts/build.js` を含まない | 完了条件の `npm run build` を実行できるよう、仮の `scripts/build.js` を作成した。Task-003 で置き換える | implementation-plan.md 2.（全タスク共通の完了条件）、Task-001（テスト期待値の概要） |
 | Task-001 | npm スクリプト `test` | Small テストが 0 件の段階でも `npm test` が成功するよう、`jest --passWithNoTests` とした | implementation-plan.md Task-001（テスト期待値の概要：コマンドが実行できること） |
 | Task-002 | Node.js の Feature の版の固定と `npm ci` の追加 | 加えて、`containerEnv` に `TZ`（`Asia/Tokyo`）を設定し、コンテナの時刻を JST にした（既定は UTC）。JST・UTC のどちらでも Small テストが全件成功することを確認した（2026-09-27 09:56） | 開発者の指示（2026-09-27、チャット：記録の日時を JST にし、コンテナを作り直しても JST にする） |
-| Task-016 | clasp の設定ファイルを `deploy/aggregate/.clasp.json`（Git の管理対象外）とし、見本を `deploy/aggregate/.clasp.json.example` とする | 設定ファイルをリポジトリの直下の `.clasp-aggregate.json` とした（`.gitignore` に `.clasp-*.json` を追加）。見本は計画どおり `deploy/aggregate/.clasp.json.example`（`rootDir` は `dist/aggregate`） | clasp 3.4.1 は設定ファイルのあるフォルダの外を `rootDir` にできないため、計画の配置では `dist/aggregate/` を送れない。ファイル名は c2 で変更してよい（implementation-plan.md 2.（ディレクトリ構成）） |
-| Task-026 | clasp の設定ファイルを `deploy/viewer/.clasp.json` とする。既存のデプロイの更新の方法は定めがない | 設定ファイルをリポジトリの直下の `.clasp-viewer.json` とした（Task-016 と同じ理由）。デプロイ ID を設定ファイルの `deploymentId` に記入し、`clasp update-deployment` で更新する | Task-016 と同じ。implementation-plan.md 2.（Web アプリは同じデプロイを更新して URL を変えない） |
-| Task-016・Task-026 | マニフェストのタイムゾーンは計画に定めがない | `Asia/Tokyo` とした | 年・日付の判定がスクリプトのタイムゾーンで行われるため、明示が必要。根拠資料に定めがないため、開発者のレビューで確認する |
-| Task-008 | 作成予定のファイル：`src/aggregate/player.js`、`tests/small/aggregate/player.test.js` | 計画どおり。加えて、行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストが全件成功） | implementation-plan.md Task-007・Task-008（同じ暦年の区切りで集計する：Feature-007 条件1） |
 | Task-003 | 作成予定のファイル：`scripts/build.js`、`tests/small/scripts/build.test.js` | 計画どおり。加えて、`src/aggregate/`・`src/viewer/` がない場合は出力せずに成功する（Task-004・Task-017 で作成するまで `npm run build` を成功させるため）。埋め込めない内容・`client/` の外の参照はエラーにする | implementation-plan.md 2.（全タスク共通の完了条件：ビルドが成功する）、Task-003 作業内容 |
+| Task-008 | 作成予定のファイル：`src/aggregate/player.js`、`tests/small/aggregate/player.test.js` | 計画どおり。加えて、行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストが全件成功） | implementation-plan.md Task-007・Task-008（同じ暦年の区切りで集計する：Feature-007 条件1） |
+| Task-016 | clasp の設定ファイルを `deploy/aggregate/.clasp.json`（Git の管理対象外）とし、見本を `deploy/aggregate/.clasp.json.example` とする | 設定ファイルをリポジトリの直下の `.clasp-aggregate.json` とした（`.gitignore` に `.clasp-*.json` を追加）。見本は計画どおり `deploy/aggregate/.clasp.json.example`（`rootDir` は `dist/aggregate`） | clasp 3.4.1 は設定ファイルのあるフォルダの外を `rootDir` にできないため、計画の配置では `dist/aggregate/` を送れない。ファイル名は c2 で変更してよい（implementation-plan.md 2.（ディレクトリ構成）） |
+| Task-016・Task-026 | マニフェストのタイムゾーンは計画に定めがない | `Asia/Tokyo` とした | 年・日付の判定がスクリプトのタイムゾーンで行われるため、明示が必要。根拠資料に定めがないため、開発者のレビューで確認する |
+| Task-021 | 作成予定のファイル：`src/viewer/client/screen-top.js`、`tests/small/viewer/screen-top.test.js` | 加えて、`src/viewer/client/format.js` に 3 つのランキングの表示の定義（`RANKING_DEFINITIONS`）と上位の取り出し（`pickTopRanked`、`forcedLaborTag`）を追加した | トップ・ランキング・画像の 3 か所で同じ名称・説明文・値の見出しを使うため（implementation-plan.md 2.：ファイル名は c2 で変更してよい） |
+| Task-021〜Task-025 | 作成予定のファイルに `style.css`・`index.html` の更新を含まない（`style.css` は Task-020） | 各画面の見た目を `style.css` に、各画面の JavaScript の読み込みを `index.html` に、それぞれのタスクで追加した | 画面ごとの見た目と読み込みを、その画面のタスクでまとめて確認するため |
+| Task-022 | 見た目・文言は採用したモック（Screen-002）に合致する | 強制労働への道のりの説明文の「−（配布チップ数 × 10）」を「−（配布チップ数 × N）」とした | N は設定値で変わり（Feature-002 条件2）、閲覧用スプレッドシートに N を置かないため、固定の 10 を表示できない |
+| Task-026 | clasp の設定ファイルを `deploy/viewer/.clasp.json` とする。既存のデプロイの更新の方法は定めがない | 設定ファイルをリポジトリの直下の `.clasp-viewer.json` とした（Task-016 と同じ理由）。デプロイ ID を設定ファイルの `deploymentId` に記入し、`clasp update-deployment` で更新する | Task-016 と同じ。implementation-plan.md 2.（Web アプリは同じデプロイを更新して URL を変えない） |
 
 ## 6. 変更履歴
 
@@ -599,3 +604,4 @@ poker-ranking/
 | 2026-09-27 12:13 | /c2-implement | Task-024（画像に描く内容の計算）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-024、採用したモック（Screen-006） |
 | 2026-09-27 12:14 | /c2-implement | Task-025（画像の描画と Screen-006）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-025、採用したモック（Screen-006） |
 | 2026-09-27 12:17 | /c2-implement | Task-026（閲覧用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、閲覧用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-026、Decision-0001、Decision-0007 |
+| 2026-09-27 12:18 | /c2-implement | 5-26 の全体確認として、ファイル一覧に `.devcontainer/devcontainer-lock.json`・`src/.gitkeep`・`tests/.gitkeep` を追記し、「5. 計画との違い」をタスクの番号順に並べ直して Task-021・Task-021〜025・Task-022 の違いを追記 | c2 スキル（最後の手順：実装設計書の全体確認） |

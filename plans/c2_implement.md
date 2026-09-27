@@ -11,10 +11,10 @@
 
 | 項目 | 内容 |
 |---|---|
-| ステータス | 確定 |
+| ステータス | レビュー待ち |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:17 |
+| 最終更新 | 2026-09-27 12:18 |
 
 ## 1. 進捗
 
@@ -28,7 +28,7 @@ AI が段階を終えるたびに ☑ と日時を記載する。
 - [x] 2. 質問への回答・指示の記入（開発者）2026-09-26 23:18
 - [x] 3. 回答の確認（AI：`/z9-answer-review c2`）2026-09-26 23:18
 - [x] 4. plan 確定（AI：`/c2-implement`）2026-09-27 00:25
-- [ ] 5. 成果物作成（AI：`/c2-implement`）
+- [x] 5. 成果物作成（AI：`/c2-implement`）2026-09-27 12:18
 - [ ] 6. 成果物レビュー（開発者）
 
 ## 2. 目的
@@ -409,12 +409,19 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 追加の確認：`node scripts/deploy.js viewer` を、設定ファイルがない場合・`deploymentId` がない場合・`deploymentId` が「-」で始まる値や記号を含む値の場合に実行し、いずれも push の前にエラーで止まる（終了コード 1）ことを確認した。仮の `scriptId` の設定ファイルで `clasp --project .clasp-viewer.json show-file-status` を実行し、送る対象が `dist/viewer/` の 3 ファイルのみであることを確認した（確認後に仮の設定ファイルを削除した）
     - 確認中の修正：最初の実装ではデプロイ ID の形の確認が「-」で始まる値（例：`--help`）を通していた。この値での確認で `clasp push` が実行されたが、認証情報がないため何も送られずに失敗した。先頭を「-」以外に限るよう修正し、push の前に止まることを確認した
     - 計画との差異：(1) clasp の設定ファイルをリポジトリの直下の `.clasp-viewer.json` とした（Task-016 と同じ理由）。(2) 既存のデプロイの更新のため、デプロイ ID を設定ファイルの `deploymentId` に記入し、`clasp update-deployment` で更新する形とした。閲覧用の初回のデプロイの作成は開発者が行う。(3) マニフェストのタイムゾーンを `Asia/Tokyo` とした（Task-016 と同じ）。いずれも implementation-design.md「5. 計画との違い」に記載
-    - コミット：
-- [ ] 5-26. 実装設計書の全体確認
+    - コミット：28ac825 [Task-026] 閲覧用のデプロイ用スクリプトを実装
+- [x] 5-26. 実装設計書の全体確認
   - 作業内容：`implementation-design.md` がコード全体と一致していること、「計画との違い」が記載されていることを確認する
   - 参照元：`src/`、`tests/`、`implementation-plan.md`
   - 作成・更新先：`implementation-design.md`
   - 実行結果：
+    - 実装設計書とコードの照合：`git ls-files` の `src/`・`tests/`・`scripts/`・`deploy/`・設定ファイルが、すべて「2. ファイル一覧」または「3. テストファイル一覧」に記載されていることを確認した。記載のなかった `.devcontainer/devcontainer-lock.json`（Dev Container のツールが自動で作成。Task-003 のコミットに含めた）と、基盤のひな形の `src/.gitkeep`・`tests/.gitkeep` を追記した
+    - 最上位の名前の照合：`src/` の各 `.js` の最上位の関数・定数の名前が、「GAS のコードの共通の書き方」の一覧と一致することを確認した（差異 0 件）
+    - 期待値の照合：Small テストのコメント `// Task-XXX 期待値N` が、implementation-plan.md の Task-003〜Task-024 のテスト期待値（計 109 項目）をすべて含むことを確認した
+    - 計画との違い：「5. 計画との違い」をタスクの番号順に並べ直し、記録の漏れていた Task-021（`format.js` の更新）、Task-021〜Task-025（`style.css`・`index.html` の更新）、Task-022（説明文の「× N」）を追記した
+    - 全体の完了条件：`npm test` 18 ファイル 114 件／114 件成功。`npm run build` 成功。`npm run lint` 指摘 0 件。`prettier --check .` 違反 0 件。`npm audit --audit-level=moderate` 0 件
+    - 開発者の確認が必要な事項（レビューの対象）：(1) マニフェストのタイムゾーン `Asia/Tokyo`（根拠資料に定めなし）。(2) clasp の設定ファイルをリポジトリの直下に置いたこと（`.clasp-aggregate.json`・`.clasp-viewer.json`）と、閲覧用の初回のデプロイの作成が開発者の作業になること。(3) 画面・画像の見た目は、この環境にブラウザ・実機がないため、モックとの目視の比較をしていないこと
+    - コミット：
 
 ## 6. 成果物の構成予定
 
@@ -532,3 +539,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:13 | /c2-implement | 5-23（Task-024）を実施し、実行結果を記載 | implementation-plan.md Task-024 |
 | 2026-09-27 12:14 | /c2-implement | 5-24（Task-025）を実施し、実行結果を記載 | implementation-plan.md Task-025 |
 | 2026-09-27 12:17 | /c2-implement | 5-25（Task-026）を実施し、実行結果を記載 | implementation-plan.md Task-026 |
+| 2026-09-27 12:18 | /c2-implement | 5-26（実装設計書の全体確認）を実施し、実行結果を記載。全手順が ☑ となったため「1. 進捗」の 5 に ☑ を付け、ステータスを「レビュー待ち」とした | c2 スキル「5. 実装」の「全タスクの完了」 |
