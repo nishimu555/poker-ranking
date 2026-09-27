@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:14 |
+| 最終更新 | 2026-09-27 12:17 |
 
 ## 1. 進捗
 
@@ -394,12 +394,22 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-006.html）の配置・色・文字の大きさを 3 倍にして描いた。実際の画像の見た目と長押しでの保存・共有は、この環境にブラウザ・実機がないため確認していない（c3 で定める Large テストで確認する）
     - 計画との差異：なし
-    - コミット：
-- [ ] 5-25. Task-026：閲覧用のデプロイ用スクリプト
+    - コミット：7549f3b [Task-025] 画像の描画と Screen-006 を実装
+- [x] 5-25. Task-026：閲覧用のデプロイ用スクリプト
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-026）
   - 作成・更新先：`scripts/deploy.js`、`src/viewer/appsscript.json`、`deploy/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：Small テストの対象なし（implementation-plan.md Task-026 のテスト期待値の概要）
+    - テスト：`npm test` 114 件／114 件成功（既存のテストがすべて成功することを確認）
+    - ビルド：`npm run build` 成功（`dist/viewer/` に `appsscript.json`・`index.html`・`server.js` を出力）
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件：`git check-ignore` で `.clasp-viewer.json` が Git の管理対象外であることを確認した（`.clasp.json`・`.clasprc.json` は 5-15 で確認済み）。`src/viewer/appsscript.json` の権限は `spreadsheets.readonly` のみ、公開設定は `executeAs: USER_ACCESSING`・`access: ANYONE`（Google アカウントを持つ全員）
+    - 追加の確認：`node scripts/deploy.js viewer` を、設定ファイルがない場合・`deploymentId` がない場合・`deploymentId` が「-」で始まる値や記号を含む値の場合に実行し、いずれも push の前にエラーで止まる（終了コード 1）ことを確認した。仮の `scriptId` の設定ファイルで `clasp --project .clasp-viewer.json show-file-status` を実行し、送る対象が `dist/viewer/` の 3 ファイルのみであることを確認した（確認後に仮の設定ファイルを削除した）
+    - 確認中の修正：最初の実装ではデプロイ ID の形の確認が「-」で始まる値（例：`--help`）を通していた。この値での確認で `clasp push` が実行されたが、認証情報がないため何も送られずに失敗した。先頭を「-」以外に限るよう修正し、push の前に止まることを確認した
+    - 計画との差異：(1) clasp の設定ファイルをリポジトリの直下の `.clasp-viewer.json` とした（Task-016 と同じ理由）。(2) 既存のデプロイの更新のため、デプロイ ID を設定ファイルの `deploymentId` に記入し、`clasp update-deployment` で更新する形とした。閲覧用の初回のデプロイの作成は開発者が行う。(3) マニフェストのタイムゾーンを `Asia/Tokyo` とした（Task-016 と同じ）。いずれも implementation-design.md「5. 計画との違い」に記載
+    - コミット：
 - [ ] 5-26. 実装設計書の全体確認
   - 作業内容：`implementation-design.md` がコード全体と一致していること、「計画との違い」が記載されていることを確認する
   - 参照元：`src/`、`tests/`、`implementation-plan.md`
@@ -521,3 +531,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:11 | /c2-implement | 5-22（Task-023）を実施し、実行結果を記載 | implementation-plan.md Task-023 |
 | 2026-09-27 12:13 | /c2-implement | 5-23（Task-024）を実施し、実行結果を記載 | implementation-plan.md Task-024 |
 | 2026-09-27 12:14 | /c2-implement | 5-24（Task-025）を実施し、実行結果を記載 | implementation-plan.md Task-025 |
+| 2026-09-27 12:17 | /c2-implement | 5-25（Task-026）を実施し、実行結果を記載 | implementation-plan.md Task-026 |

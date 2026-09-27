@@ -1,5 +1,5 @@
-// Task-016: デプロイ用のスクリプト（ビルドしてから clasp push する）
-// 使い方：npm run deploy:aggregate（集計用）
+// Task-016: デプロイ用のスクリプト（ビルドしてから clasp push する）、Task-026: 閲覧用の既存のデプロイの更新
+// 使い方：npm run deploy:aggregate（集計用）、npm run deploy:viewer（閲覧用）
 // GAS に送るのは dist/<プロジェクト>/ の中のファイルのみとする（c1/Question-007-1）。
 const fs = require("fs");
 const path = require("path");
@@ -11,8 +11,13 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 // Task-016: プロジェクトごとの clasp の設定ファイル（Git の管理対象外。見本は deploy/<プロジェクト>/.clasp.json.example）
 // clasp は設定ファイルのあるフォルダを基点とし、rootDir がその外にあると拒否するため、設定ファイルはリポジトリの直下に置く
 const TARGETS = {
-  aggregate: { configFile: ".clasp-aggregate.json" },
+  aggregate: { configFile: ".clasp-aggregate.json", updatesDeployment: false },
+  // Task-026: 閲覧用は Web アプリのため、push の後に既存のデプロイを更新する（URL を変えない）
+  viewer: { configFile: ".clasp-viewer.json", updatesDeployment: true },
 };
+
+// Task-026: デプロイ ID の形（英数字・「-」・「_」のみで、先頭は「-」以外。clasp の引数・オプションとして誤って解釈されないため）
+const DEPLOYMENT_ID_PATTERN = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
 
 // Task-016: 設定ファイルを読み、rootDir が dist/<プロジェクト>/ を指すことを確かめる（送るファイルの範囲の限定：c1/Question-007-1）
 function readClaspConfig(rootDir, target) {
@@ -45,7 +50,17 @@ function readClaspConfig(rootDir, target) {
       `${TARGETS[target].configFile} に scriptId を記入してください。`,
     );
   }
-  return configPath;
+  // Task-026: 既存のデプロイを更新する対象は、デプロイ ID が必要
+  if (
+    TARGETS[target].updatesDeployment &&
+    (typeof config.deploymentId !== "string" ||
+      !DEPLOYMENT_ID_PATTERN.test(config.deploymentId))
+  ) {
+    throw new Error(
+      `${TARGETS[target].configFile} に、Web アプリの既存のデプロイ ID（deploymentId）を記入してください。初回は GAS のエディタ、または clasp create-deployment でデプロイを作成し、その ID を記入します。`,
+    );
+  }
+  return { configPath, config };
 }
 
 // Task-016: clasp を実行する（シェルを介さずに実行し、出力はそのまま表示する）
@@ -69,10 +84,21 @@ function deploy(target, rootDir = ROOT_DIR) {
       `デプロイの対象は ${Object.keys(TARGETS).join("、")} のいずれかを指定してください。`,
     );
   }
-  const configPath = readClaspConfig(rootDir, target);
+  const { configPath, config } = readClaspConfig(rootDir, target);
   build(rootDir);
   // --force：GAS 側のマニフェスト（appsscript.json）も、確認なしで dist の内容で置き換える
   runClasp(rootDir, ["--project", configPath, "push", "--force"]);
+  if (TARGETS[target].updatesDeployment) {
+    // Task-026: 新しい版を作り、既存のデプロイをその版に更新する（Web アプリの URL は変わらない）
+    runClasp(rootDir, [
+      "--project",
+      configPath,
+      "update-deployment",
+      config.deploymentId,
+      "--description",
+      `npm run deploy:${target}（${new Date().toISOString()}）`,
+    ]);
+  }
 }
 
 if (require.main === module) {
