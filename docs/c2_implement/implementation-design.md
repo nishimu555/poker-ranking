@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 11:53 |
+| 最終更新 | 2026-09-27 11:54 |
 
 ## 1. ディレクトリ構成
 
@@ -30,7 +30,8 @@ poker-ranking/
 │       ├── input-access.js           # Task-009：入力用スプレッドシートの読み込み、Task-010：除外した行の印付け
 │       ├── viewer-writer.js          # Task-011：閲覧用スプレッドシートへの書き出し
 │       ├── setup.js                  # Task-012：入力用スプレッドシートの初期設定、Task-013：ニックネームの候補の更新
-│       └── run.js                    # Task-014：集計の実行の処理の流れ
+│       ├── run.js                    # Task-014：集計の実行の処理の流れ
+│       └── menu.js                   # Task-015：メニュー
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -42,6 +43,7 @@ poker-ranking/
         ├── aggregate/viewer-writer.test.js # Task-011
         ├── aggregate/setup.test.js   # Task-012・013
         ├── aggregate/run.test.js     # Task-014
+        ├── aggregate/menu.test.js    # Task-015
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -113,6 +115,7 @@ poker-ranking/
 | `src/aggregate/viewer-writer.js` | 閲覧用スプレッドシートへの書き出し（`writeViewerSpreadsheet`） | Component-004、Component-005 | Task-011 |
 | `src/aggregate/setup.js` | 入力用スプレッドシートの初期設定（`setupInputSpreadsheet`）、ニックネームの候補の更新（`updateNicknameOptions`） | Component-001 | Task-012、Task-013 |
 | `src/aggregate/run.js` | 集計の実行の処理の流れ（`runAggregation`） | Component-002 | Task-014 |
+| `src/aggregate/menu.js` | メニュー（`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet`） | Component-002 | Task-015 |
 
 ### GAS のコードの共通の書き方
 
@@ -131,6 +134,7 @@ poker-ranking/
 | `VIEWER_SPREADSHEET_ID_KEY`、`RANKING_KIND_LABELS`、`VIEWER_SHEET_HEADERS`、`toCellValue`、`buildSummaryRows`、`buildRankingRows`、`buildPlayerRows`、`buildHistoryRows`、`replaceSheetValues`、`writeViewerSpreadsheet` | `src/aggregate/viewer-writer.js` |
 | `PLAY_SHEET_HEADERS`、`DEFAULT_FORCED_LABOR_COUNT`、`createPlaySheet`、`createSettingsSheet`、`setupInputSpreadsheet`、`updateNicknameOptions` | `src/aggregate/setup.js` |
 | `isValidSettingValue`、`runAggregation` | `src/aggregate/run.js` |
+| `MENU_TITLE`、`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet` | `src/aggregate/menu.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -280,6 +284,7 @@ poker-ranking/
 | `tests/small/aggregate/viewer-writer.test.js` | `src/aggregate/viewer-writer.js` の `writeViewerSpreadsheet`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-011 期待値1〜4 |
 | `tests/small/aggregate/setup.test.js` | `src/aggregate/setup.js` の `setupInputSpreadsheet`、`updateNicknameOptions`（`SpreadsheetApp` の入力規則とスプレッドシートは代用品） | Task-012 期待値1〜3、Task-013 期待値1〜2 |
 | `tests/small/aggregate/run.test.js` | `src/aggregate/run.js` の `runAggregation`（Component-003 は実物、Component-004 の関数と `updateNicknameOptions` は代用品） | Task-014 期待値1〜6 |
+| `tests/small/aggregate/menu.test.js` | `src/aggregate/menu.js` の `onOpen`（`SpreadsheetApp.getUi()` は代用品） | Task-015 期待値1 |
 
 ## 4. 主要な処理の流れ
 
@@ -296,6 +301,17 @@ poker-ranking/
 - 途中で例外が起きた場合（シートがない等）は、`console.error` で実行ログに残し、「集計を実行できませんでした。」に例外のメッセージを続けて表示する。
 - `notify` は、メニューから呼ぶ際に `SpreadsheetApp.getUi().alert` を渡す（Task-015）。Small テストでは `jest.fn()` を渡す。
 - 設定値のマイナス・0 は、計画・設計に定めがないため中止の対象にしていない。
+
+### メニュー（`src/aggregate/menu.js`、Task-015）
+
+| 関数 | 呼ばれる時 | 処理 |
+|---|---|---|
+| `onOpen()` | 入力用スプレッドシートを開いたとき（GAS のシンプルトリガー） | メニュー「POKER RANKING」（`MENU_TITLE`。アプリの名称：b1/Question-015-1）に、項目「集計を反映」（`menuRunAggregation`）と「初期設定」（`menuSetupInputSpreadsheet`）を追加する |
+| `menuRunAggregation()` | メニュー「集計を反映」 | `runAggregation(SpreadsheetApp.getActiveSpreadsheet(), message => ui.alert(message))` を呼ぶ |
+| `menuSetupInputSpreadsheet()` | メニュー「初期設定」 | `setupInputSpreadsheet(SpreadsheetApp.getActiveSpreadsheet())` を呼び、完了または失敗をダイアログで知らせる（失敗時は `console.error` で実行ログに残す） |
+
+- メニューの名前は計画・設計に定めがないため、アプリの名称とした。
+- `menuRunAggregation`・`menuSetupInputSpreadsheet` の動作（ダイアログの表示）は、`SpreadsheetApp.getUi()` に依存するため Small テストの対象外とし、Medium（デプロイ先）で確認する（component-design.md 7.（テストのしやすさ））。
 
 ## 5. 計画との違い
 
@@ -326,3 +342,4 @@ poker-ranking/
 | 2026-09-27 11:47 | /c2-implement | Task-012（入力用スプレッドシートの初期設定）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（作るシートの内容・入力規則を含む）、テストファイル一覧を更新 | implementation-plan.md Task-012 |
 | 2026-09-27 11:52 | /c2-implement | Task-013（ニックネームの候補の更新）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-013 |
 | 2026-09-27 11:53 | /c2-implement | Task-014（集計の実行の処理の流れ）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-014 |
+| 2026-09-27 11:54 | /c2-implement | Task-015（メニュー）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-015 |
