@@ -60,6 +60,25 @@ function readSettings(spreadsheet) {
   };
 }
 
+// Task-010: 集計から除外した行の印（背景色。薄い赤）（b1/Question-008）
+const EXCLUDED_ROW_COLOR = "#f4cccc";
+
+// Task-010: シート「プレイ結果」のデータ行の前回の印（背景色）を消し、指定した行番号の行に印を付ける
+// rowNumbers：除外した行のシート上の行番号（readPlayRows の rowNumber）
+function markExcludedRows(spreadsheet, rowNumbers) {
+  const sheet = getRequiredSheet(spreadsheet, PLAY_SHEET_NAME);
+  const lastRow = sheet.getLastRow();
+  if (lastRow >= 2) {
+    // 見出し行は残し、データ行の背景色を消す（Component-002 処理の流れ 2.：前回の印は消してから付け直す）
+    sheet.getRange(2, 1, lastRow - 1, PLAY_COLUMN_COUNT).setBackground(null);
+  }
+  for (const rowNumber of rowNumbers) {
+    sheet
+      .getRange(rowNumber, 1, 1, PLAY_COLUMN_COUNT)
+      .setBackground(EXCLUDED_ROW_COLOR);
+  }
+}
+
 // ローカルのテスト用の公開（GAS 上では module がないため何もしない）
 if (typeof module !== "undefined") {
   module.exports = {
@@ -69,5 +88,6 @@ if (typeof module !== "undefined") {
     SETTING_LABEL_FORCED_LABOR_COUNT,
     readPlayRows,
     readSettings,
+    markExcludedRows,
   };
 }
