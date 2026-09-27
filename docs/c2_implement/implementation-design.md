@@ -88,7 +88,7 @@ poker-ranking/
 | Node.js | 24.21.0（`package.json` の `engines`、`.nvmrc`、Dev Container の Node.js の Feature） | implementation-plan.md 2.、c1/Question-023 |
 | 開発用の依存ライブラリ（版を固定） | `prettier` 3.9.9、`eslint` 10.11.0、`jest` 30.5.2、`@google/clasp` 3.4.1 | implementation-plan.md 2.（依存ライブラリの管理方法） |
 | `npm run build` | `node scripts/build.js`（`dist/aggregate/`・`dist/viewer/` を生成する。下記「ビルドの処理」） | Task-001、Task-003 |
-| `npm test` | `jest --passWithNoTests`（`tests/` 配下の `*.test.js` を Node.js の環境で実行） | Task-001 |
+| `npm test` | `jest`（`tests/` 配下の `*.test.js` を Node.js の環境で実行。テストが 1 件も見つからない場合は失敗する。c2/ai-review-002） | Task-001 |
 | `npm run lint` | `eslint .` | Task-001 |
 | `npm run format` | `prettier --write .`（`.prettierignore` により Markdown・ドキュメントは対象外） | Task-001 |
 | `npm run audit` | `npm audit --audit-level=moderate` | Task-001、c1/Question-005 |
@@ -564,7 +564,7 @@ poker-ranking/
 |---|---|---|---|
 | Task-001 | ESLint の推奨ルールを使う | ESLint 10 は推奨ルールの設定を本体に含まないため（別パッケージ `@eslint/js`）、本体の組み込みルールの recommended の印から同じ内容の設定を作った。`@eslint/js` 10.0.1 の recommended と 64 ルールが一致することを確認した（2026-09-27 00:15） | implementation-plan.md 2.（依存ライブラリは Prettier・ESLint・Jest・clasp のみ）、c1/Question-012 |
 | Task-001 | 作成予定のファイルに `scripts/build.js` を含まない | 完了条件の `npm run build` を実行できるよう、仮の `scripts/build.js` を作成した。Task-003 で置き換える | implementation-plan.md 2.（全タスク共通の完了条件）、Task-001（テスト期待値の概要） |
-| Task-001 | npm スクリプト `test` | Small テストが 0 件の段階でも `npm test` が成功するよう、`jest --passWithNoTests` とした | implementation-plan.md Task-001（テスト期待値の概要：コマンドが実行できること） |
+| Task-001 | npm スクリプト `test` | Small テストが 0 件の段階でも `npm test` が成功するよう、`jest --passWithNoTests` とした。Small テストの作成後に、この設定を外した（c2/ai-review-002：テストが見つからない場合も成功と表示されるのを防ぐため） | implementation-plan.md Task-001（テスト期待値の概要：コマンドが実行できること） |
 | Task-002 | Node.js の Feature の版の固定と `npm ci` の追加 | 加えて、`containerEnv` に `TZ`（`Asia/Tokyo`）を設定し、コンテナの時刻を JST にした（既定は UTC）。JST・UTC のどちらでも Small テストが全件成功することを確認した（2026-09-27 09:56） | 開発者の指示（2026-09-27、チャット：記録の日時を JST にし、コンテナを作り直しても JST にする） |
 | Task-003 | 作成予定のファイル：`scripts/build.js`、`tests/small/scripts/build.test.js` | 計画どおり。加えて、`src/aggregate/`・`src/viewer/` がない場合は出力せずに成功する（Task-004・Task-017 で作成するまで `npm run build` を成功させるため）。埋め込めない内容・`client/` の外の参照はエラーにする | implementation-plan.md 2.（全タスク共通の完了条件：ビルドが成功する）、Task-003 作業内容 |
 | Task-008 | 作成予定のファイル：`src/aggregate/player.js`、`tests/small/aggregate/player.test.js` | 計画どおり。加えて、行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストが全件成功） | implementation-plan.md Task-007・Task-008（同じ暦年の区切りで集計する：Feature-007 条件1） |
@@ -607,3 +607,4 @@ poker-ranking/
 | 2026-09-27 12:17 | /c2-implement | Task-026（閲覧用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、閲覧用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-026、Decision-0001、Decision-0007 |
 | 2026-09-27 12:18 | /c2-implement | 5-26 の全体確認として、ファイル一覧に `.devcontainer/devcontainer-lock.json`・`src/.gitkeep`・`tests/.gitkeep` を追記し、「5. 計画との違い」をタスクの番号順に並べ直して Task-021・Task-021〜025・Task-022 の違いを追記 | c2 スキル（最後の手順：実装設計書の全体確認） |
 | 2026-09-27 13:00 | /c2-implement | c2/ai-review-001 への対応：閲覧用スプレッドシートへの書き出しで、文字列の列を書式なしテキストにしてから書き込むよう変更（主要な関数、最上位の名前を更新） | c2/ai-review-001 の開発者判断（推奨で対応） |
+| 2026-09-27 13:00 | /c2-implement | c2/ai-review-002 への対応：npm スクリプト `test` から `--passWithNoTests` を外した（開発ツールと npm スクリプト、計画との違いを更新） | c2/ai-review-002 の開発者判断（推奨で対応） |

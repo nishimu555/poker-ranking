@@ -519,19 +519,19 @@ ID を付けずに追記した場合は、AI が ID を付与する。
   - 推奨：書き込む前に、文字列を書き込む列（ニックネーム、ランキングの種類、集計済みの年）の表示形式を書式なしテキスト（`setNumberFormat("@")`）にする。根拠：component-design.md 7.（改ざん（Tampering）：意図しない表示・動作の防止）、Microsoft SDL（入力の検証・出力のエンコード）
   - 開発者判断：推奨で対応
 
-  - AI対応内容：`src/aggregate/viewer-writer.js` の `replaceSheetValues` で、書き込む前に文字列の列（`VIEWER_TEXT_COLUMNS`：集計情報の「集計済みの年」、ランキングの「ランキングの種類」「ニックネーム」、個人の戦績・履歴の「ニックネーム」）を `setNumberFormat("@")`（書式なしテキスト）にするよう変更した。`tests/small/aggregate/viewer-writer.test.js` は、代用品のシートに `setNumberFormat` を追加した（期待値は変更していない）。`implementation-design.md` の主要な関数・最上位の名前を更新した。コミット：（下記）
+  - AI対応内容：`src/aggregate/viewer-writer.js` の `replaceSheetValues` で、書き込む前に文字列の列（`VIEWER_TEXT_COLUMNS`：集計情報の「集計済みの年」、ランキングの「ランキングの種類」「ニックネーム」、個人の戦績・履歴の「ニックネーム」）を `setNumberFormat("@")`（書式なしテキスト）にするよう変更した。`tests/small/aggregate/viewer-writer.test.js` は、代用品のシートに `setNumberFormat` を追加した（期待値は変更していない）。`implementation-design.md` の主要な関数・最上位の名前を更新した。コミット：6995e1b [Task-011] ai-review-001：閲覧用スプレッドシートの文字列の列を書式なしテキストにしてから書き込む
 
   - AI確認結果：`npm test` 114 件／114 件成功、`npm run build` 成功、`npm run lint` 指摘 0 件、`prettier --check .` 違反 0 件、`npm audit --audit-level=moderate` 0 件。代用品で、ニックネーム「=X」を含む集計結果を書き出し、4 シートとも「内容の消去 → 文字列の列の書式なしテキストへの設定 → 書き込み」の順に呼ばれることを確認した。c1 の期待値にこの対応を確かめる項目はないため、Small テストは追加していない（2026-09-27 13:00）
 
-- [ ] **ai-review-002**：`npm test` にテストが 0 件でも成功する設定（`--passWithNoTests`）が残っている
+- [x] **ai-review-002**：`npm test` にテストが 0 件でも成功する設定（`--passWithNoTests`）が残っている
   - 観点・重要度：1. テストに合格させるためだけの実装／低
   - 事実：`package.json:12` の `test` が `jest --passWithNoTests`。5-1 でテストが 0 件の段階の `npm test` を成功させるために付けた設定（implementation-design.md「5. 計画との違い」に記録済み）で、現在は 18 ファイル 114 件のテストがある。Jest の設定（`roots`・`testMatch`）の誤り等でテストが 1 件も見つからなくなった場合も、`npm test` が成功と表示される
   - 推奨：`--passWithNoTests` を外し、`jest` のみとする。根拠：implementation-plan.md 2.（全タスク共通の完了条件：Small テストがすべて成功する）を、テストが実行されたうえで確認できるようにするため
   - 開発者判断：推奨で対応
 
-  - AI対応内容：
+  - AI対応内容：`package.json` の npm スクリプト `test` を `jest --passWithNoTests` から `jest` に変更した。`implementation-design.md` の開発ツールと npm スクリプト、計画との違い（Task-001）を更新した。コミット：（下記）
 
-  - AI確認結果：
+  - AI確認結果：`npm test` 18 ファイル 114 件／114 件成功。テストが見つからない場合（`jest --roots` に存在しないフォルダを指定）に終了コードが 1（失敗）になることを確認した。`npm run build` 成功、`npm run lint` 指摘 0 件、`prettier --check .` 違反 0 件、`npm audit --audit-level=moderate` 0 件（2026-09-27 13:00）
 
 - [ ] **ai-review-003**：`.gitignore` に、環境変数のファイル・鍵・証明書・npm の設定の除外がない
   - 観点・重要度：6. 除外設定と秘密情報の配置／低
