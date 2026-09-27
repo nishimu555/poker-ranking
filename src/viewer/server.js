@@ -1,4 +1,4 @@
-// Task-017: データの取得（Component-006 Web アプリ：サーバー側）
+// Task-017: データの取得、Task-018: 画面の返却（Component-006 Web アプリ：サーバー側）
 // 閲覧用スプレッドシート（Component-005）から、指定した年の集計結果を読み込んで画面に返す。
 // Web アプリはアクセスしたユーザーとして実行するため、共有されていないアカウントでは読み込めない（Decision-0001）。
 
@@ -174,7 +174,18 @@ function getViewerData(year) {
   }
 }
 
+// Task-018: 画面のタイトル（アプリの名称：b1/Question-015-1）
+const APP_TITLE = "POKER RANKING";
+
+// Task-018: Web アプリの URL を開いたときに GAS が呼ぶ。ビルドした画面（dist/viewer/index.html）を返す
+// GAS の Web アプリでは HTML 内の title・viewport が効かないため、setTitle・addMetaTag で指定する（Quality-005：スマートフォン前提）
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile("index")
+    .setTitle(APP_TITLE)
+    .addMetaTag("viewport", "width=device-width, initial-scale=1");
+}
+
 // ローカルのテスト用の公開（GAS 上では module がないため何もしない）
 if (typeof module !== "undefined") {
-  module.exports = { getViewerData };
+  module.exports = { getViewerData, doGet };
 }

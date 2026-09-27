@@ -1,6 +1,6 @@
-// Task-017: データの取得の Small テスト
-// GAS の PropertiesService・SpreadsheetApp は代用品（jest.fn()）に置き換える
-const { getViewerData } = require("../../../src/viewer/server");
+// Task-017: データの取得、Task-018: 画面の返却の Small テスト
+// GAS の PropertiesService・SpreadsheetApp・HtmlService は代用品（jest.fn()）に置き換える
+const { getViewerData, doGet } = require("../../../src/viewer/server");
 
 // 代用品のシートを作る（values：見出し行を含む全セルの値）
 function createSheet(values) {
@@ -168,4 +168,30 @@ test("スクリプトプロパティ VIEWER_SPREADSHEET_ID が未設定の場合
   expect(typeof data.message).toBe("string");
   expect(data.rankings).toBeUndefined();
   expect(global.SpreadsheetApp.openById).not.toHaveBeenCalled();
+});
+
+// Task-018 期待値1
+test("Web アプリを開くと、画面の HTML が返り、タイトルは「POKER RANKING」、スマートフォン向けの表示設定（viewport）が付く", () => {
+  const output = { title: null, metaTags: {} };
+  output.setTitle = jest.fn((title) => {
+    output.title = title;
+    return output;
+  });
+  output.addMetaTag = jest.fn((name, content) => {
+    output.metaTags[name] = content;
+    return output;
+  });
+  global.HtmlService = {
+    createHtmlOutputFromFile: jest.fn(() => output),
+  };
+
+  const result = doGet();
+
+  expect(global.HtmlService.createHtmlOutputFromFile).toHaveBeenCalledWith(
+    "index",
+  );
+  expect(result).toBe(output);
+  expect(output.title).toBe("POKER RANKING");
+  expect(output.metaTags.viewport).toContain("width=device-width");
+  delete global.HtmlService;
 });

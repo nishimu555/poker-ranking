@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 11:59 |
+| 最終更新 | 2026-09-27 12:00 |
 
 ## 1. 進捗
 
@@ -288,12 +288,19 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。`google.script.run` は `Date` を画面に渡せないため日付・日時を文字列で返すこと、戻り値の形、指定した年が集計済みの年にない場合は最新の年を返すこと、閲覧できない場合の文言は implementation-design.md「4. 主要な処理の流れ」に記載した
-    - コミット：
-- [ ] 5-17. Task-018：画面の返却
+    - コミット：7dd2d67 [Task-017] データの取得を実装
+- [x] 5-17. Task-018：画面の返却
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-018）
   - 作成・更新先：`src/viewer/server.js`、`src/viewer/client/index.html`、`tests/small/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/viewer/server.test.js` の Task-018 のテスト（期待値1、1 件）が失敗。理由：`doGet` が未実装（`TypeError: doGet is not a function`）。同じファイルの Task-017 のテスト 4 件は実装済みのため成功した
+    - テスト：`npm test` 86 件／86 件成功（Task-003〜017 の 85 件を含む）
+    - ビルド：`npm run build` 成功（`dist/viewer/` に `index.html`・`server.js` を出力）
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：なし。GAS の Web アプリでは HTML 内の title・viewport が効かないため `setTitle`・`addMetaTag` で指定したことは implementation-design.md「4. 主要な処理の流れ」に記載した。`index.html` は骨組みのみとし、CSS・JavaScript の読み込みは Task-020 で追加する
+    - コミット：
 - [ ] 5-18. Task-019：表示用の整形
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-019）
@@ -447,3 +454,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 11:54 | /c2-implement | 5-14（Task-015）を実施し、実行結果を記載 | implementation-plan.md Task-015 |
 | 2026-09-27 11:57 | /c2-implement | 5-15（Task-016）を実施し、実行結果を記載 | implementation-plan.md Task-016 |
 | 2026-09-27 11:59 | /c2-implement | 5-16（Task-017）を実施し、実行結果を記載 | implementation-plan.md Task-017 |
+| 2026-09-27 12:00 | /c2-implement | 5-17（Task-018）を実施し、実行結果を記載 | implementation-plan.md Task-018 |

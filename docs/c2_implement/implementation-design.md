@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 11:59 |
+| 最終更新 | 2026-09-27 12:00 |
 
 ## 1. ディレクトリ構成
 
@@ -38,7 +38,9 @@ poker-ranking/
 │       ├── run.js                    # Task-014：集計の実行の処理の流れ
 │       └── menu.js                   # Task-015：メニュー
 │   └── viewer/                       # 閲覧用プロジェクト
-│       └── server.js                 # Task-017：データの取得
+│       ├── server.js                 # Task-017：データの取得、Task-018：画面の返却
+│       └── client/
+│           └── index.html            # Task-018：画面の HTML（ビルド時に CSS・JavaScript を埋め込む）
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
@@ -51,7 +53,7 @@ poker-ranking/
         ├── aggregate/setup.test.js   # Task-012・013
         ├── aggregate/run.test.js     # Task-014
         ├── aggregate/menu.test.js    # Task-015
-        ├── viewer/server.test.js     # Task-017
+        ├── viewer/server.test.js     # Task-017・018
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -151,7 +153,8 @@ poker-ranking/
 | `src/aggregate/setup.js` | 入力用スプレッドシートの初期設定（`setupInputSpreadsheet`）、ニックネームの候補の更新（`updateNicknameOptions`） | Component-001 | Task-012、Task-013 |
 | `src/aggregate/run.js` | 集計の実行の処理の流れ（`runAggregation`） | Component-002 | Task-014 |
 | `src/aggregate/menu.js` | メニュー（`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet`） | Component-002 | Task-015 |
-| `src/viewer/server.js` | Web アプリのサーバー側：データの取得（`getViewerData`） | Component-006 | Task-017 |
+| `src/viewer/server.js` | Web アプリのサーバー側：データの取得（`getViewerData`）、画面の返却（`doGet`） | Component-006 | Task-017、Task-018 |
+| `src/viewer/client/index.html` | 画面の HTML（ビルド時に CSS・JavaScript を埋め込む） | Component-007 | Task-018 |
 
 ### GAS のコードの共通の書き方
 
@@ -176,7 +179,7 @@ poker-ranking/
 
 | 最上位の名前 | ファイル |
 |---|---|
-| `VIEWER_SPREADSHEET_ID_PROPERTY`、`NOT_VIEWABLE_MESSAGE`、`RANKING_KINDS`、`pad2`、`formatDate`、`formatDateTime`、`toRankOrNull`、`readDataRows`、`readSummary`、`readRankings`、`readPlayers`、`readHistory`、`getViewerData` | `src/viewer/server.js` |
+| `VIEWER_SPREADSHEET_ID_PROPERTY`、`NOT_VIEWABLE_MESSAGE`、`RANKING_KINDS`、`pad2`、`formatDate`、`formatDateTime`、`toRankOrNull`、`readDataRows`、`readSummary`、`readRankings`、`readPlayers`、`readHistory`、`getViewerData`、`APP_TITLE`、`doGet` | `src/viewer/server.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -328,7 +331,7 @@ poker-ranking/
 | `tests/small/aggregate/setup.test.js` | `src/aggregate/setup.js` の `setupInputSpreadsheet`、`updateNicknameOptions`（`SpreadsheetApp` の入力規則とスプレッドシートは代用品） | Task-012 期待値1〜3、Task-013 期待値1〜2 |
 | `tests/small/aggregate/run.test.js` | `src/aggregate/run.js` の `runAggregation`（Component-003 は実物、Component-004 の関数と `updateNicknameOptions` は代用品） | Task-014 期待値1〜6 |
 | `tests/small/aggregate/menu.test.js` | `src/aggregate/menu.js` の `onOpen`（`SpreadsheetApp.getUi()` は代用品） | Task-015 期待値1 |
-| `tests/small/viewer/server.test.js` | `src/viewer/server.js` の `getViewerData`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-017 期待値1〜4 |
+| `tests/small/viewer/server.test.js` | `src/viewer/server.js` の `getViewerData`（`PropertiesService`・`SpreadsheetApp` は代用品） | Task-017 期待値1〜4、Task-018 期待値1 |
 
 ## 4. 主要な処理の流れ
 
@@ -383,6 +386,12 @@ poker-ranking/
 - 閲覧できない場合の文言は `NOT_VIEWABLE_MESSAGE`（「閲覧できません。このページを閲覧するには、管理者からの招待が必要です。」）とし、原因（未設定・権限なし）を画面に出さない。原因は実行ログで確認する。
 - 強制労働への道のりの「強制労働の該当」は、閲覧用スプレッドシートの値が `true` の場合のみ `true` とする。
 
+### 画面の返却（`doGet()`、`src/viewer/server.js`、Task-018）
+
+- Web アプリの URL を開くと、`HtmlService.createHtmlOutputFromFile("index")`（ビルドで CSS・JavaScript を埋め込んだ `dist/viewer/index.html`）を返す。
+- GAS の Web アプリでは、HTML 内の `<title>`・viewport の `<meta>` が効かないため、`setTitle("POKER RANKING")`（`APP_TITLE`：b1/Question-015-1）と `addMetaTag("viewport", "width=device-width, initial-scale=1")`（Quality-005）で指定する。
+- `index.html` の `<base target="_top">` は、画面内のリンクを GAS の枠の外で開くための指定である。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -417,3 +426,4 @@ poker-ranking/
 | 2026-09-27 11:54 | /c2-implement | Task-015（メニュー）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-015 |
 | 2026-09-27 11:57 | /c2-implement | Task-016（集計用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、集計用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-016、clasp 3.4.1 の設定ファイルの扱い |
 | 2026-09-27 11:59 | /c2-implement | Task-017（データの取得）を追加。ディレクトリ構成、ファイル一覧、最上位の名前（閲覧用プロジェクト）、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-017 |
+| 2026-09-27 12:00 | /c2-implement | Task-018（画面の返却）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-018 |
