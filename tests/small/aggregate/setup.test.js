@@ -1,8 +1,11 @@
-// Task-012: 入力用スプレッドシートの初期設定の Small テスト
+// Task-012: 入力用スプレッドシートの初期設定、Task-013: ニックネームの候補の更新の Small テスト
 // GAS の SpreadsheetApp（スプレッドシート・シート・入力規則）は代用品（jest.fn()）に置き換える
 // GAS では全ファイルが同じ場所で動くため、setup.js が使う定数をグローバルに置いてから読み込む
 Object.assign(global, require("../../../src/aggregate/input-access"));
-const { setupInputSpreadsheet } = require("../../../src/aggregate/setup");
+const {
+  setupInputSpreadsheet,
+  updateNicknameOptions,
+} = require("../../../src/aggregate/setup");
 
 // 代用品のシートを作る。値・入力規則の書き込みと、変更の操作を記録する
 function createSheet(name, initialValues = []) {
@@ -53,8 +56,15 @@ function createSpreadsheet(sheets = {}) {
 beforeEach(() => {
   global.SpreadsheetApp = {
     newDataValidation: jest.fn(() => {
-      const rule = { kind: null, allowInvalid: true };
+      // allowInvalid は、setAllowInvalid を呼んだ場合のみ値が入る
+      const rule = { kind: null, allowInvalid: undefined };
       const builder = {
+        requireValueInList: jest.fn((values, showDropdown) => {
+          rule.kind = "list";
+          rule.values = values;
+          rule.showDropdown = showDropdown;
+          return builder;
+        }),
         requireDate: jest.fn(() => {
           rule.kind = "date";
           return builder;
@@ -141,4 +151,26 @@ test("シート「プレイ結果」「設定」がすでにあり、データ�
   expect(settings.changes).toEqual([]);
   expect(play.values).toEqual(playValues);
   expect(settings.values).toEqual(settingValues);
+});
+
+// Task-013 期待値1
+test("ニックネーム「ナッツ」「 ナッツ」「リバー」の候補は「ナッツ」「リバー」の 2 つ", () => {
+  const play = createSheet("プレイ結果");
+  const spreadsheet = createSpreadsheet({ プレイ結果: play });
+
+  updateNicknameOptions(spreadsheet, ["ナッツ", " ナッツ", "リバー"]);
+
+  const rule = play.validations["A2:A"];
+  expect(rule.kind).toBe("list");
+  expect(rule.values).toEqual(["ナッツ", "リバー"]);
+});
+
+// Task-013 期待値2
+test("候補を設定すると、候補にない名前の入力を拒否しない設定になる", () => {
+  const play = createSheet("プレイ結果");
+  const spreadsheet = createSpreadsheet({ プレイ結果: play });
+
+  updateNicknameOptions(spreadsheet, ["ナッツ", "リバー"]);
+
+  expect(play.validations["A2:A"].allowInvalid).toBe(true);
 });

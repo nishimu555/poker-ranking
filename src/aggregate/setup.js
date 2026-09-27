@@ -1,4 +1,4 @@
-// Task-012: 入力用スプレッドシートの初期設定（Component-001 入力用スプレッドシート）
+// Task-012: 入力用スプレッドシートの初期設定、Task-013: ニックネームの候補の更新（Component-001 入力用スプレッドシート）
 // シート「プレイ結果」「設定」がない場合のみ作る。既存のシートとデータは変更・削除しない（Quality-007）。
 // 他のファイルの定数（GAS では同じ場所で動く）
 /* global PLAY_SHEET_NAME, SETTINGS_SHEET_NAME, SETTING_LABEL_DISTRIBUTED_CHIPS, SETTING_LABEL_FORCED_LABOR_COUNT */
@@ -56,7 +56,31 @@ function setupInputSpreadsheet(spreadsheet) {
   }
 }
 
+// Task-013: ニックネームの候補を、シート「プレイ結果」のプレイヤー名の列（A 列）に設定する
+// nicknames：有効な行のニックネーム。前後の空白を取り除き、重複を除いて文字コード順に並べる（b1/Question-007 (b)・(c)）
+// 候補にない新しい名前も入力できるよう、規則に合わない入力を拒否しない（Feature-001 条件4）
+function updateNicknameOptions(spreadsheet, nicknames) {
+  const sheet = spreadsheet.getSheetByName(PLAY_SHEET_NAME);
+  if (!sheet) {
+    return;
+  }
+  const options = [...new Set(nicknames.map((n) => String(n).trim()))]
+    .filter((n) => n !== "")
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const range = sheet.getRange("A2:A");
+  if (options.length === 0) {
+    // 候補がない場合は入力規則を外す（空の候補の一覧は設定できないため）
+    range.setDataValidation(null);
+    return;
+  }
+  const rule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(options, true)
+    .setAllowInvalid(true)
+    .build();
+  range.setDataValidation(rule);
+}
+
 // ローカルのテスト用の公開（GAS 上では module がないため何もしない）
 if (typeof module !== "undefined") {
-  module.exports = { setupInputSpreadsheet };
+  module.exports = { setupInputSpreadsheet, updateNicknameOptions };
 }
