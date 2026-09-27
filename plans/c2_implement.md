@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:04 |
+| 最終更新 | 2026-09-27 12:05 |
 
 ## 1. 進捗
 
@@ -325,12 +325,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：初回の `npm run lint` で 1 件（`app.js` の `/* global */` で、ESLint の設定で既知の `google` を重ねて宣言していた：`no-redeclare`）。宣言から `google` を外し、指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。画面の切り替え・データの取得・描画の仕組みは implementation-design.md「4. 主要な処理の流れ」に記載した。DOM での表示と画面の切り替えの動作は Small テストの対象外（Large テストで確認する：component-design.md 7.（テストのしやすさ））
-    - コミット：
-- [ ] 5-20. Task-021：Screen-001 トップ画面
+    - コミット：6cdc2b3 [Task-020] 画面の共通部分を実装
+- [x] 5-20. Task-021：Screen-001 トップ画面
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-021）
   - 作成・更新先：`src/viewer/client/screen-top.js`、`tests/small/viewer/`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：`tests/small/viewer/screen-top.test.js`（期待値1〜4、4 件）が全件失敗。理由：`src/viewer/client/screen-top.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 102 件／102 件成功（Task-003〜020 の 98 件を含む）
+    - ビルド：`npm run build` 成功（`dist/viewer/index.html` に 3 つの JavaScript を埋め込んだ）
+    - 追加の確認：`dist/viewer/index.html` に埋め込んだ JavaScript を 1 つの実行環境に読み込み、構文の誤り・最上位の名前の重複によるエラーがないことを確認した
+    - 静的解析：初回の `npm run lint` で 1 件（`renderTopScreen` が未使用：`no-unused-vars`。`app.js` から呼ばれる関数のため）。`/* exported renderTopScreen */` を記載し、指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-001.html）と同じ構成・文言・CSS（色・余白・文字の大きさ）で作った。ブラウザでの見た目の確認は、この環境にブラウザがないため行っていない（デプロイ後に開発者のレビュー、または c3 で定める Large テストで確認する）
+    - 計画との差異：3 つのランキングの名称・説明文・値の見出しを、トップ・ランキング・画像で共通に使うため `format.js` の `RANKING_DEFINITIONS` に置いた（作成予定のファイルに `format.js` の更新を追加）。implementation-design.md「4. 主要な処理の流れ」に記載した
+    - コミット：
 - [ ] 5-21. Task-022：Screen-002〜004 ランキング画面
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-022）
@@ -472,3 +481,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:00 | /c2-implement | 5-17（Task-018）を実施し、実行結果を記載 | implementation-plan.md Task-018 |
 | 2026-09-27 12:01 | /c2-implement | 5-18（Task-019）を実施し、実行結果を記載 | implementation-plan.md Task-019 |
 | 2026-09-27 12:04 | /c2-implement | 5-19（Task-020）を実施し、実行結果を記載 | implementation-plan.md Task-020 |
+| 2026-09-27 12:05 | /c2-implement | 5-20（Task-021）を実施し、実行結果を記載 | implementation-plan.md Task-021 |

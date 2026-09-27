@@ -110,3 +110,70 @@ footer {
   font-size: 14px;
   color: var(--sub);
 }
+/* Task-021: Screen-001 トップ画面 */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 14px 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  color: var(--gold);
+}
+.card p.desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--sub);
+}
+.card .empty {
+  margin: 8px 0;
+  font-size: 15px;
+  color: var(--sub);
+  text-align: center;
+}
+.top-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.top-list li {
+  display: flex;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 15px;
+}
+.top-list li:last-child {
+  border-bottom: none;
+}
+.top-list .rank {
+  width: 34px;
+  font-weight: bold;
+  color: var(--gold);
+}
+.top-list .name {
+  flex: 1;
+}
+.top-list .val {
+  font-variant-numeric: tabular-nums;
+}
+a.more {
+  display: block;
+  text-align: right;
+  margin-top: 8px;
+  font-size: 14px;
+}
+a.btn {
+  display: block;
+  text-align: center;
+  margin: 18px 0 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--gold);
+  color: #1a1a1a;
+  font-weight: bold;
+}

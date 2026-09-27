@@ -54,6 +54,57 @@ function calcGaugePercent(totalBalance, distributedChips, forcedLaborCount) {
   return Math.min((-totalBalance / threshold) * 100, 100);
 }
 
+// Task-021: 上位として表示する順位の上限（上位 5 名：Feature-008 条件1、Feature-012 条件1）
+const TOP_RANK_LIMIT = 5;
+
+// Task-021: 3 つのランキングの表示の定義（表示の順：アベレージ、累計、強制労働への道のり）
+// 名称・説明文・値の見出しは採用したモック（Screen-001・002・006）とランキングの呼び名（b1/Question-012-1、b1/Question-016）
+const RANKING_DEFINITIONS = [
+  {
+    kind: "average",
+    icon: "🏆",
+    title: "アベレージランキング",
+    shortTitle: "アベレージ",
+    topDescription:
+      "回数が少なくても活躍できる（プレイ時間で補正した 1 日あたりの収支）",
+    description:
+      "回数が少なくても活躍できる（プレイ時間で補正した 1 日あたりの収支の平均）",
+    valueHeader: "平均値チップ数",
+  },
+  {
+    kind: "total",
+    icon: "🎖",
+    title: "累計ランキング",
+    shortTitle: "累計",
+    topDescription:
+      "参加したすべてのゲームの累計（1 年の収支の合計が大きい順）",
+    description:
+      "参加したすべてのゲームの累計（集計期間内の収支の合計が大きい順）",
+    valueHeader: "累計チップ数",
+  },
+  {
+    kind: "forcedLabor",
+    icon: "⛏",
+    title: "強制労働への道のり",
+    shortTitle: "強制労働",
+    topDescription:
+      "強制労働に誰が近いか！のランキング（1 年の収支の合計がマイナスの人のみ）",
+    description:
+      "強制労働に誰が近いか！のランキング（集計期間内の収支の合計がマイナスの人のみ。小さい順）。−（配布チップ数 × N）以下で「強制労働」",
+    valueHeader: "基準値",
+  },
+];
+
+// Task-021: 順位が 5 位以内のプレイヤーを取り出す（同順位で 6 人以上になることがある：c1/Question-015）
+function pickTopRanked(entries) {
+  return entries.filter((entry) => entry.rank <= TOP_RANK_LIMIT);
+}
+
+// Task-021: 強制労働に該当するプレイヤーのラベル（Feature-006 条件2、b1/review-007）
+function forcedLaborTag(entry) {
+  return entry.isForcedLabor === true ? "強制労働" : null;
+}
+
 // ローカルのテスト用の公開（ブラウザでは module がないため何もしない）
 if (typeof module !== "undefined") {
   module.exports = {
@@ -63,5 +114,9 @@ if (typeof module !== "undefined") {
     formatRank,
     formatRemainingChips,
     calcGaugePercent,
+    TOP_RANK_LIMIT,
+    RANKING_DEFINITIONS,
+    pickTopRanked,
+    forcedLaborTag,
   };
 }
