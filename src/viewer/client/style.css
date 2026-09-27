@@ -177,3 +177,70 @@ a.btn {
   color: #1a1a1a;
   font-weight: bold;
 }
+/* Task-022: Screen-002〜004 ランキング画面 */
+.switch {
+  display: flex;
+  gap: 6px;
+  margin: 14px 0 6px;
+}
+.switch a {
+  flex: 1;
+  text-align: center;
+  padding: 8px 2px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  color: var(--sub);
+  font-size: 12px;
+}
+.screen-title {
+  font-size: 20px;
+  color: var(--gold);
+  margin: 10px 0 2px;
+}
+p.desc {
+  font-size: 12px;
+  color: var(--sub);
+  margin: 0 0 4px;
+}
+p.period-text {
+  font-size: 13px;
+  color: var(--sub);
+  margin: 0 0 10px;
+}
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.ranking-table th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--sub);
+  font-weight: normal;
+  border-bottom: 1px solid var(--gold);
+  padding: 6px 4px;
+}
+.ranking-table td {
+  padding: 9px 4px;
+  border-bottom: 1px dashed var(--line);
+}
+.ranking-table td.rk {
+  color: var(--gold);
+  font-weight: bold;
+  width: 44px;
+}
+.ranking-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-table a.player-link {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+.empty {
+  margin: 16px 0;
+  font-size: 15px;
+  color: var(--sub);
+  text-align: center;
+}
