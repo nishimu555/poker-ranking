@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 12:13 |
+| 最終更新 | 2026-09-27 12:14 |
 
 ## 1. 進捗
 
@@ -380,12 +380,21 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし。描く位置・大きさ・色（モックの 3 倍）、人数が増えた場合の縮め方、過去の年の集計時点の日付（その年の 12/31）は implementation-design.md「4. 主要な処理の流れ」に記載した
-    - コミット：
-- [ ] 5-24. Task-025：画像の描画と Screen-006
+    - コミット：f3b878d [Task-024] 画像に描く内容の計算を実装
+- [x] 5-24. Task-025：画像の描画と Screen-006
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-025）
   - 作成・更新先：`src/viewer/client/image-draw.js`、`implementation-design.md`
   - 実行結果：
+    - 失敗の確認：Small テストの対象なし（implementation-plan.md Task-025 のテスト期待値の概要：canvas・端末の保存に依存する）
+    - テスト：`npm test` 114 件／114 件成功（既存のテストがすべて成功することを確認）
+    - ビルド：`npm run build` 成功（`dist/viewer/index.html` に 7 つの JavaScript を埋め込んだ）
+    - 追加の確認：(1) `dist/viewer/index.html` に埋め込んだ JavaScript を 1 つの実行環境に読み込み、構文の誤り・最上位の名前の重複によるエラーがないことを確認した。(2) DOM・canvas・`google.script.run` の簡易な代用品（作業用のスクリプト。リポジトリには含めない）で、トップ、3 つのランキング、個人の戦績（参加している年・参加していない年）、画像、閲覧できない場合の各画面を描き、実行時のエラーがないこと、画面の文字が HTML として解釈されない（テキストノードのみで、`innerHTML` を使わない）こと、画像の文字が描く順に描かれることを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - タスク固有の完了条件（見た目がモックに合致する）：モック（Screen-006.html）の配置・色・文字の大きさを 3 倍にして描いた。実際の画像の見た目と長押しでの保存・共有は、この環境にブラウザ・実機がないため確認していない（c3 で定める Large テストで確認する）
+    - 計画との差異：なし
+    - コミット：
 - [ ] 5-25. Task-026：閲覧用のデプロイ用スクリプト
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-026）
@@ -511,3 +520,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 12:10 | /c2-implement | 5-21（Task-022）を実施し、実行結果を記載 | implementation-plan.md Task-022 |
 | 2026-09-27 12:11 | /c2-implement | 5-22（Task-023）を実施し、実行結果を記載 | implementation-plan.md Task-023 |
 | 2026-09-27 12:13 | /c2-implement | 5-23（Task-024）を実施し、実行結果を記載 | implementation-plan.md Task-024 |
+| 2026-09-27 12:14 | /c2-implement | 5-24（Task-025）を実施し、実行結果を記載 | implementation-plan.md Task-025 |

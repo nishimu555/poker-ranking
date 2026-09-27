@@ -360,3 +360,41 @@ p.period-text {
 .history-table .num {
   text-align: right;
 }
+/* Task-025: Screen-006 画像生成画面 */
+p.guide {
+  font-size: 13px;
+  color: var(--sub);
+  margin: 10px 0;
+}
+.image-view {
+  max-width: 360px;
+  margin: 0 auto;
+}
+.image-view img.ranking-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border-radius: 14px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  margin: 14px auto;
+  max-width: 360px;
+}
+.actions a {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.actions .primary {
+  background: var(--gold);
+  color: #1a1a1a;
+  font-weight: bold;
+}
+.actions .ghost {
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}

@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:13 |
+| 最終更新 | 2026-09-27 12:14 |
 
 ## 1. ディレクトリ構成
 
@@ -46,6 +46,7 @@ poker-ranking/
 │           ├── screen-ranking.js     # Task-022：Screen-002〜004 ランキング画面
 │           ├── screen-player.js      # Task-023：Screen-005 個人の戦績画面
 │           ├── image-layout.js       # Task-024：画像に描く内容の計算
+│           ├── image-draw.js         # Task-025：画像の描画と Screen-006
 │           ├── app.js                # Task-020：画面の共通部分（最後に読み込む）
 │           └── style.css             # Task-020：画面の見た目
 └── tests/
@@ -173,6 +174,7 @@ poker-ranking/
 | `src/viewer/client/screen-ranking.js` | Screen-002〜004 ランキング画面（`buildRankingContent`、`renderRankingScreen`） | Component-007 | Task-022 |
 | `src/viewer/client/screen-player.js` | Screen-005 個人の戦績画面（`buildPlayerContent`、`renderPlayerScreen`） | Component-007 | Task-023 |
 | `src/viewer/client/image-layout.js` | 画像に描く内容の計算（`buildImageLayout`） | Component-008 | Task-024 |
+| `src/viewer/client/image-draw.js` | 画像の描画と Screen-006 画像生成画面（`drawImageLayout`、`createRankingImage`、`renderImageScreen`） | Component-008 | Task-025 |
 | `src/viewer/client/app.js` | 画面の共通部分（年の選択、画面の切り替え、データの取得、閲覧できない旨、免責表示） | Component-007 | Task-020 |
 | `src/viewer/client/style.css` | 画面の見た目（採用したモックの色・配置） | Component-007 | Task-020（各画面の分は Task-021〜025 で追加） |
 
@@ -210,6 +212,7 @@ poker-ranking/
 | `buildRankingContent`、`renderRankingScreen` | `src/viewer/client/screen-ranking.js` |
 | `formatHours`、`buildPlayerContent`、`renderPlayerScreen` | `src/viewer/client/screen-player.js` |
 | `IMAGE_WIDTH`、`IMAGE_HEIGHT`、`IMAGE_COLORS`、`IMAGE_DISCLAIMER`、`IMAGE_METRICS`、`buildPointDate`、`buildImageLayout` | `src/viewer/client/image-layout.js` |
+| `IMAGE_FONT_FAMILY`、`traceRoundRect`、`drawImageLayout`、`createRankingImage`、`renderImageScreen` | `src/viewer/client/image-draw.js` |
 | `DISCLAIMER`、`NOT_VIEWABLE_FALLBACK_MESSAGE`、`buildYearOptions`、`buildNotViewableContent`、`buildPeriodText`、`appState`、`yearDataCache`、`el`、`navigate`、`buildYearSelect`、`screenHelpers`、`findRenderer`、`render`、`loadYear` | `src/viewer/client/app.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
@@ -369,6 +372,7 @@ poker-ranking/
 | `tests/small/viewer/screen-ranking.test.js` | `src/viewer/client/screen-ranking.js` の `buildRankingContent` | Task-022 期待値1〜4 |
 | `tests/small/viewer/screen-player.test.js` | `src/viewer/client/screen-player.js` の `buildPlayerContent` | Task-023 期待値1〜3 |
 | `tests/small/viewer/image-layout.test.js` | `src/viewer/client/image-layout.js` の `buildImageLayout` | Task-024 期待値1〜5 |
+| （なし） | Task-025 は Small テストの対象なし（canvas・端末の保存に依存する。implementation-plan.md 4.）。Large テスト（実機のスマートフォン）で確認する | — |
 
 ## 4. 主要な処理の流れ
 
@@ -525,6 +529,13 @@ poker-ranking/
 - 同順位で表示の人数が増えた場合（c1/Question-015）は、行の高さ（標準 55px）と文字の大きさ（標準 36px）を、見出し・免責表示を除いた残りの高さに収まるよう縮める（各ランキング 12 人・計 36 行でも免責表示の上に収まることを確認した）。
 - 集計時点の日付は、集計日時の日付とする。表示中の年より後に集計した場合（過去の年を表示する場合）は、その年の 12/31 とする（`buildPointDate`）。
 
+### 画像の描画と Screen-006（`src/viewer/client/image-draw.js`、Task-025）
+
+- `createRankingImage(data)`：`buildImageLayout(data)` の内容を、1080 × 1920 の canvas に描き（`drawImageLayout`）、PNG の data URL を返す。
+- `drawImageLayout(ctx, layout)`：`items` を順に描く。背景は角の丸い枠の内側を、上端の中央を中心とした放射状のグラデーションで塗る（枠の外の角は透明）。文字は画面と同じ書体、上端を基準に描く。ニックネームは `maxWidth` を指定し、長い場合は幅に収まるよう縮めて描く。角の丸い四角形は、`roundRect` に対応しないブラウザでも動くよう `arcTo` で描く（`traceRoundRect`）。
+- `renderImageScreen`：採用したモック（Screen-006）の構成（「‹ トップへ」、保存の案内「画像を長押しすると、端末に保存・共有できます。」、画像（`<img>`）、「戻る」「画像を作り直す」）で描く。画像は `<img>` で表示し、利用者は長押しで保存・共有する（Decision-0004）。「画像を作り直す」は、表示中の年のデータで画像を描き直す。
+- 画像の見た目と長押しでの保存・共有は、c3 で定める Large テスト（実機のスマートフォン）で確認する（component-design.md 7.（テストのしやすさ））。
+
 ## 5. 計画との違い
 
 | Task | 計画 | 実際 | 根拠 |
@@ -566,3 +577,4 @@ poker-ranking/
 | 2026-09-27 12:10 | /c2-implement | Task-022（Screen-002〜004 ランキング画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-022、採用したモック（Screen-002） |
 | 2026-09-27 12:11 | /c2-implement | Task-023（Screen-005 個人の戦績画面）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-023、採用したモック（Screen-005） |
 | 2026-09-27 12:13 | /c2-implement | Task-024（画像に描く内容の計算）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-024、採用したモック（Screen-006） |
+| 2026-09-27 12:14 | /c2-implement | Task-025（画像の描画と Screen-006）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-025、採用したモック（Screen-006） |
