@@ -90,7 +90,7 @@ afterEach(() => {
   delete global.SpreadsheetApp;
 });
 
-// Task-017 期待値1
+// Test-064（Task-017 期待値1）
 test("年 2026 を指定すると、2026 年のランキング・個人の戦績・履歴のみと、集計日時、年の一覧（2025、2026）が返る", () => {
   setUpGas("viewer-id", () => createViewerSpreadsheet());
 
@@ -130,7 +130,7 @@ test("年 2026 を指定すると、2026 年のランキング・個人の戦績
   expect(data.history["古株"]).toBeUndefined();
 });
 
-// Task-017 期待値2
+// Test-065（Task-017 期待値2）
 test("年を指定しない場合、集計済みの年のうち最新の年（2026）の結果が返る", () => {
   setUpGas("viewer-id", () => createViewerSpreadsheet());
 
@@ -141,7 +141,7 @@ test("年を指定しない場合、集計済みの年のうち最新の年（20
   expect(data.players.map((p) => p.nickname)).toEqual(["ナッツ", "リバー"]);
 });
 
-// Task-017 期待値3
+// Test-066（Task-017 期待値3）
 test("閲覧用スプレッドシートを開けない場合（共有されていないアカウント）、データを返さず閲覧できない旨を返す", () => {
   setUpGas("viewer-id", () => {
     throw new Error(
@@ -158,7 +158,7 @@ test("閲覧用スプレッドシートを開けない場合（共有されて�
   expect(data.history).toBeUndefined();
 });
 
-// Task-017 期待値4
+// Test-067（Task-017 期待値4）
 test("スクリプトプロパティ VIEWER_SPREADSHEET_ID が未設定の場合、データを返さず閲覧できない旨を返す", () => {
   setUpGas(null, () => createViewerSpreadsheet());
 
@@ -170,7 +170,7 @@ test("スクリプトプロパティ VIEWER_SPREADSHEET_ID が未設定の場合
   expect(global.SpreadsheetApp.openById).not.toHaveBeenCalled();
 });
 
-// Task-018 期待値1
+// Test-068（Task-018 期待値1）
 test("Web アプリを開くと、画面の HTML が返り、タイトルは「POKER RANKING」、スマートフォン向けの表示設定（viewport）が付く", () => {
   const output = { title: null, metaTags: {} };
   output.setTitle = jest.fn((title) => {

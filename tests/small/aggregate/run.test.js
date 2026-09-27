@@ -54,7 +54,7 @@ const threeValidRows = [
   playRow(5, "ナッツ", "2026/09/20", 1, 20000, 1),
 ];
 
-// Task-014 期待値1
+// Test-057（Task-014 期待値1）
 test.each([
   ["空欄", ""],
   ["数値でない", "abc"],
@@ -75,7 +75,7 @@ test.each([
   },
 );
 
-// Task-014 期待値2
+// Test-058（Task-014 期待値2）
 test.each([
   ["空欄", ""],
   ["数値でない", "abc"],
@@ -96,7 +96,7 @@ test.each([
   },
 );
 
-// Task-014 期待値3
+// Test-059（Task-014 期待値3）
 test("有効な行 3 件と無効な行 1 件（4 行目）では、4 行目に印が付き、3 件で集計・書き出しが行われ、完了のメッセージに除外した行の数 1 が含まれる", () => {
   setUpAccess({
     settings: validSettings,
@@ -121,7 +121,7 @@ test("有効な行 3 件と無効な行 1 件（4 行目）では、4 行目に�
   expect(notify.mock.calls[0][0]).toMatch(/1\s*件/);
 });
 
-// Task-014 期待値4
+// Test-060（Task-014 期待値4）
 test("書き出しが失敗した場合、管理者に失敗のメッセージを表示する", () => {
   const failure = {
     ok: false,
@@ -140,7 +140,7 @@ test("書き出しが失敗した場合、管理者に失敗のメッセージ�
   expect(notify.mock.calls[0][0]).toContain(failure.message);
 });
 
-// Task-014 期待値5
+// Test-061（Task-014 期待値5）
 test("集計が成功した場合、ニックネームの候補が更新される", () => {
   setUpAccess({ settings: validSettings, rows: threeValidRows });
 
@@ -152,7 +152,7 @@ test("集計が成功した場合、ニックネームの候補が更新され�
   expect([...new Set(nicknames)].sort()).toEqual(["ナッツ", "リバー"].sort());
 });
 
-// Task-014 期待値6
+// Test-062（Task-014 期待値6）
 test("行を修正・削除してから実行すると、修正後の行のみで集計される（前回の結果は置き換えられる）", () => {
   setUpAccess({ settings: validSettings, rows: threeValidRows });
   runAggregation(spreadsheet, jest.fn());

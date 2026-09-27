@@ -73,7 +73,7 @@ afterEach(() => {
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
 
-// Task-003 期待値1
+// Test-001（Task-003 期待値1）
 test("集計用：dist/aggregate/ に .js と appsscript.json のみが出力される", () => {
   writeFiles(rootDir, { ...aggregateFiles, ...viewerFiles });
 
@@ -94,7 +94,7 @@ test("集計用：dist/aggregate/ に .js と appsscript.json のみが出力さ
   expect(allDist.some((f) => f.endsWith("eslint.config.js"))).toBe(false);
 });
 
-// Task-003 期待値2
+// Test-002（Task-003 期待値2）
 test("閲覧用：dist/viewer/ に server.js、appsscript.json、CSS・JavaScript を埋め込んだ HTML が出力される", () => {
   writeFiles(rootDir, { ...aggregateFiles, ...viewerFiles });
 
@@ -120,7 +120,7 @@ test("閲覧用：dist/viewer/ に server.js、appsscript.json、CSS・JavaScrip
   expect(html.indexOf("FORMAT")).toBeLessThan(html.indexOf("APP"));
 });
 
-// Task-003 期待値3
+// Test-003（Task-003 期待値3）
 test("前回のビルドの出力は消され、今回の出力のみになる", () => {
   writeFiles(rootDir, {
     ...aggregateFiles,

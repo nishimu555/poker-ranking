@@ -38,21 +38,21 @@ function texts(layout) {
     .map((item) => item.text);
 }
 
-// Task-024 期待値1
+// Test-092（Task-024 期待値1）
 test("画像の大きさは 1080 × 1920 ピクセル（9:16）", () => {
   const layout = buildImageLayout(data);
   expect(layout.width).toBe(1080);
   expect(layout.height).toBe(1920);
 });
 
-// Task-024 期待値2
+// Test-093（Task-024 期待値2）
 test("2026 年、集計日 2026/09/26 では、名称「POKER RANKING」と「2026 年（2026/01/01〜2026/09/26 時点）」を含む", () => {
   const all = texts(buildImageLayout(data));
   expect(all.some((t) => t.includes("POKER RANKING"))).toBe(true);
   expect(all).toContain("2026 年（2026/01/01〜2026/09/26 時点）");
 });
 
-// Task-024 期待値3
+// Test-094（Task-024 期待値3）
 test("アベレージ、累計、強制労働への道のりの順に、それぞれ 5 位以内のプレイヤー（同順位で 6 人以上もありうる）を含む", () => {
   const layout = buildImageLayout(data);
   expect(layout.blocks.map((b) => b.kind)).toEqual([
@@ -83,14 +83,14 @@ test("アベレージ、累計、強制労働への道のりの順に、それ�
   expect(all).not.toContain("G");
 });
 
-// Task-024 期待値4
+// Test-095（Task-024 期待値4）
 test("「強制労働」に該当するプレイヤーは、ニックネームに「（強制労働）」を付ける", () => {
   const rows = buildImageLayout(data).blocks[2].rows;
   expect(rows[0].nicknameText).toBe("ジョーカー（強制労働）");
   expect(rows[1].nicknameText).toBe("B");
 });
 
-// Task-024 期待値5
+// Test-096（Task-024 期待値5）
 test("免責表示の文言を含む", () => {
   const all = texts(buildImageLayout(data));
   expect(

@@ -1,7 +1,7 @@
 // Task-006: 順位付けの Small テスト
 const { rankEntries, pickTopRanked } = require("../../../src/aggregate/rank");
 
-// Task-006 期待値1
+// Test-018（Task-006 期待値1）
 test("値 300、100、100、50（大きい順）の順位は 1、2、2、4 位", () => {
   const ranked = rankEntries(
     [
@@ -20,7 +20,7 @@ test("値 300、100、100、50（大きい順）の順位は 1、2、2、4 位",
   ]);
 });
 
-// Task-006 期待値2
+// Test-019（Task-006 期待値2）
 test("値 -300、-100、-50（小さい順）の順位は -300 が 1 位、-100 が 2 位、-50 が 3 位", () => {
   const ranked = rankEntries(
     [
@@ -37,7 +37,7 @@ test("値 -300、-100、-50（小さい順）の順位は -300 が 1 位、-100 
   ]);
 });
 
-// Task-006 期待値3
+// Test-020（Task-006 期待値3）
 test("同じ値のプレイヤーは同じ順位で、ニックネームの文字コード順に並ぶ", () => {
   const ranked = rankEntries(
     [
@@ -54,7 +54,7 @@ test("同じ値のプレイヤーは同じ順位で、ニックネームの文�
   ]);
 });
 
-// Task-006 期待値4
+// Test-021（Task-006 期待値4）
 test("順位が 1、2、3、4、5、5、7 位の 7 人から、5 位以内の 6 人が取り出される", () => {
   const ranked = [1, 2, 3, 4, 5, 5, 7].map((rank, i) => ({
     nickname: `P${i}`,
@@ -66,7 +66,7 @@ test("順位が 1、2、3、4、5、5、7 位の 7 人から、5 位以内の 6 
   expect(top.map((e) => e.rank)).toEqual([1, 2, 3, 4, 5, 5]);
 });
 
-// Task-006 期待値5
+// Test-022（Task-006 期待値5）
 test("一覧が空の場合は空の一覧を返す", () => {
   expect(rankEntries([], "desc")).toEqual([]);
   expect(rankEntries([], "asc")).toEqual([]);

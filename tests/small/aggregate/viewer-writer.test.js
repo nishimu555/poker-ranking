@@ -145,7 +145,7 @@ const aggregation = {
   },
 };
 
-// Task-011 期待値1
+// Test-048（Task-011 期待値1）
 test("4 シートの前回の内容が消され、集計情報・ランキング・個人の戦績・履歴の各行が書き込まれる", () => {
   const viewer = createViewerSpreadsheet();
   setUpGas("viewer-id", viewer);
@@ -187,7 +187,7 @@ test("4 シートの前回の内容が消され、集計情報・ランキング
   ]);
 });
 
-// Task-011 期待値2
+// Test-049（Task-011 期待値2）
 test("強制労働への道のりの対象外のプレイヤーは、個人の戦績のその順位の欄が空欄", () => {
   const viewer = createViewerSpreadsheet();
   setUpGas("viewer-id", viewer);
@@ -201,7 +201,7 @@ test("強制労働への道のりの対象外のプレイヤーは、個人の�
   expect(rowA[column]).toBe("");
 });
 
-// Task-011 期待値3
+// Test-050（Task-011 期待値3）
 test("スクリプトプロパティ VIEWER_SPREADSHEET_ID が未設定の場合、書き出しを行わず失敗を返す", () => {
   const viewer = createViewerSpreadsheet();
   setUpGas(null, viewer);
@@ -214,7 +214,7 @@ test("スクリプトプロパティ VIEWER_SPREADSHEET_ID が未設定の場合
   expect(viewer.events).toEqual([]);
 });
 
-// Task-011 期待値4
+// Test-051（Task-011 期待値4）
 test("書き出す列は component-design.md 5. のシート構成のみ", () => {
   const viewer = createViewerSpreadsheet();
   setUpGas("viewer-id", viewer);

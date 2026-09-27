@@ -26,7 +26,7 @@ const rankings = {
   ],
 };
 
-// Task-022 期待値1
+// Test-085（Task-022 期待値1）
 test("値の見出しは、アベレージ「平均値チップ数」、累計「累計チップ数」、強制労働への道のり「基準値」", () => {
   expect(buildRankingContent(rankings, "average").valueHeader).toBe(
     "平均値チップ数",
@@ -39,7 +39,7 @@ test("値の見出しは、アベレージ「平均値チップ数」、累計�
   );
 });
 
-// Task-022 期待値2
+// Test-086（Task-022 期待値2）
 test("対象者全員が順位の順に、順位・ニックネーム・値・参加日数を持つ行になる", () => {
   const rows = buildRankingContent(rankings, "average").rows;
   expect(
@@ -54,7 +54,7 @@ test("対象者全員が順位の順に、順位・ニックネーム・値・�
   ]);
 });
 
-// Task-022 期待値3
+// Test-087（Task-022 期待値3）
 test("強制労働への道のりの対象者がいない場合、「ランキングなし」を表示する内容になる", () => {
   const content = buildRankingContent(
     { ...rankings, forcedLabor: [] },
@@ -64,7 +64,7 @@ test("強制労働への道のりの対象者がいない場合、「ランキ�
   expect(content.emptyText).toBe("ランキングなし");
 });
 
-// Task-022 期待値4
+// Test-088（Task-022 期待値4）
 test("ニックネームは、そのプレイヤーの個人の戦績画面への移動先を持つ", () => {
   const rows = buildRankingContent(rankings, "forcedLabor").rows;
   expect(rows[0].link).toEqual({ screen: "player", nickname: "ジョーカー" });

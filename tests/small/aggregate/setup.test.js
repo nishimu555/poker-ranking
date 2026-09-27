@@ -93,7 +93,7 @@ afterEach(() => {
   delete global.SpreadsheetApp;
 });
 
-// Task-012 期待値1
+// Test-052（Task-012 期待値1）
 test("シートがない場合、シート「プレイ結果」が 5 列の見出しで作られ、日付・数値の入力規則が設定される", () => {
   const spreadsheet = createSpreadsheet();
 
@@ -115,7 +115,7 @@ test("シートがない場合、シート「プレイ結果」が 5 列の見�
   expect(sheet.validations["E2:E"].kind).toBe("number");
 });
 
-// Task-012 期待値2
+// Test-053（Task-012 期待値2）
 test("シートがない場合、シート「設定」に配布チップ数（空欄）と N（10）が作られる", () => {
   const spreadsheet = createSpreadsheet();
 
@@ -129,7 +129,7 @@ test("シートがない場合、シート「設定」に配布チップ数（�
   ]);
 });
 
-// Task-012 期待値3
+// Test-054（Task-012 期待値3）
 test("シート「プレイ結果」「設定」がすでにあり、データが入っている場合、既存のシートとデータは変更・削除されない", () => {
   const playValues = [
     ["プレイヤー名", "プレイ日付", "プレイ時間", "最終チップ数", "借金回数"],
@@ -153,7 +153,7 @@ test("シート「プレイ結果」「設定」がすでにあり、データ�
   expect(settings.values).toEqual(settingValues);
 });
 
-// Task-013 期待値1
+// Test-055（Task-013 期待値1）
 test("ニックネーム「ナッツ」「 ナッツ」「リバー」の候補は「ナッツ」「リバー」の 2 つ", () => {
   const play = createSheet("プレイ結果");
   const spreadsheet = createSpreadsheet({ プレイ結果: play });
@@ -165,7 +165,7 @@ test("ニックネーム「ナッツ」「 ナッツ」「リバー」の候補�
   expect(rule.values).toEqual(["ナッツ", "リバー"]);
 });
 
-// Task-013 期待値2
+// Test-056（Task-013 期待値2）
 test("候補を設定すると、候補にない名前の入力を拒否しない設定になる", () => {
   const play = createSheet("プレイ結果");
   const spreadsheet = createSpreadsheet({ プレイ結果: play });

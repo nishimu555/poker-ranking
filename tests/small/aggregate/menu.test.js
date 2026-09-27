@@ -30,7 +30,7 @@ afterEach(() => {
   delete global.SpreadsheetApp;
 });
 
-// Task-015 期待値1
+// Test-063（Task-015 期待値1）
 test("入力用スプレッドシートを開くと、「集計を反映」と「初期設定」の 2 つの項目を持つメニューが追加される", () => {
   const ui = createUi();
   global.SpreadsheetApp = { getUi: jest.fn(() => ui) };

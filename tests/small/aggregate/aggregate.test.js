@@ -26,7 +26,7 @@ function summary(entries) {
   return entries.map((e) => [e.nickname, e.value, e.rank]);
 }
 
-// Task-007 期待値1
+// Test-023（Task-007 期待値1）
 test("2026 年の集計には 2026/01/01 の行のみが含まれる", () => {
   const result = aggregateAllYears(
     [row("A", "2025/12/31", 2, 1000), row("B", "2026/01/01", 2, 3000)],
@@ -37,7 +37,7 @@ test("2026 年の集計には 2026/01/01 の行のみが含まれる", () => {
   expect(summary(rankings.average)).toEqual([["B", 3000, 1]]);
 });
 
-// Task-007 期待値2
+// Test-024（Task-007 期待値2）
 test("集計済みの年の一覧は 2025、2026", () => {
   const result = aggregateAllYears(
     [
@@ -50,7 +50,7 @@ test("集計済みの年の一覧は 2025、2026", () => {
   expect(result.years).toEqual([2025, 2026]);
 });
 
-// Task-007 期待値3
+// Test-025（Task-007 期待値3）
 test("アベレージランキングの値は（10000 × 1 ＋ -5000 × 0.5）÷ 2 ＝ 3750", () => {
   const result = aggregateAllYears(
     [row("A", "2026/01/10", 2, 10000), row("A", "2026/01/17", 0.5, -5000)],
@@ -61,7 +61,7 @@ test("アベレージランキングの値は（10000 × 1 ＋ -5000 × 0.5）÷
   ]);
 });
 
-// Task-007 期待値4
+// Test-026（Task-007 期待値4）
 test("参加日数が 1 日のプレイヤーもアベレージランキングに含まれる", () => {
   const result = aggregateAllYears(
     [
@@ -75,7 +75,7 @@ test("参加日数が 1 日のプレイヤーもアベレージランキング�
   expect(nicknames).toContain("B");
 });
 
-// Task-007 期待値5
+// Test-027（Task-007 期待値5）
 test("同じプレイヤー・同じ日付の 2 行は参加日数 1 日として集計する", () => {
   const result = aggregateAllYears(
     [row("A", "2026/02/01", 2, 4000), row("A", "2026/02/01", 2, 2000)],
@@ -86,7 +86,7 @@ test("同じプレイヤー・同じ日付の 2 行は参加日数 1 日とし�
   expect(summary(rankings.total)).toEqual([["A", 6000, 1]]);
 });
 
-// Task-007 期待値6
+// Test-028（Task-007 期待値6）
 test("アベレージランキングの値が 1234.5 と 1234.6 の 2 人は、どちらも 1235 で同じ順位", () => {
   const result = aggregateAllYears(
     [row("A", "2026/02/01", 2, 1234.5), row("B", "2026/02/01", 2, 1234.6)],
@@ -105,7 +105,7 @@ const threePlayers = [
   row("C", "2026/03/01", 2, 9500),
 ];
 
-// Task-007 期待値7
+// Test-029（Task-007 期待値7）
 test("累計ランキングは 44200、9500、-8800 の順（全員が対象）", () => {
   const result = aggregateAllYears(threePlayers, settings);
   expect(summary(result.rankingsByYear[2026].total)).toEqual([
@@ -115,7 +115,7 @@ test("累計ランキングは 44200、9500、-8800 の順（全員が対象）"
   ]);
 });
 
-// Task-007 期待値8
+// Test-030（Task-007 期待値8）
 test("強制労働への道のりは -8800 の 1 人のみ", () => {
   const result = aggregateAllYears(threePlayers, settings);
   expect(summary(result.rankingsByYear[2026].forcedLabor)).toEqual([
@@ -123,7 +123,7 @@ test("強制労働への道のりは -8800 の 1 人のみ", () => {
   ]);
 });
 
-// Task-007 期待値9
+// Test-031（Task-007 期待値9）
 test("基準値がマイナスのプレイヤーがいない場合、強制労働への道のりは空", () => {
   const result = aggregateAllYears(
     [row("A", "2026/03/01", 2, 1000), row("B", "2026/03/01", 2, 0)],
@@ -132,7 +132,7 @@ test("基準値がマイナスのプレイヤーがいない場合、強制労�
   expect(result.rankingsByYear[2026].forcedLabor).toEqual([]);
 });
 
-// Task-007 期待値10
+// Test-032（Task-007 期待値10）
 test("配布チップ数 20000・N 10 では、基準値 -200000 は強制労働に該当し、-199999 は該当しない", () => {
   const result = aggregateAllYears(
     [row("A", "2026/03/01", 2, -200000), row("B", "2026/03/01", 2, -199999)],
@@ -143,7 +143,7 @@ test("配布チップ数 20000・N 10 では、基準値 -200000 は強制労働
   expect(forcedLabor.find((e) => e.nickname === "B").isForcedLabor).toBe(false);
 });
 
-// Task-007 期待値11
+// Test-033（Task-007 期待値11）
 test("基準値は年ごとに数え直す（2025 年 -150000、2026 年 -60000）", () => {
   const result = aggregateAllYears(
     [row("A", "2025/06/01", 2, -150000), row("A", "2026/06/01", 2, -60000)],
@@ -157,7 +157,7 @@ test("基準値は年ごとに数え直す（2025 年 -150000、2026 年 -60000�
   ]);
 });
 
-// Task-007 期待値12
+// Test-034（Task-007 期待値12）
 test("収支の合計 1000.5 の累計チップ数・基準値は 1001（合計してから丸める）", () => {
   const result = aggregateAllYears(
     [row("A", "2026/03/01", 2, 500.25), row("A", "2026/03/08", 2, 500.25)],
@@ -166,7 +166,7 @@ test("収支の合計 1000.5 の累計チップ数・基準値は 1001（合計�
   expect(summary(result.rankingsByYear[2026].total)).toEqual([["A", 1001, 1]]);
 });
 
-// Task-007 期待値13
+// Test-035（Task-007 期待値13）
 test("配布チップ数を 20000 から 30000 に変えると、すべての年の収支・ランキングが 30000 で計算される", () => {
   const rows = [
     row("A", "2025/03/01", 2, 50000, 1),

@@ -15,12 +15,12 @@ function makeRow(overrides) {
 
 const numberFields = ["playTime", "finalChips", "debtCount"];
 
-// Task-004 期待値1
+// Test-004（Task-004 期待値1）
 test("すべての項目が正しい行は有効", () => {
   expect(validateRow(makeRow({}))).toEqual({ valid: true, nickname: "ナッツ" });
 });
 
-// Task-004 期待値2
+// Test-005（Task-004 期待値2）
 test.each(["playerName", "playDate", ...numberFields])(
   "%s が空欄の行は無効",
   (field) => {
@@ -29,22 +29,22 @@ test.each(["playerName", "playDate", ...numberFields])(
   },
 );
 
-// Task-004 期待値3
+// Test-006（Task-004 期待値3）
 test("プレイ日付が日付でない（文字列「abc」）行は無効", () => {
   expect(validateRow(makeRow({ playDate: "abc" })).valid).toBe(false);
 });
 
-// Task-004 期待値4
+// Test-007（Task-004 期待値4）
 test.each(numberFields)("%s が数値でない（文字列「abc」）行は無効", (field) => {
   expect(validateRow(makeRow({ [field]: "abc" })).valid).toBe(false);
 });
 
-// Task-004 期待値5
+// Test-008（Task-004 期待値5）
 test.each(numberFields)("%s がマイナス（-1）の行は無効", (field) => {
   expect(validateRow(makeRow({ [field]: -1 })).valid).toBe(false);
 });
 
-// Task-004 期待値6
+// Test-009（Task-004 期待値6）
 test("プレイ時間 0、借金回数 0.5、最終チップ数 100.5 の行は有効", () => {
   expect(
     validateRow(makeRow({ playTime: 0, debtCount: 0.5, finalChips: 100.5 }))
@@ -52,7 +52,7 @@ test("プレイ時間 0、借金回数 0.5、最終チップ数 100.5 の行は�
   ).toBe(true);
 });
 
-// Task-004 期待値7
+// Test-010（Task-004 期待値7）
 test("プレイヤー名の前後の空白を取り除いたニックネームを返す", () => {
   expect(validateRow(makeRow({ playerName: " ナッツ " }))).toEqual({
     valid: true,
@@ -60,7 +60,7 @@ test("プレイヤー名の前後の空白を取り除いたニックネーム�
   });
 });
 
-// Task-004 期待値8
+// Test-011（Task-004 期待値8）
 test("プレイヤー名が空白のみの行は無効（空欄として扱う）", () => {
   expect(validateRow(makeRow({ playerName: "   " })).valid).toBe(false);
 });

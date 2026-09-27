@@ -25,7 +25,7 @@ const rankings = {
   ],
 };
 
-// Task-021 期待値1
+// Test-081（Task-021 期待値1）
 test("アベレージ、累計、強制労働への道のりの順に、それぞれ 5 位以内のプレイヤー（同順位で 6 人以上もありうる）が並ぶ", () => {
   const cards = buildTopContent(rankings);
   expect(cards.map((c) => c.kind)).toEqual(["average", "total", "forcedLabor"]);
@@ -41,21 +41,21 @@ test("アベレージ、累計、強制労働への道のりの順に、それ�
   expect(cards[1].rows.map((r) => r.valueText)).toEqual(["+1,000", "−500"]);
 });
 
-// Task-021 期待値2
+// Test-082（Task-021 期待値2）
 test("強制労働への道のりで「強制労働」に該当するプレイヤーは、ニックネームの右側に「強制労働」のラベルを付ける内容になる", () => {
   const rows = buildTopContent(rankings)[2].rows;
   expect(rows[0]).toMatchObject({ nickname: "ジョーカー", tag: "強制労働" });
   expect(rows[1].tag).toBeNull();
 });
 
-// Task-021 期待値3
+// Test-083（Task-021 期待値3）
 test("強制労働への道のりの対象者がいない場合、「ランキングなし」を表示する内容になる", () => {
   const card = buildTopContent({ ...rankings, forcedLabor: [] })[2];
   expect(card.rows).toEqual([]);
   expect(card.emptyText).toBe("ランキングなし");
 });
 
-// Task-021 期待値4
+// Test-084（Task-021 期待値4）
 test("ランキング名・「すべて見る」は、同じランキング画面への移動先を持つ", () => {
   for (const card of buildTopContent(rankings)) {
     const expected = { screen: "ranking", rankingKind: card.kind };

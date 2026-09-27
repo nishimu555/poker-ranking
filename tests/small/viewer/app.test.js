@@ -5,7 +5,7 @@ const {
   DISCLAIMER,
 } = require("../../../src/viewer/client/app");
 
-// Task-020 期待値1
+// Test-078（Task-020 期待値1）
 test("集計済みの年 2025、2026 では、年の選択肢は 2026、2025 で、最初に選ばれる年は 2026", () => {
   expect(buildYearOptions([2025, 2026])).toEqual({
     options: [2026, 2025],
@@ -13,7 +13,7 @@ test("集計済みの年 2025、2026 では、年の選択肢は 2026、2025 で
   });
 });
 
-// Task-020 期待値2
+// Test-079（Task-020 期待値2）
 test("取得の結果が「閲覧できない」の場合、データの代わりに閲覧できない旨を表示する内容になる", () => {
   const content = buildNotViewableContent({
     ok: false,
@@ -29,7 +29,7 @@ test("取得の結果が「閲覧できない」の場合、データの代わ�
   expect(buildNotViewableContent({ ok: true })).toEqual({ viewable: true });
 });
 
-// Task-020 期待値3
+// Test-080（Task-020 期待値3）
 test("免責表示の文言は「本ページは有志が作成したものであり、開催店舗とは関係ありません。」", () => {
   expect(DISCLAIMER).toBe(
     "本ページは有志が作成したものであり、開催店舗とは関係ありません。",

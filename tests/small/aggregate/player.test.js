@@ -32,7 +32,7 @@ function formatDate(date) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 }
 
-// Task-008 期待値1
+// Test-036（Task-008 期待値1）
 test("3 日分（プレイ時間 2.0、1.5、3.0、借金回数 0、1、0）は参加日数 3 日、合計プレイ時間 6.5、借金回数の累計 1", () => {
   const playersByYear = aggregatePlayerStats(
     [
@@ -48,7 +48,7 @@ test("3 日分（プレイ時間 2.0、1.5、3.0、借金回数 0、1、0）は�
   expect(player.totalDebtCount).toBe(1);
 });
 
-// Task-008 期待値2
+// Test-037（Task-008 期待値2）
 test("基準値 44200、配布チップ数 20000、N 10 の強制労働までの残りチップ数は 244200", () => {
   const playersByYear = aggregatePlayerStats(
     [row("A", "2026/02/01", 2, 44200, 0)],
@@ -59,7 +59,7 @@ test("基準値 44200、配布チップ数 20000、N 10 の強制労働までの
   expect(player.remainingChips).toBe(244200);
 });
 
-// Task-008 期待値3
+// Test-038（Task-008 期待値3）
 test("基準値 -210000、配布チップ数 20000、N 10 の強制労働までの残りチップ数は -10000", () => {
   // 収支 ＝ 10000 − 20000 × 11 ＝ -210000
   const playersByYear = aggregatePlayerStats(
@@ -71,7 +71,7 @@ test("基準値 -210000、配布チップ数 20000、N 10 の強制労働まで�
   expect(player.remainingChips).toBe(-10000);
 });
 
-// Task-008 期待値4
+// Test-039（Task-008 期待値4）
 test("基準値が 0 以上のプレイヤーは、強制労働への道のりの順位が「なし」", () => {
   const playersByYear = aggregatePlayerStats(
     [row("A", "2026/03/01", 2, 5000), row("B", "2026/03/01", 2, 0)],
@@ -81,7 +81,7 @@ test("基準値が 0 以上のプレイヤーは、強制労働への道のり�
   expect(findPlayer(playersByYear, 2026, "B").ranks.forcedLabor).toBeNull();
 });
 
-// Task-008 期待値5
+// Test-040（Task-008 期待値5）
 test("基準値がマイナスのプレイヤーは 3 つのランキングすべての順位を持つ", () => {
   const playersByYear = aggregatePlayerStats(
     [
@@ -98,7 +98,7 @@ test("基準値がマイナスのプレイヤーは 3 つのランキングす�
   });
 });
 
-// Task-008 期待値6
+// Test-041（Task-008 期待値6）
 test("履歴は新しい日付から並び、各行に日付・時間・最終チップ・借金・収支を持つ", () => {
   const playersByYear = aggregatePlayerStats(
     [
@@ -124,7 +124,7 @@ test("履歴は新しい日付から並び、各行に日付・時間・最終�
   ]);
 });
 
-// Task-008 期待値7
+// Test-042（Task-008 期待値7）
 test("同じ日付の 2 行は、履歴に 2 行とも含まれ、参加日数は 1 日", () => {
   const playersByYear = aggregatePlayerStats(
     [row("A", "2026/02/01", 2, 4000), row("A", "2026/02/01", 2, 2000)],

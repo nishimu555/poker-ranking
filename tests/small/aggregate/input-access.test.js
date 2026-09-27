@@ -36,7 +36,7 @@ const header = [
   "借金回数",
 ];
 
-// Task-009 期待値1
+// Test-043（Task-009 期待値1）
 test("シート「プレイ結果」の見出し行とデータ 2 行から、2 件の行が行番号（2、3）付きで返る", () => {
   const date1 = new Date(2026, 8, 13);
   const date2 = new Date(2026, 8, 13);
@@ -67,7 +67,7 @@ test("シート「プレイ結果」の見出し行とデータ 2 行から、2 
   ]);
 });
 
-// Task-009 期待値2
+// Test-044（Task-009 期待値2）
 test("シート「設定」の配布チップ数 20000、N 10 が返る", () => {
   const spreadsheet = createSpreadsheet({
     設定: createSheet([
@@ -81,7 +81,7 @@ test("シート「設定」の配布チップ数 20000、N 10 が返る", () => 
   });
 });
 
-// Task-009 期待値3
+// Test-045（Task-009 期待値3）
 test("シート「設定」の配布チップ数が空欄の場合、空欄のまま返る", () => {
   const spreadsheet = createSpreadsheet({
     設定: createSheet([
@@ -110,7 +110,7 @@ function createMarkableSheet(lastRow) {
   return { sheet, calls };
 }
 
-// Task-010 期待値1
+// Test-046（Task-010 期待値1）
 test("除外する行番号 3、5 では、データ行の背景色が消されたうえで 3 行目と 5 行目に背景色が付く", () => {
   const { sheet, calls } = createMarkableSheet(6);
   markExcludedRows(createSpreadsheet({ プレイ結果: sheet }), [3, 5]);
@@ -135,7 +135,7 @@ test("除外する行番号 3、5 では、データ行の背景色が消され�
   }
 });
 
-// Task-010 期待値2
+// Test-047（Task-010 期待値2）
 test("除外する行がない場合、データ行の背景色が消され、新たな印は付かない", () => {
   const { sheet, calls } = createMarkableSheet(6);
   markExcludedRows(createSpreadsheet({ プレイ結果: sheet }), []);

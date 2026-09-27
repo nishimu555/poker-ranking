@@ -60,7 +60,7 @@ const data = {
   },
 };
 
-// Task-023 期待値1
+// Test-089（Task-023 期待値1）
 test("表示中のプレイヤーの戦績がある年では、参加日数、合計プレイ時間、収支の累計、平均値チップ数、各ランキングでの順位、借金回数の累計、残りチップ数、ゲージの割合、履歴を表示する内容になる", () => {
   const content = buildPlayerContent(data, "リバー");
   expect(content.hasRecord).toBe(true);
@@ -88,7 +88,7 @@ test("表示中のプレイヤーの戦績がある年では、参加日数、�
   ]);
 });
 
-// Task-023 期待値2
+// Test-090（Task-023 期待値2）
 test("自分以外のプレイヤーでも、同じ内容を表示する", () => {
   const content = buildPlayerContent(data, "ジョーカー");
   expect(content.hasRecord).toBe(true);
@@ -107,7 +107,7 @@ test("自分以外のプレイヤーでも、同じ内容を表示する", () =>
   expect(content.history.map((h) => h.balanceText)).toEqual(["−40,000"]);
 });
 
-// Task-023 期待値3
+// Test-091（Task-023 期待値3）
 test("表示中のプレイヤーが参加していない年を選ぶと、「この年の戦績はありません」を表示する内容になる", () => {
   const content = buildPlayerContent(data, "古株");
   expect(content.hasRecord).toBe(false);
