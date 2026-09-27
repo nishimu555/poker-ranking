@@ -5,15 +5,20 @@ const {
 } = require("../../../src/aggregate/viewer-writer");
 
 // 代用品のシートを作る。clearContents・setValues の呼び出しを events に順に記録する
+// 表示形式の設定（setNumberFormat）は formats に記録する（c2/ai-review-001 の対応で追加した呼び出しの代用品）
 function createSheet(name, events) {
   const sheet = {
     name,
     values: [["前回の内容"]],
+    formats: [],
     clearContents: jest.fn(() => {
       events.push(["clear", name]);
       sheet.values = [];
     }),
     getRange: jest.fn((row, column, numRows, numColumns) => ({
+      setNumberFormat: jest.fn((format) => {
+        sheet.formats.push({ row, column, numRows, numColumns, format });
+      }),
       setValues: jest.fn((values) => {
         events.push(["write", name]);
         expect(values).toHaveLength(numRows);

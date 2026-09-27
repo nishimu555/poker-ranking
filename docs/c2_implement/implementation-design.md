@@ -5,7 +5,7 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 12:18 |
+| 最終更新 | 2026-09-27 13:00 |
 
 ## 1. ディレクトリ構成
 
@@ -213,7 +213,7 @@ poker-ranking/
 | `toDateKey`、`summarizePlayers`、`aggregateYear`、`groupRowsByYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
 | `findRank`、`buildPlayerStats`、`aggregatePlayerStats` | `src/aggregate/player.js` |
 | `PLAY_SHEET_NAME`、`SETTINGS_SHEET_NAME`、`PLAY_COLUMN_COUNT`、`SETTING_LABEL_DISTRIBUTED_CHIPS`、`SETTING_LABEL_FORCED_LABOR_COUNT`、`getRequiredSheet`、`readPlayRows`、`readSettings`、`EXCLUDED_ROW_COLOR`、`markExcludedRows` | `src/aggregate/input-access.js` |
-| `VIEWER_SPREADSHEET_ID_KEY`、`RANKING_KIND_LABELS`、`VIEWER_SHEET_HEADERS`、`toCellValue`、`buildSummaryRows`、`buildRankingRows`、`buildPlayerRows`、`buildHistoryRows`、`replaceSheetValues`、`writeViewerSpreadsheet` | `src/aggregate/viewer-writer.js` |
+| `VIEWER_SPREADSHEET_ID_KEY`、`RANKING_KIND_LABELS`、`VIEWER_SHEET_HEADERS`、`VIEWER_TEXT_COLUMNS`、`toCellValue`、`buildSummaryRows`、`buildRankingRows`、`buildPlayerRows`、`buildHistoryRows`、`replaceSheetValues`、`writeViewerSpreadsheet` | `src/aggregate/viewer-writer.js` |
 | `PLAY_SHEET_HEADERS`、`DEFAULT_FORCED_LABOR_COUNT`、`createPlaySheet`、`createSettingsSheet`、`setupInputSpreadsheet`、`updateNicknameOptions` | `src/aggregate/setup.js` |
 | `isValidSettingValue`、`runAggregation` | `src/aggregate/run.js` |
 | `MENU_TITLE`、`onOpen`、`menuRunAggregation`、`menuSetupInputSpreadsheet` | `src/aggregate/menu.js` |
@@ -333,6 +333,7 @@ poker-ranking/
 - 閲覧用スプレッドシートの ID は、スクリプトプロパティ `VIEWER_SPREADSHEET_ID` から読む（c1/Question-008）。未設定の場合は `openById` を呼ばず、`{ ok: false, message }` を返す。
 - `openById` や書き込みで例外が起きた場合は、`console.error` で GAS の標準の実行ログに残し、`{ ok: false, message }` を返す（component-design.md 7.（ログ・監視、エラー処理））。途中のシートまで書き込まれている場合がある（次の集計で置き換わる）。
 - 各シートは `clearContents()` で前回の内容（値）を消してから、1 行目に見出し、2 行目以降にデータを `setValues` で書き込む。シートがない場合は `insertSheet` で作る。
+- 書き込む前に、文字列を書き込む列（`VIEWER_TEXT_COLUMNS`：集計情報の「集計済みの年」、ランキングの「ランキングの種類」「ニックネーム」、個人の戦績・履歴の「ニックネーム」）を書式なしテキスト（`setNumberFormat("@")`）にする。「=」で始まる文字列が数式に、数字の文字列が数値に解釈されないようにするため（c2/ai-review-001）。
 
 閲覧用スプレッドシートの各シートの列（1 行目が見出し。component-design.md 5.）：
 
@@ -605,3 +606,4 @@ poker-ranking/
 | 2026-09-27 12:14 | /c2-implement | Task-025（画像の描画と Screen-006）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、テストファイル一覧、4. 主要な処理の流れを更新 | implementation-plan.md Task-025、採用したモック（Screen-006） |
 | 2026-09-27 12:17 | /c2-implement | Task-026（閲覧用のデプロイ用スクリプト）を追加。ディレクトリ構成、開発ツールと npm スクリプト、デプロイの処理、閲覧用のマニフェスト、ファイル一覧、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-026、Decision-0001、Decision-0007 |
 | 2026-09-27 12:18 | /c2-implement | 5-26 の全体確認として、ファイル一覧に `.devcontainer/devcontainer-lock.json`・`src/.gitkeep`・`tests/.gitkeep` を追記し、「5. 計画との違い」をタスクの番号順に並べ直して Task-021・Task-021〜025・Task-022 の違いを追記 | c2 スキル（最後の手順：実装設計書の全体確認） |
+| 2026-09-27 13:00 | /c2-implement | c2/ai-review-001 への対応：閲覧用スプレッドシートへの書き出しで、文字列の列を書式なしテキストにしてから書き込むよう変更（主要な関数、最上位の名前を更新） | c2/ai-review-001 の開発者判断（推奨で対応） |

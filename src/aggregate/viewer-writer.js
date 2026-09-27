@@ -127,12 +127,25 @@ function buildHistoryRows(aggregation) {
   return rows;
 }
 
+// Task-011（c2/ai-review-001）: 文字列を書き込む列（1 から数えた列番号）
+// 書式なしテキストにしてから書き込み、「=」で始まる文字列が数式に、数字の文字列が数値に解釈されないようにする
+const VIEWER_TEXT_COLUMNS = {
+  集計情報: [2],
+  ランキング: [2, 4],
+  個人の戦績: [2],
+  履歴: [2],
+};
+
 // Task-011: シートの前回の内容を消し、見出しと行を書き込む。シートがない場合は作る
 function replaceSheetValues(spreadsheet, sheetName, rows) {
   const sheet =
     spreadsheet.getSheetByName(sheetName) || spreadsheet.insertSheet(sheetName);
   const values = [VIEWER_SHEET_HEADERS[sheetName], ...rows];
   sheet.clearContents();
+  // c2/ai-review-001: 文字列の列を書式なしテキストにする（component-design.md 7.（改ざん：意図しない表示・動作の防止））
+  for (const column of VIEWER_TEXT_COLUMNS[sheetName]) {
+    sheet.getRange(1, column, values.length, 1).setNumberFormat("@");
+  }
   sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
 }
 
