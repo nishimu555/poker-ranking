@@ -11,10 +11,10 @@
 
 | 項目 | 内容 |
 |---|---|
-| ステータス | 確定 |
+| ステータス | レビュー待ち |
 | スキル | `/c3-test-plan` |
 | 成果物 | `docs/c3_test-plan/test-plan.md` |
-| 最終更新 | 2026-09-27 13:09 |
+| 最終更新 | 2026-09-27 13:19 |
 
 ## 1. 進捗
 
@@ -27,8 +27,8 @@ AI が段階を終えるたびに ☑ と日時を記載する。
 - [x] 1. plan 作成（AI：`/c3-test-plan`）2026-09-26 23:38
 - [x] 2. 質問への回答・指示の記入（開発者）2026-09-27 13:09
 - [x] 3. 回答の確認（AI：`/z9-answer-review c3`）2026-09-27 13:09
-- [ ] 4. plan 確定（AI：`/c3-test-plan`）
-- [ ] 5. 成果物作成（AI：`/c3-test-plan`）
+- [x] 4. plan 確定（AI：`/c3-test-plan`）2026-09-27 13:19
+- [x] 5. 成果物作成（AI：`/c3-test-plan`）2026-09-27 13:19
 - [ ] 6. 成果物レビュー（開発者）
 
 ## 2. 目的
@@ -74,27 +74,27 @@ AI が段階を終えるたびに ☑ と日時を記載する。
   - 作業内容：確認観点（対象範囲、テストの方針、Medium・Large の対象、開発者が実行するテスト、合格の基準）ごとに記載有無を確認し、Question 項目にする
   - 参照元：入力すべて
   - 作成・更新先：本 plan「8. 質問・指示」
-- [ ] 5-3. テストの方針の作成
+- [x] 5-3. テストの方針の作成
   - 作業内容：サイズごとの実行環境・実行者・テストツールを記載する
   - 参照元：implementation-plan.md 2.、component-design.md 7.、本 plan の確定した回答・指示
   - 作成・更新先：`test-plan.md`（2. テストの方針）
-- [ ] 5-4. Small テストケースの登録
+- [x] 5-4. Small テストケースの登録
   - 作業内容：c1 のテスト期待値を内容を変えずに Small テストケースとして登録し、`Test-XXX` を付与する
   - 参照元：implementation-plan.md 4.
   - 作成・更新先：`test-plan.md`（3. テストケース一覧、4. Small テストケース）
-- [ ] 5-5. Medium・Large テストケースの作成
+- [x] 5-5. Medium・Large テストケースの作成
   - 作業内容：受け入れ条件、非機能要件の確認基準、脅威分析の対策、ローカルで確認できない範囲から、Medium・Large のテストケースを作成する
   - 参照元：requirements.md、component-design.md、本 plan の確定した回答・指示
   - 作成・更新先：`test-plan.md`（3. テストケース一覧、5. Medium・Large テストケース）
-- [ ] 5-6. 開発者が実行するテストの手順の作成
+- [x] 5-6. 開発者が実行するテストの手順の作成
   - 作業内容：実行者が開発者のテストについて、事前準備・デプロイ手順・実施手順・結果の記載方法を記載する
   - 参照元：implementation-plan.md 2.（デプロイの方法、clasp のセキュリティに関する注意事項）
   - 作成・更新先：`test-plan.md`（6. 開発者が実行するテストの手順）
-- [ ] 5-7. 合格の基準の作成
+- [x] 5-7. 合格の基準の作成
   - 作業内容：開発者が定めた合格の基準を記載する
   - 参照元：本 plan の確定した回答・指示
   - 作成・更新先：`test-plan.md`（7. 合格の基準）
-- [ ] 5-8. トレーサビリティの確認
+- [x] 5-8. トレーサビリティの確認
   - 作業内容：すべての Feature・Quality・c1 のテスト期待値が、いずれかのテストケースに対応していることを確認する
   - 参照元：requirements.md、implementation-plan.md、`test-plan.md`
   - 作成・更新先：`test-plan.md`（8. トレーサビリティ）
@@ -233,3 +233,4 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 |---|---|---|---|
 | 2026-09-26 23:38 | /c3-test-plan | plan を作成し、Question-001〜006 を記載 | `docs/c1_implementation-plan/implementation-plan.md`（c1 完了）、`docs/b1_design/component-design.md`、`docs/a1_requirements/requirements.md` |
 | 2026-09-27 13:09 | /z9-answer-review c3 | Question-001〜006 に ☑ を付与し、「6. 成果物の構成予定」に回答（実行者・実行環境、テスト用の環境、アカウント、端末、データ量、合格の基準）を反映。「8. 質問・指示」「9. レビュー指摘」がすべて ☑ となったため、ステータスを「確定」とし、「1. 進捗」の 2・3 に ☑ を付与 | c3/Question-001〜006 の開発者回答 |
+| 2026-09-27 13:19 | /c3-test-plan | plan を確定し、`docs/c3_test-plan/test-plan.md` を作成（Small 96 件（c1 の期待値を文言のまま登録）、Medium 13 件、Large 16 件、計 125 件）。手順 5-3〜5-8 に ☑。Medium の件数は見込み（約 10 件）から 13 件、Large は見込み（約 15 件）から 16 件とした（Dev Container の確認、否認の対策、文字列の数式・HTML としての解釈の確認を加えたため）。ステータスを「レビュー待ち」とした | c3/Question-001〜006 の開発者回答、requirements.md、component-design.md、implementation-plan.md |
