@@ -14,7 +14,7 @@
 | ステータス | 確定 |
 | スキル | `/c2-implement` |
 | 成果物 | `src/`、`tests/`（Small テスト）、`docs/c2_implement/implementation-design.md` |
-| 最終更新 | 2026-09-27 01:00 |
+| 最終更新 | 2026-09-27 09:56 |
 
 ## 1. 進捗
 
@@ -150,12 +150,22 @@ c2 スキルの手順 5-1（開発環境の準備）は、実装計画の Task-0
     - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
     - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
     - 計画との差異：なし
-    - コミット：
-- [ ] 5-7. Task-008：個人の戦績の集計
+    - コミット：73a948b task-007
+- [x] 5-7. Task-008：個人の戦績の集計
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-008）
   - 作成・更新先：`src/aggregate/player.js`、`tests/small/aggregate/`、`implementation-design.md`
   - 実行結果：
+    - 実行環境：Claude Code の Bash の sandbox がこのコンテナで起動できない（`bwrap: No permissions to create a new namespace`）ため、開発者の指示（sandbox を無効にしてコマンドを実行する）に従い、sandbox の外で実行した
+    - 失敗の確認：`tests/small/aggregate/player.test.js`（期待値1〜7、7 件）が全件失敗。理由：`src/aggregate/player.js` がないため、テストファイルの読み込みで失敗した（`Cannot find module`）
+    - テスト：`npm test` 58 件／58 件成功（Task-003〜007 の 51 件を含む）
+    - ビルド：`npm run build` 成功（`dist/aggregate/` に `aggregate.js`・`calc.js`・`player.js`・`rank.js`・`validate.js` を出力）
+    - 追加の確認：`dist/aggregate/` の全 `.js` を 1 つの実行環境に読み込み（GAS と同じく同じ場所で動かす）、最上位の名前の重複によるエラーがなく `aggregatePlayerStats` が動くことを確認した
+    - 静的解析：`npm run lint` 指摘 0 件。`prettier --check .` 整形の違反 0 件
+    - 脆弱性チェック：`npm audit --audit-level=moderate` 0 件
+    - 計画との差異：行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストは全件成功）。implementation-design.md「5. 計画との違い」に記載
+    - 開発者の指示による追加の変更（2026-09-27 09:56）：`.devcontainer/devcontainer.json` の `containerEnv` に `TZ`（`Asia/Tokyo`）を追加した（コンテナの既定は UTC）。`TZ=Asia/Tokyo`・UTC のどちらでも `npm test` 58 件／58 件成功。`npm run lint` 指摘 0 件、`prettier --check .` 違反 0 件。コンテナの作り直しと、その後に時刻が JST になることの確認は開発者が行う
+    - コミット：
 - [ ] 5-8. Task-009：入力用スプレッドシートの読み込み
   - 作業内容：同上
   - 参照元：implementation-plan.md 4.（Task-009）
@@ -347,3 +357,5 @@ ID を付けずに追記した場合は、AI が ID を付与する。
 | 2026-09-27 00:54 | /c2-implement | 5-4（Task-005）を実施し、実行結果を記載 | implementation-plan.md Task-005 |
 | 2026-09-27 00:57 | /c2-implement | 5-5（Task-006）を実施し、実行結果を記載 | implementation-plan.md Task-006 |
 | 2026-09-27 01:00 | /c2-implement | 5-6（Task-007）を実施し、実行結果を記載 | implementation-plan.md Task-007 |
+| 2026-09-27 09:53 | /c2-implement | 5-7（Task-008）を実施し、実行結果を記載 | implementation-plan.md Task-008、sandbox を無効にしてコマンドを実行するという開発者の指示（チャット） |
+| 2026-09-27 09:56 | /c2-implement | 5-7 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）を設定し、5-7 の実行結果に記載 | 開発者の指示（チャット：日時を JST にする、コンテナを作り直しても JST にする） |

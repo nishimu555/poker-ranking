@@ -5,13 +5,13 @@
 | 工程 | c2 実装 |
 | plan ファイル | `plans/c2_implement.md` |
 | 入力 | `docs/c1_implementation-plan/implementation-plan.md` |
-| 最終更新 | 2026-09-27 01:00 |
+| 最終更新 | 2026-09-27 09:56 |
 
 ## 1. ディレクトリ構成
 
 ```
 poker-ranking/
-├── .devcontainer/devcontainer.json   # Task-002：Node.js 24.21.0 の固定、npm ci
+├── .devcontainer/devcontainer.json   # Task-002：Node.js 24.21.0 の固定、npm ci、タイムゾーン（JST）
 ├── .gitignore                        # Task-001：dist/、node_modules/、.clasp.json、.clasprc.json
 ├── .nvmrc                            # Task-001：Node.js の版（24.21.0）
 ├── .prettierignore                   # Task-001
@@ -25,13 +25,15 @@ poker-ranking/
 │       ├── validate.js               # Task-004：行の確認
 │       ├── calc.js                   # Task-005：収支・ウェイト・端数の計算
 │       ├── rank.js                   # Task-006：順位付け
-│       └── aggregate.js              # Task-007：年ごとの集計と 3 つのランキング
+│       ├── aggregate.js              # Task-007：年ごとの集計と 3 つのランキング
+│       └── player.js                 # Task-008：個人の戦績の集計
 └── tests/
     └── small/
         ├── aggregate/validate.test.js # Task-004
         ├── aggregate/calc.test.js    # Task-005
         ├── aggregate/rank.test.js    # Task-006
         ├── aggregate/aggregate.test.js # Task-007
+        ├── aggregate/player.test.js  # Task-008
         └── scripts/build.test.js     # Task-003
 ```
 
@@ -92,12 +94,13 @@ poker-ranking/
 | `jest.config.js` | Jest の設定 | 開発環境 | Task-001 |
 | `.prettierignore` | Prettier の対象外 | 開発環境 | Task-001 |
 | `.gitignore` | Git の管理対象外（秘密情報・ビルドの出力・依存ライブラリ） | 開発環境 | Task-001 |
-| `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行 | 開発環境 | Task-002 |
+| `.devcontainer/devcontainer.json` | Node.js の Feature の版の固定、`npm ci` の実行、タイムゾーンの設定（`containerEnv` の `TZ`：`Asia/Tokyo`） | 開発環境 | Task-002 |
 | `scripts/build.js` | ビルド（`dist/` の生成、画面の CSS・JavaScript の埋め込み） | 開発環境 | Task-003（Task-001 で仮のスクリプトを作成） |
 | `src/aggregate/validate.js` | 行の確認（`validateRow`） | Component-003 | Task-004 |
 | `src/aggregate/calc.js` | 収支・ウェイト・端数の計算（`calcBalance`、`calcWeight`、`roundToInteger`） | Component-003 | Task-005 |
 | `src/aggregate/rank.js` | 順位付け（`rankEntries`、`pickTopRanked`） | Component-003 | Task-006 |
 | `src/aggregate/aggregate.js` | 年ごとの集計と 3 つのランキング（`aggregateAllYears`） | Component-003 | Task-007 |
+| `src/aggregate/player.js` | 個人の戦績の集計（`aggregatePlayerStats`） | Component-003 | Task-008 |
 
 ### GAS のコードの共通の書き方
 
@@ -110,7 +113,8 @@ poker-ranking/
 | `isBlank`、`isValidDate`、`isNonNegativeNumber`、`validateRow` | `src/aggregate/validate.js` |
 | `calcBalance`、`calcWeight`、`roundToInteger` | `src/aggregate/calc.js` |
 | `TOP_RANK_LIMIT`、`compareNickname`、`rankEntries`、`pickTopRanked` | `src/aggregate/rank.js` |
-| `toDateKey`、`summarizePlayers`、`aggregateYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
+| `toDateKey`、`summarizePlayers`、`aggregateYear`、`groupRowsByYear`、`aggregateAllYears` | `src/aggregate/aggregate.js` |
+| `findRank`、`buildPlayerStats`、`aggregatePlayerStats` | `src/aggregate/player.js` |
 
 - 他のファイルの関数を使う場合は、ファイルの先頭に `/* global 関数名 */` を書き、ESLint に既知として知らせる（`require` は使わない）。
 - Small テストでは、使われる側のファイルの公開部分を `Object.assign(global, require(…))` でグローバルに置いてから、使う側のファイルを読み込む（GAS で全ファイルが同じ場所で動く状態の再現）。
@@ -134,6 +138,7 @@ poker-ranking/
 | `aggregateAllYears(rows, settings)` | `src/aggregate/aggregate.js` | `rows`：有効な行 `[{ nickname, playDate, playTime, finalChips, debtCount }]`（`nickname` は前後の空白を取り除いたもの）、`settings`：`{ distributedChips（配布チップ数）, forcedLaborCount（N） }` | `{ years, rankingsByYear }`。`years` は集計済みの年（昇順）、`rankingsByYear[年]` は `{ average, total, forcedLabor }`（各要素 `{ nickname, value, rank }`。`forcedLabor` は `isForcedLabor` も持つ） | Task-007 |
 | `summarizePlayers(rows, settings)` | `src/aggregate/aggregate.js` | 1 年分の行、設定値 | プレイヤーごとの `{ nickname, days, weightedSum, balanceSum }`（丸める前の値。Task-008 でも使う） | Task-007 |
 | `toDateKey(date)` | `src/aggregate/aggregate.js` | 日付 | `"年-月-日"` の文字列（同じ日付の判定に使う） | Task-007 |
+| `groupRowsByYear(rows)` | `src/aggregate/aggregate.js` | 有効な行 | `Map`（年 → その年の行）。`aggregateAllYears` と `aggregatePlayerStats` で使う | Task-007（Task-008 で関数に切り出し） |
 
 `aggregateAllYears` の計算（1 年分・プレイヤーごと）：
 
@@ -147,6 +152,27 @@ poker-ranking/
 
 - 丸めは合計・平均を計算した後に 1 回だけ行い（`roundToInteger`）、順位・強制労働の判定は丸めた値で行う（c1/Question-019）。
 - 設定値は引数で受け取るため、配布チップ数を変えて集計し直すと、すべての年が新しい値で計算される（Decision-0006）。
+
+| 関数 | ファイル | 入力 | 出力 | Task |
+|---|---|---|---|---|
+| `aggregatePlayerStats(rows, settings)` | `src/aggregate/player.js` | `aggregateAllYears` と同じ | `{ 年: [個人の戦績] }`。各年のプレイヤーは累計ランキングの順に並ぶ。個人の戦績は下表のとおり | Task-008 |
+
+`aggregatePlayerStats` の個人の戦績（1 年分・プレイヤーごと）：
+
+| 項目 | 内容 | 由来 |
+|---|---|---|
+| `nickname` | ニックネーム | Feature-010 |
+| `days` | 参加日数（異なるプレイ日付の数） | Feature-010 条件1、c1/Question-016 |
+| `totalPlayTime` | 合計プレイ時間（プレイ時間の合計。丸めない） | Feature-010 条件1 |
+| `totalBalance` | 収支の累計（基準値）。累計ランキングの値（丸めた値） | Feature-010 条件1、c1/Question-019 |
+| `averageChips` | 平均値チップ数。アベレージランキングの値（丸めた値） | Feature-010 条件1（ランキング 1 の値）、component-design.md 5.（個人の戦績） |
+| `totalDebtCount` | 借金回数の累計（借金回数の合計。丸めない） | Feature-010 条件1 |
+| `remainingChips` | 強制労働までの残りチップ数 ＝ `totalBalance` ＋ 配布チップ数 × N（0 以下もそのまま返す） | Feature-010 条件1 |
+| `ranks` | `{ average, total, forcedLabor }`。各ランキングでの順位。強制労働への道のりの対象外（基準値が 0 以上）は `null` | Feature-010 条件1・条件2-2 |
+| `history` | 実施日ごとの履歴 `[{ playDate, playTime, finalChips, debtCount, balance }]`。新しい日付から並ぶ。同じ日付の行はすべて含め、入力の順のまま。`balance` は `calcBalance` の値（丸めない） | Feature-010 条件1、component-design.md 8.（Screen-005）、c1/Question-016 |
+
+- 順位・基準値・平均値チップ数は `aggregateAllYears` の結果から取り出し、ランキングと個人の戦績で値が食い違わないようにする。
+- 丸めない値（合計プレイ時間、借金回数の累計、履歴の値）の表示の整形は、閲覧用の表示用の整形（Task-019）で行う。
 
 `validateRow` の判定（上から順に確認し、1 つでも当てはまれば無効）：
 
@@ -168,6 +194,7 @@ poker-ranking/
 | `tests/small/aggregate/calc.test.js` | `src/aggregate/calc.js` の `calcBalance`、`calcWeight`、`roundToInteger` | Task-005 期待値1〜6 |
 | `tests/small/aggregate/rank.test.js` | `src/aggregate/rank.js` の `rankEntries`、`pickTopRanked` | Task-006 期待値1〜5 |
 | `tests/small/aggregate/aggregate.test.js` | `src/aggregate/aggregate.js` の `aggregateAllYears` | Task-007 期待値1〜13 |
+| `tests/small/aggregate/player.test.js` | `src/aggregate/player.js` の `aggregatePlayerStats` | Task-008 期待値1〜7 |
 
 ## 4. 主要な処理の流れ
 
@@ -180,6 +207,8 @@ poker-ranking/
 | Task-001 | ESLint の推奨ルールを使う | ESLint 10 は推奨ルールの設定を本体に含まないため（別パッケージ `@eslint/js`）、本体の組み込みルールの recommended の印から同じ内容の設定を作った。`@eslint/js` 10.0.1 の recommended と 64 ルールが一致することを確認した（2026-09-27 00:15） | implementation-plan.md 2.（依存ライブラリは Prettier・ESLint・Jest・clasp のみ）、c1/Question-012 |
 | Task-001 | 作成予定のファイルに `scripts/build.js` を含まない | 完了条件の `npm run build` を実行できるよう、仮の `scripts/build.js` を作成した。Task-003 で置き換える | implementation-plan.md 2.（全タスク共通の完了条件）、Task-001（テスト期待値の概要） |
 | Task-001 | npm スクリプト `test` | Small テストが 0 件の段階でも `npm test` が成功するよう、`jest --passWithNoTests` とした | implementation-plan.md Task-001（テスト期待値の概要：コマンドが実行できること） |
+| Task-002 | Node.js の Feature の版の固定と `npm ci` の追加 | 加えて、`containerEnv` に `TZ`（`Asia/Tokyo`）を設定し、コンテナの時刻を JST にした（既定は UTC）。JST・UTC のどちらでも Small テストが全件成功することを確認した（2026-09-27 09:56） | 開発者の指示（2026-09-27、チャット：記録の日時を JST にし、コンテナを作り直しても JST にする） |
+| Task-008 | 作成予定のファイル：`src/aggregate/player.js`、`tests/small/aggregate/player.test.js` | 計画どおり。加えて、行を暦年ごとに分ける処理を `src/aggregate/aggregate.js` の `groupRowsByYear` に切り出し、Task-007 と共用した（Task-007 の動作は変えていない。Task-007 の Small テストが全件成功） | implementation-plan.md Task-007・Task-008（同じ暦年の区切りで集計する：Feature-007 条件1） |
 | Task-003 | 作成予定のファイル：`scripts/build.js`、`tests/small/scripts/build.test.js` | 計画どおり。加えて、`src/aggregate/`・`src/viewer/` がない場合は出力せずに成功する（Task-004・Task-017 で作成するまで `npm run build` を成功させるため）。埋め込めない内容・`client/` の外の参照はエラーにする | implementation-plan.md 2.（全タスク共通の完了条件：ビルドが成功する）、Task-003 作業内容 |
 
 ## 6. 変更履歴
@@ -192,3 +221,5 @@ poker-ranking/
 | 2026-09-27 00:54 | /c2-implement | Task-005（収支・ウェイト・端数の計算）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新 | implementation-plan.md Task-005 |
 | 2026-09-27 00:57 | /c2-implement | Task-006（順位付け）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に最上位の名前の一覧を追加 | implementation-plan.md Task-006、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
 | 2026-09-27 01:00 | /c2-implement | Task-007（年ごとの集計と 3 つのランキング）を追加。ディレクトリ構成、ファイル一覧、主要な関数、テストファイル一覧を更新。GAS のコードの共通の書き方に、他のファイルの関数の使い方と Small テストでの再現方法を追加 | implementation-plan.md Task-007、implementation-plan.md 2.（GAS のコードは全ファイルが同じ場所で動く） |
+| 2026-09-27 09:53 | /c2-implement | Task-008（個人の戦績の集計）を追加。ディレクトリ構成、ファイル一覧、最上位の名前、主要な関数（`groupRowsByYear` の切り出しを含む）、テストファイル一覧、計画との違いを更新 | implementation-plan.md Task-008 |
+| 2026-09-27 09:56 | /c2-implement | Task-008 の記録の日時を UTC（00:53）から JST（09:53）に修正。`.devcontainer/devcontainer.json` にタイムゾーン（JST）の設定を追加し、ディレクトリ構成・ファイル一覧・計画との違いを更新 | 開発者の指示（チャット） |

@@ -20,7 +20,9 @@
     "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
   "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    // 時刻を日本時間（JST）にする（コンテナの既定は UTC）。記録の日時を JST で残すため
+    "TZ": "Asia/Tokyo"
   },
   // フック（.claude/hooks/）が使う jq を導入し、フックに実行権限を付ける
   // Task-002: 開発用の依存ライブラリを package-lock.json のとおりに導入する（npm ci）

@@ -71,11 +71,9 @@ function aggregateYear(rows, settings) {
   return { average, total, forcedLabor };
 }
 
-// Task-007: 全年分を暦年ごとに集計する（Feature-007 条件1・条件2）
-// rows：[{ nickname, playDate, playTime, finalChips, debtCount }]（有効な行。nickname は前後の空白を取り除いたもの）
-// settings：{ distributedChips（配布チップ数）, forcedLaborCount（N） }
-// 戻り値：{ years: [集計済みの年（昇順）], rankingsByYear: { 年: { average, total, forcedLabor } } }
-function aggregateAllYears(rows, settings) {
+// Task-007: 行を暦年ごとに分ける（Feature-007 条件1。Task-008 でも使う）
+// 戻り値：Map（年 → その年の行）
+function groupRowsByYear(rows) {
   const rowsByYear = new Map();
   for (const row of rows) {
     const year = row.playDate.getFullYear();
@@ -84,6 +82,15 @@ function aggregateAllYears(rows, settings) {
     }
     rowsByYear.get(year).push(row);
   }
+  return rowsByYear;
+}
+
+// Task-007: 全年分を暦年ごとに集計する（Feature-007 条件1・条件2）
+// rows：[{ nickname, playDate, playTime, finalChips, debtCount }]（有効な行。nickname は前後の空白を取り除いたもの）
+// settings：{ distributedChips（配布チップ数）, forcedLaborCount（N） }
+// 戻り値：{ years: [集計済みの年（昇順）], rankingsByYear: { 年: { average, total, forcedLabor } } }
+function aggregateAllYears(rows, settings) {
+  const rowsByYear = groupRowsByYear(rows);
   const years = [...rowsByYear.keys()].sort((a, b) => a - b);
   const rankingsByYear = {};
   for (const year of years) {
@@ -94,5 +101,10 @@ function aggregateAllYears(rows, settings) {
 
 // ローカルのテスト用の公開（GAS 上では module がないため何もしない）
 if (typeof module !== "undefined") {
-  module.exports = { toDateKey, summarizePlayers, aggregateAllYears };
+  module.exports = {
+    toDateKey,
+    summarizePlayers,
+    groupRowsByYear,
+    aggregateAllYears,
+  };
 }
