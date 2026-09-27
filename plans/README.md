@@ -5,7 +5,7 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-27 13:01
+最終更新：2026-09-27 13:05
 
 ## 1. 工程一覧
 
@@ -14,7 +14,7 @@
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 19:45 |
 | b1 | コンポーネント設計 | 完了 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 22:43 |
 | c1 | 実装計画 | 完了 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | 2026-09-26 23:17 |
-| c2 | 実装 | レビュー待ち | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-27 13:01 |
+| c2 | 実装 | 完了 | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-27 13:05 |
 | c3 | テスト計画 | 回答待ち | 6 | 0 | [c3_test-plan.md](c3_test-plan.md) | 2026-09-26 23:38 |
 | c4 | テスト | 未着手 | 0 | 0 | [c4_test.md](c4_test.md) | |
 | d1 | セットアップ手順 | 未着手 | 0 | 0 | [d1_setup.md](d1_setup.md) | |
@@ -24,8 +24,7 @@
 
 ## 2. 次に行うこと
 
-1. c2 は ai-review-001〜004 への対応でコードを修正したため、`/r1-final-review c2` で最終レビューをやり直す（推奨）。そのうえでコードと `docs/c2_implement/implementation-design.md` をレビューし、指摘があれば `plans/c2_implement.md` の「9. レビュー指摘」に追記、指摘がなければ「1. 進捗」の「6. 成果物レビュー」に ☑ を付けて `/c2-implement` を実行する。
-2. `plans/c3_test-plan.md` の Question-001〜006（Medium の実行方法、テスト環境、テスト用アカウント、実機、データ量、合格の基準）に回答し、`/z9-answer-review c3` を実行する。
+1. `plans/c3_test-plan.md` の Question-001〜006（Medium の実行方法、テスト環境、テスト用アカウント、実機、データ量、合格の基準）に回答し、`/z9-answer-review c3` を実行する。c3 の完了後に `/c4-test` を実行する（c4 は c2・c3 の完了が必要）。
 
 ## 3. 差し戻し中の工程
 
