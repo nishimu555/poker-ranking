@@ -1,0 +1,5 @@
+{
+  "scriptId": "<閲覧用の Web アプリの GAS プロジェクト（単独のプロジェクト）のスクリプト ID>",
+  "rootDir": "dist/viewer",
+  "deploymentId": "<Web アプリの既存のデプロイ ID（初回のデプロイで作成したもの）>"
+}

@@ -5,7 +5,7 @@
 ステータスの定義は CLAUDE.md「5. 工程の進め方 > ステータス」に従う。
 -->
 
-最終更新：2026-09-26 23:18
+最終更新：2026-09-28 01:54
 
 ## 1. 工程一覧
 
@@ -14,9 +14,9 @@
 | a1 | 要件定義 | 完了 | 0 | 0 | [a1_requirements.md](a1_requirements.md) | 2026-09-26 19:45 |
 | b1 | コンポーネント設計 | 完了 | 0 | 0 | [b1_design.md](b1_design.md) | 2026-09-26 22:43 |
 | c1 | 実装計画 | 完了 | 0 | 0 | [c1_implementation-plan.md](c1_implementation-plan.md) | 2026-09-26 23:17 |
-| c2 | 実装 | 確定 | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-26 23:18 |
-| c3 | テスト計画 | 未着手 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | |
-| c4 | テスト | 未着手 | 0 | 0 | [c4_test.md](c4_test.md) | |
+| c2 | 実装 | 完了 | 0 | 0 | [c2_implement.md](c2_implement.md) | 2026-09-27 13:05 |
+| c3 | テスト計画 | 完了 | 0 | 0 | [c3_test-plan.md](c3_test-plan.md) | 2026-09-27 13:19 |
+| c4 | テスト | 確定 | 0 | 0 | [c4_test.md](c4_test.md) | 2026-09-28 01:54 |
 | d1 | セットアップ手順 | 未着手 | 0 | 0 | [d1_setup.md](d1_setup.md) | |
 
 - 未完了の質問・指示：plan「8. 質問・指示」の ☐ の件数
@@ -24,8 +24,7 @@
 
 ## 2. 次に行うこと
 
-1. Dev Container 内で起動した Claude Code から `/c2-implement` を実行する（5-1 開発環境の準備から開始）。
-2. `/c3-test-plan` を実行する（c2 と並行して実施できる）。
+1. c4 第1回：開発者が実行するテスト 29 件（Test-097〜Test-125）を `docs/c3_test-plan/test-plan.md`「6. 開発者が実行するテストの手順」に従って実施し、結果を `docs/c4_test/test-report.md`「4. 実施記録」の結果欄に記載してから `/c4-test` を実行する。
 
 ## 3. 差し戻し中の工程
 
